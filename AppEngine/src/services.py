@@ -227,9 +227,11 @@ class PortalService(object):
             portal.endLocationLatitudeIndex = secondL.latIndex
             portal.endLocationLongitudeIndex = secondL.lonIndex
             
+            logging.error("Portal" + str(portal.endLocationLatitude))
+            logging.error("Portal" + str(portal.endLocationLongitude))
+            
             # Create the proxy
-            proxy = ObjectProxy(portal)
-            listOfPortals.append(proxy)
+            listOfPortals.append(portal)
         
         return ArrayCollection(listOfPortals)
 
@@ -257,8 +259,7 @@ class RoadService(object):
             road.longitude = l.longitude
             
             # The proxy
-            proxy = ObjectProxy(road)
-            listOfRoads.append(proxy)
+            listOfRoads.append(road)
             
         return ArrayCollection(listOfRoads)
 

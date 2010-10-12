@@ -1,5 +1,7 @@
 package assets
 {
+	import models.Portal;
+
 	public class PhotoAssets
 	{
 		// Images for the four levels of tower
@@ -43,6 +45,10 @@ package assets
 		[Bindable] public var SouthWestRoad:Class;
 		[Embed(source="assets/pictures/WestRoad.png")]
 		[Bindable] public var WestRoad:Class;
+		
+		// The portal
+		[Embed(source="assets/pictures/Portal.png")]
+		[Bindbale] public var ThePortal:Class;
 		
 		// The cannonball texture
 		[Embed(source="assets/pictures/Cannon_Material.png")]

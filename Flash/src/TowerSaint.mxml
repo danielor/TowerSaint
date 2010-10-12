@@ -159,10 +159,101 @@
 					if(object is Tower){
 						drawTower(object as Tower);
 					}else if(object is Portal){
-						
+						drawPortal(object as Portal);
 					}else if(object is Road){
-						
+						drawRoad(object as Road);	
 					}
+				}
+			}
+			
+			private function drawPortal(portal:Portal) : void {
+				Alert.show("Inside");
+				var portalIcon:BitmapAsset = _photo.ThePortal() as BitmapAsset;
+				Alert.show(portal.endLocationLatitude.toString());
+				// Extract the position associated with remoteObject(Tower)			
+				var firstPosition:LatLng = new LatLng(portal.endLocationLatitude, portal.endLocationLongitude);
+				var secondPosition:LatLng = new LatLng(portal.startLocationLatitude, portal.startLocationLongitude);
+				
+				
+				// Create test overlays
+				var markerOptions : MarkerOptions = new MarkerOptions();
+				markerOptions.icon = portalIcon;
+				markerOptions.iconAlignment = MarkerOptions.ALIGN_HORIZONTAL_CENTER | MarkerOptions.ALIGN_BOTTOM;
+				markerOptions.hasShadow = false;
+				markerOptions.radius = 5;
+				
+				// The two markers
+				var marker: Marker = new Marker(firstPosition, markerOptions);				
+				this.map.addOverlay(marker);
+				var marker2:Marker = new Marker(secondPosition, markerOptions);
+				this.map.addOverlay(marker2);
+				
+			}
+			
+			private function drawRoad(road:Road) : void {
+				// Add a ground overlay
+				var roadIcon:BitmapAsset = getRoadFromNeighbors(road);
+			
+				// Extract the position associated with remoteObject(Tower)			
+				var gposition:LatLng = new LatLng(road.latitude, road.longitude);
+				
+				// Create test overlays
+				var markerOptions : MarkerOptions = new MarkerOptions();
+				markerOptions.icon = roadIcon;
+				markerOptions.iconAlignment = MarkerOptions.ALIGN_HORIZONTAL_CENTER | MarkerOptions.ALIGN_BOTTOM;
+				markerOptions.hasShadow = false;
+				markerOptions.radius = 5;
+				var marker: Marker = new Marker(gposition, markerOptions);				
+				
+				this.map.addOverlay(marker);
+			}
+			
+			// Helper function for finding the type of road need to drawn
+			// on the map.
+			private function getRoadFromNeighbors(road:Road):BitmapAsset {
+				
+				// TODO: This value needs to be calculated properly so that depending on the
+				// neighbor list different bitmaps are used.
+				var neighborType:Number = 0;
+				// North - (0, 1)
+				// East - (0, 2)
+				// South - (0, 4)
+				// West - (0, 8)
+				switch(neighborType){
+					//case 0:
+					//	return new _photo.EastRoad() as BitmapAsset;
+					case 1:
+						return new _photo.NorthRoad() as BitmapAsset;
+					case 2:
+						return new _photo.EastRoad() as BitmapAsset;
+					case 3:
+						return new _photo.NorthEastRoad() as BitmapAsset;
+					case 4:
+						return new _photo.SouthRoad() as BitmapAsset;
+					case 5:
+						return new _photo.NorthSouthRoad() as BitmapAsset;
+					case 6:
+						return new _photo.SouthEastRoad() as BitmapAsset;
+					case 7:
+						return new _photo.NorthSouthEastRoad() as BitmapAsset;
+					case 8:
+						return new _photo.WestRoad() as BitmapAsset;
+					case 9:
+						return new _photo.NorthWestRoad() as BitmapAsset;
+					case 10:
+						return new _photo.EastWestRoad() as BitmapAsset;
+					case 11:
+						return new _photo.NorthEastWestRoad() as BitmapAsset;
+					case 12:
+						return new _photo.SouthWestRoad() as BitmapAsset;
+					case 13:
+						return new _photo.NorthSouthWestRoad() as BitmapAsset;
+					case 14:
+						return new _photo.SouthEastWestRoad() as BitmapAsset;
+					case 15:
+						return new _photo.NorthSouthEastWestRoad() as BitmapAsset;
+					default:
+						return new _photo.EastRoad() as BitmapAsset;
 				}
 			}
 			
@@ -456,14 +547,16 @@
 			
 			protected function onGetAllPortalObjectsFromServer(event:ResultEvent) : void {
 				listOfPortals = event.result as ArrayCollection;
-				for(var obj:Object in listOfPortals){
-					var p:Portal = obj as Portal;
+				Alert.show(listOfPortals.toString());
+				for(var i:Number = 0; i < listOfPortals.length; i++){
+					var p:Portal = listOfPortals.getItemAt(i) as Portal;
+					drawPortal(p);
 				}
 			}
 			
 			protected function onGetAllTowerObjectsFromServer(event:ResultEvent) : void {
 				listOfTowers = event.result as ArrayCollection;
-		
+
 				for(var i:Number = 0; i < listOfTowers.length; i++){
 					var t:Tower = listOfTowers.getItemAt(i) as Tower;
 					drawTower(t);
@@ -473,7 +566,10 @@
 			
 			protected function onGetAllRoadObjectsFromServer(event:ResultEvent) : void {
 				listOfRoads = event.result as ArrayCollection;
-				//drawObjectOverlays(listOfRoads);
+				for(var i:Number = 0; i < listOfRoads.length; i++){
+					var r:Road = listOfRoads.getItemAt(i) as Road;
+					drawRoad(r);
+				}
 			}
 			
 			protected function onGetAllObjectsFromServer(event:ResultEvent) : void {
@@ -491,7 +587,6 @@
 					listOfRoads = collection;
 					drawObjectOverlays(listOfRoads);
 				}else if(obj is Tower){
-					Alert.show("Here");
 					listOfTowers = collection;
 					drawObjectOverlays(listOfTowers);
 				}
