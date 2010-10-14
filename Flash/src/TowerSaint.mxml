@@ -167,13 +167,18 @@
 			}
 			
 			private function drawPortal(portal:Portal) : void {
-				Alert.show("Inside");
-				var portalIcon:BitmapAsset = _photo.ThePortal() as BitmapAsset;
-				Alert.show(portal.endLocationLatitude.toString());
 				// Extract the position associated with remoteObject(Tower)			
 				var firstPosition:LatLng = new LatLng(portal.endLocationLatitude, portal.endLocationLongitude);
 				var secondPosition:LatLng = new LatLng(portal.startLocationLatitude, portal.startLocationLongitude);
 				
+				// Create both portals
+				_drawPortal(firstPosition);
+				_drawPortal(secondPosition);
+			}
+			
+			private function _drawPortal(pos:LatLng) : void {
+				// The portal icon
+				var portalIcon:BitmapAsset = new _photo.ThePortal() as BitmapAsset;
 				
 				// Create test overlays
 				var markerOptions : MarkerOptions = new MarkerOptions();
@@ -182,11 +187,9 @@
 				markerOptions.hasShadow = false;
 				markerOptions.radius = 5;
 				
-				// The two markers
-				var marker: Marker = new Marker(firstPosition, markerOptions);				
+				// Create the marker
+				var marker: Marker = new Marker(pos, markerOptions);				
 				this.map.addOverlay(marker);
-				var marker2:Marker = new Marker(secondPosition, markerOptions);
-				this.map.addOverlay(marker2);
 				
 			}
 			
@@ -547,7 +550,6 @@
 			
 			protected function onGetAllPortalObjectsFromServer(event:ResultEvent) : void {
 				listOfPortals = event.result as ArrayCollection;
-				Alert.show(listOfPortals.toString());
 				for(var i:Number = 0; i < listOfPortals.length; i++){
 					var p:Portal = listOfPortals.getItemAt(i) as Portal;
 					drawPortal(p);
@@ -575,7 +577,6 @@
 			protected function onGetAllObjectsFromServer(event:ResultEvent) : void {
 				// Get the array collection
 				var collection:ArrayCollection = event.result as ArrayCollection;
-				Alert.show(collection.toString());
 				// Get the first item
 				var obj:Object = collection.getItemAt(0);
 

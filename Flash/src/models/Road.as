@@ -1,7 +1,7 @@
 package models
 {
 	[Bindable]
-	[RemoteClass("alias=models.Road")]
+	[RemoteClass(alias="models.Road")]
 	public class Road
 	{
 		// Information
