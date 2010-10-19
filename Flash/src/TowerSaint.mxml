@@ -2,7 +2,7 @@
 <s:Application xmlns:fx="http://ns.adobe.com/mxml/2009" 
 			   xmlns:s="library://ns.adobe.com/flex/spark" 
 			   xmlns:mx="library://ns.adobe.com/flex/mx" 
-			   minWidth="955" minHeight="600" xmlns:maps="com.google.maps.*" currentState="start">
+			   minWidth="955" minHeight="600" xmlns:maps="com.google.maps.*" currentState="start" width.inApp="1271" minWidth.inApp="1000">
 	<fx:Script>
 		<![CDATA[
 			import assets.PhotoAssets;
@@ -31,6 +31,7 @@
 			import com.google.maps.LatLngBounds;
 			import com.google.maps.Map;
 			import com.google.maps.MapEvent;
+			import com.google.maps.MapMouseEvent;
 			import com.google.maps.MapType;
 			import com.google.maps.ProjectionBase;
 			import com.google.maps.overlays.GroundOverlay;
@@ -52,6 +53,7 @@
 			import models.Road;
 			import models.Tower;
 			import models.User;
+			import models.states.ImageState;
 			
 			import mx.collections.ArrayCollection;
 			import mx.controls.Alert;
@@ -88,6 +90,9 @@
 			private var listOfRoads:ArrayCollection = new ArrayCollection();
 			[Bindable]
 			private var listOfPortals:ArrayCollection = new ArrayCollection();
+			[Bindbale]
+			private var markerToModel:Dictionary = new Dictionary();
+			
 			protected const latOffset:Number = .001;
 			protected const lonOffset:Number = .001;
 			
@@ -106,12 +111,14 @@
 			private var remoteObjectCollection:Dictionary = new Dictionary();
 			
 			// State variable
-			[Bindable]private var finishedLoadingMap:Boolean = false;
+			[Bindable] private var finishedLoadingMap:Boolean = false;
+			[Bindable] public var imageState:ImageState = new ImageState();
 			
 			// Map handlers. The map handler gets called after you are logged
 			// into facebook
 			private function onMapReady(event:Event) : void {
 				this.map.setCenter(new LatLng(42.366662,-71.106262), 11, MapType.NORMAL_MAP_TYPE);
+				
 
 				// Initialize the services needed with the server over amf
 				initializeServicesToGoogleAppEngine();
@@ -123,9 +130,10 @@
 
 				// Set an event listener upon the complete loading of the information
 				this.map.addEventListener(MapEvent.TILES_LOADED, onTilesLoaded);
+				this.map.addEventListener(MapMouseEvent.CLICK, onMapMouseClick);
 			}
 			
-			// Create the 
+			// Create the basic polygon
 			private function createBasicScopePolygon(loc:LatLng) : void {
 				var latlng:LatLng = loc
 				var lat:Number = latlng.lat();
@@ -147,6 +155,38 @@
 							alpha: 0.7})
 					}));
 				map.addOverlay(polygon);
+			}
+			
+			private function onMapMouseClick(event:MapMouseEvent) : void {
+				if(imageState.isClicked){
+					// The image state
+					imageState.isClicked = false;
+					
+					// The location
+					var pos:LatLng = event.latLng;
+					
+					if(imageState.endObject is Tower){
+						// Draw the tower
+						var t:Tower = imageState.endObject as Tower;
+						t.longitude = pos.lng();
+						t.latitude = pos.lat();
+						drawTower(t);
+					}else if(imageState.endObject is Portal){
+						// Draw the portal
+						var p:Portal = imageState.endObject as Portal;
+						p.startLocationLatitude = pos.lng();
+						p.startLocationLongitude = pos.lat();
+						p.endLocationLatitude = pos.lat();
+						p.endLocationLongitude = pos.lng();
+						
+						drawPortal(p);
+					}else if(imageState.endObject is Road){
+						var r:Road = imageState.endObject as Road;
+						r.latitude = pos.lat();
+						r.longitude = pos.lng();
+						drawRoad(r);
+					}
+				}
 			}
 			
 			private function onTilesLoaded(event:MapEvent) : void {
@@ -173,7 +213,7 @@
 				
 				// Create both portals
 				_drawPortal(firstPosition);
-				_drawPortal(secondPosition);
+				//_drawPortal(secondPosition);
 			}
 			
 			private function _drawPortal(pos:LatLng) : void {
@@ -206,9 +246,19 @@
 				markerOptions.iconAlignment = MarkerOptions.ALIGN_HORIZONTAL_CENTER | MarkerOptions.ALIGN_BOTTOM;
 				markerOptions.hasShadow = false;
 				markerOptions.radius = 5;
-				var marker: Marker = new Marker(gposition, markerOptions);				
 				
+				// Create the marker and add the events
+				var marker: Marker = new Marker(gposition, markerOptions);				
+				marker.addEventListener( MapMouseEvent.MOUSE_DOWN, onRoadMouseDown);
 				this.map.addOverlay(marker);
+			}
+			
+			private function onRoadMouseDown(event:MapMouseEvent):void {
+				var pos:LatLng = event.latLng;				/* The position of the marker */
+				for(var i:Number = 0; i < listOfRoads.length; i++){
+					var r:Road = listOfRoads.getItemAt(i) as Road;
+					
+				}
 			}
 			
 			// Helper function for finding the type of road need to drawn
@@ -300,6 +350,21 @@
 				this.map.addOverlay(marker);
 			}
 			
+			// Button handlers for the create amf objects
+			protected function onImageClick(event:MouseEvent) : void {
+				imageState.isClicked = true;
+				var im:Image = event.currentTarget as Image;
+				
+				if(im.id == "towerImage"){
+					imageState.endObject = new Tower();
+				}else if(im.id == "portalImage"){
+					imageState.endObject = new Portal();
+				}else if(im.id == "roadImage"){
+					imageState.endObject = new Road();
+				}
+			}
+			
+
 			// The button handlers
 			protected function loginBtnClickHandler(event:MouseEvent) : void {
 				_sessionId = new FacebookSessionUtil(API_KEY, SECRET, loaderInfo);
@@ -635,7 +700,7 @@
 	<s:Button includeIn="inApp" x="488" y="30" label="Logout" click="logoutBtnClickHandler(event)"/>
 	<s:Panel includeIn="inApp" x="5" y="76" width="218" height="514" id="focusPanel">
 		<mx:Image x="10" y="10" width="114" height="114" id="focusImage"/>
-		<s:Button x="136" y="450" label="Updgrade" id="updgradeButton"/>
+		<s:Button x="136" y="450" label="Upgrade" id="upgradeButton"/>
 		<s:RichEditableText x="10" y="132" width="196" height="310" id="bodyText"/>
 		<s:RichEditableText x="132" y="10" height="114" id="titleText" width="74"/>
 	</s:Panel>
@@ -644,4 +709,12 @@
 	<s:Label includeIn="inApp" x="599" y="18" text="Send"/>
 	<s:Label includeIn="inApp" x="599" y="48" text="Response"/>
 	<s:Button includeIn="inApp" x="856" y="11" label="Send" id="sendButton" click="onSendButtonClicked(event)"/>
+	<s:HGroup includeIn="inApp" x="975" y="10" width="151" height="58">
+		<mx:Image id = "towerImage" width="44" height="57" useHandCursor="true" buttonMode="true" click="onImageClick(event)"
+				  source="file:/Users/danielo/Documents/Adobe Flash Builder 4/TOWERSAINT/SRC/assets/pictures/Tower_Level0.png"/>
+		<mx:Image id = "portalImage" width="44" height="57" useHandCursor="true" buttonMode="true" click="onImageClick(event)" 
+				  source="file:/Users/danielo/Documents/Adobe Flash Builder 4/TOWERSAINT/SRC/assets/pictures/Portal.png"/>
+		<mx:Image id = "roadImage" width="44" height="57" useHandCursor="true" buttonMode="true" click="onImageClick(event)" 
+				  source="file:/Users/danielo/Documents/Adobe Flash Builder 4/TOWERSAINT/SRC/assets/pictures/NorthSouthEastWestRoad.png"/>
+	</s:HGroup>
 </s:Application>

@@ -7,6 +7,7 @@ from google.appengine.ext import db
 import pyamf, random, string, logging
 from pyamf import amf3
 from pyamf.flex import ArrayCollection, ObjectProxy
+from models import User, Road, Tower, Portal, Location, Bounds
 
 def drange(start, stop, step):
     """Get the range"""
@@ -65,19 +66,12 @@ def createListOfPairs(seq):
 
 # The AMF objects - AMF requires these classes to be effectively empty since the
 # package embeds its own constructors for different use cases.
+
+""""
 class Portal(object):
     pass
 class Location(object):
     pass
-"""
-class Location(db.Model):
-    """"""
-    Abstraction of a location model
-    latitude = db.FloatProperty()
-    longitude = db.FloatProperty()
-    latIndex = db.IntegerProperty()                 
-    lonIndex = db.IntegerProperty()
-"""
 
 class Road(object):
     pass
@@ -90,7 +84,7 @@ class User(object):
 
 class Tower(object):
     pass
-
+"""
 # Factory functions to create the objects
 def createPortal(hitPoints, level, user):
     """
@@ -169,6 +163,7 @@ class TowerService(object):
         """Get all tower objects within the bounds"""
         listOfLocations = createListOfLocations(latlng)
         u = createRandomUser()
+        u.put()
         
         # List of objects
         listOfTowers = []
@@ -176,7 +171,7 @@ class TowerService(object):
         # From the list of locations 
         for l in listOfLocations:
             tower = createTower(random.randint(0, 1000), random.randint(0, 10), random.randint(0, 10),
-                                                  random.randint(0, 10), random.randint(0, 10), random.randint(0, 10),
+                                                  random.randint(0, 10), random.randint(0, 10), random.random(),
                                                   random.randint(0, 1000), random.randint(0, 1) == 0, random.randint(0, 1) == 0,
                                                   random.randint(0, 1) == 0, u, random.randint(0, 1000), random.randint(0, 1000),
                                                   random.randint(0, 1000), random.randint(0, 4))
@@ -207,6 +202,7 @@ class PortalService(object):
         # Create the objects
         listOfLocations = createListOfLocations(latlng)
         u = createRandomUser()
+        u.put()
         listOfPairs = createListOfPairs(listOfLocations)
         
         # The list of portals
@@ -244,6 +240,7 @@ class RoadService(object):
         """Get all tower objects within the bounds"""
         listOfLocations = createListOfLocations(latlng)
         u = createRandomUser()
+        u.put()
         
         # The list of road
         listOfRoads = []

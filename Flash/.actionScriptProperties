@@ -8,7 +8,6 @@
           <libraryPathEntry kind="3" linkType="1" path="${PROJECT_FRAMEWORKS}/libs/flex.swc" useDefaultLinkType="false"/>
         </excludedEntries>
       </libraryPathEntry>
-      <libraryPathEntry kind="1" linkType="1" path="libs"/>
       <libraryPathEntry kind="3" linkType="1" path="/Users/danielo/Documents/flex/sdk/lib/map_flex_1_18b.swc" useDefaultLinkType="false"/>
       <libraryPathEntry kind="3" linkType="1" path="/Users/danielo/Documents/flex/facebook/Facebook_library_v3.4_flex.swc" useDefaultLinkType="false"/>
     </libraryPath>

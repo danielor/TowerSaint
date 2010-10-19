@@ -1,5 +1,7 @@
 package models
 {
+	import flashx.textLayout.elements.TextFlow;
+
 	[Bindable]
 	[RemoteClass(alias="models.Portal")]
 	public class Portal
@@ -31,6 +33,11 @@ package models
 		public function Portal()
 		{
 			super();
+		}
+		
+		public function toTextFlow():TextFlow {
+			var textFlow:TextFlow = new TextFlow();
+			return textFlow;
 		}
 	}
 }
