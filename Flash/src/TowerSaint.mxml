@@ -51,6 +51,7 @@
 			import models.Location;
 			import models.Portal;
 			import models.Road;
+			import models.SuperObject;
 			import models.Tower;
 			import models.User;
 			import models.states.ImageState;
@@ -58,6 +59,7 @@
 			import mx.collections.ArrayCollection;
 			import mx.controls.Alert;
 			import mx.core.BitmapAsset;
+			import mx.events.DragEvent;
 			import mx.messaging.ChannelSet;
 			import mx.messaging.channels.AMFChannel;
 			import mx.rpc.AbstractOperation;
@@ -92,6 +94,8 @@
 			private var listOfPortals:ArrayCollection = new ArrayCollection();
 			[Bindbale]
 			private var markerToModel:Dictionary = new Dictionary();
+			[Bindable]
+			private var currentMarker:Marker;
 			
 			protected const latOffset:Number = .001;
 			protected const lonOffset:Number = .001;
@@ -157,6 +161,8 @@
 				map.addOverlay(polygon);
 			}
 			
+
+			
 			private function onMapMouseClick(event:MapMouseEvent) : void {
 				if(imageState.isClicked){
 					// The image state
@@ -164,28 +170,14 @@
 					
 					// The location
 					var pos:LatLng = event.latLng;
+					var obj:SuperObject = imageState.endObject as SuperObject;
 					
-					if(imageState.endObject is Tower){
-						// Draw the tower
-						var t:Tower = imageState.endObject as Tower;
-						t.longitude = pos.lng();
-						t.latitude = pos.lat();
-						drawTower(t);
-					}else if(imageState.endObject is Portal){
-						// Draw the portal
-						var p:Portal = imageState.endObject as Portal;
-						p.startLocationLatitude = pos.lng();
-						p.startLocationLongitude = pos.lat();
-						p.endLocationLatitude = pos.lat();
-						p.endLocationLongitude = pos.lng();
-						
-						drawPortal(p);
-					}else if(imageState.endObject is Road){
-						var r:Road = imageState.endObject as Road;
-						r.latitude = pos.lat();
-						r.longitude = pos.lng();
-						drawRoad(r);
-					}
+					// The draw function
+					obj.setPosition(pos);
+					obj.draw(true, this.map, _photo);
+				
+					// The control button for sending info
+					controlButton.name = "Submit"
 				}
 			}
 			
@@ -203,6 +195,13 @@
 					}else if(object is Road){
 						drawRoad(object as Road);	
 					}
+				}
+			}
+			
+			private function onControlButtonClicked(event:MouseEvent){
+				var but:Button = event.currentTarget as Button;
+				if(but.name == "Submit"){
+					
 				}
 			}
 			
@@ -700,7 +699,7 @@
 	<s:Button includeIn="inApp" x="488" y="30" label="Logout" click="logoutBtnClickHandler(event)"/>
 	<s:Panel includeIn="inApp" x="5" y="76" width="218" height="514" id="focusPanel">
 		<mx:Image x="10" y="10" width="114" height="114" id="focusImage"/>
-		<s:Button x="136" y="450" label="Upgrade" id="upgradeButton"/>
+		<s:Button x="136" y="450" label="Upgrade" id="controlButton" click="onControlButtonClicked(event)"/>
 		<s:RichEditableText x="10" y="132" width="196" height="310" id="bodyText"/>
 		<s:RichEditableText x="132" y="10" height="114" id="titleText" width="74"/>
 	</s:Panel>
