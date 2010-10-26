@@ -163,6 +163,7 @@
 					// The draw function
 					obj.setPosition(pos);
 					obj.draw(true, this.map, _photo);
+					obj.setIsModified(true);
 				
 					// The control button for sending info
 					controlButton.name = "Submit"

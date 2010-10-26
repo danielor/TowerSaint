@@ -89,5 +89,19 @@ package managers
 				s.draw(false, this.map, this.photo);
 			}
 		}
+		
+		/*
+			Function return all objects that have been modified in an array
+		*/
+		public function getAllModifiedObjects():Array {
+			var a:Array = new Array();
+			for(var i:int = 0; i < this.listOfObjects.length; i++){
+				var s:SuperObject = this.listOfObjects.getItemAt(i) as SuperObject;
+				if(s.getIsModified()){
+					a.push(s);
+				}
+			}
+			return a;
+		}
 	}
 }

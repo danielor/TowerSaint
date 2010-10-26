@@ -5,9 +5,12 @@ package models
 	import com.google.maps.LatLng;
 	import com.google.maps.LatLngBounds;
 	import com.google.maps.Map;
+	import com.google.maps.MapMouseEvent;
 	import com.google.maps.overlays.Marker;
 	import com.google.maps.overlays.MarkerOptions;
 	
+	import flashx.textLayout.elements.ParagraphElement;
+	import flashx.textLayout.elements.SpanElement;
 	import flashx.textLayout.elements.TextFlow;
 	
 	import mx.core.BitmapAsset;
@@ -37,8 +40,8 @@ package models
 		public var endLocationLatitudeIndex:Number;
 		public var endLocationLongitudeIndex:Number;
 		
-		//public var startLocation:Location;
-		//public var endLocation:Location;
+		// State variables
+		private var isModified:Boolean;
 		
 		public function Portal()
 		{
@@ -75,19 +78,45 @@ package models
 			markerOptions.draggable = drag;
 			
 			// Create the marker
-			var marker: Marker = new Marker(pos, markerOptions);				
+			var marker: Marker = new Marker(pos, markerOptions);
+			marker.addEventListener(MapMouseEvent.CLICK, onMarkerClick);
 			map.addOverlay(marker);
+			
+		}
+		
+		private function onMarkerClick(event:MapMouseEvent) : void {
+			var tF:TextFlow = this.display();
 			
 		}
 		
 		public function display():TextFlow {
 			var textFlow:TextFlow = new TextFlow();
+			
+			// Setup the stuff
+			var pGraph:ParagraphElement = new ParagraphElement();
+		
+			// Add the span
+			var iSpan:SpanElement = new SpanElement();
+			iSpan.text = "portal";
+		
+			// The span element
+			pGraph.addChild(iSpan);
+			textFlow.addChild(pGraph);
+			
 			return textFlow;
 		}
 		
 		public function setPosition(pos:LatLng) : void {
 			startLocationLatitude = pos.lat();
 			startLocationLongitude = pos.lng();
+		}
+		
+		// Interface to the isModified flag, which is true when an object has been create.
+		public function setIsModified(t:Boolean) : void {
+			this.isModified = t;
+		}
+		public function getIsModified():Boolean {
+			return this.isModified;
 		}
 	}
 }

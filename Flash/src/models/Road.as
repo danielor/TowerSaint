@@ -1,14 +1,17 @@
 package models
 {
-	import flashx.textLayout.elements.TextFlow;
+	import assets.PhotoAssets;
 	
 	import com.google.maps.LatLng;
 	import com.google.maps.LatLngBounds;
 	import com.google.maps.Map;
 	import com.google.maps.overlays.Marker;
 	import com.google.maps.overlays.MarkerOptions;
-
-	import assets.PhotoAssets;
+	
+	import flashx.textLayout.elements.ParagraphElement;
+	import flashx.textLayout.elements.SpanElement;
+	import flashx.textLayout.elements.TextFlow;
+	
 	import mx.core.BitmapAsset;
 
 	[Bindable]
@@ -27,6 +30,9 @@ package models
 		public var lonIndex:int;
 		public var latitude:Number;
 		public var longitude:Number;
+		
+		// State variables
+		private var isModified:Boolean;
 	
 		
 		public function Road()
@@ -105,12 +111,32 @@ package models
 		
 		public function display():TextFlow {
 			var textFlow:TextFlow = new TextFlow();
+			
+			// Setup the stuff
+			var pGraph:ParagraphElement = new ParagraphElement();
+			
+			// Add the span
+			var iSpan:SpanElement = new SpanElement();
+			iSpan.text = "road";
+			
+			// The span element
+			pGraph.addChild(iSpan);
+			textFlow.addChild(pGraph);
+			
 			return textFlow;
 		}
 		
 		public function setPosition(pos:LatLng) : void {
 			latitude = pos.lat();
 			longitude = pos.lng();
+		}
+		
+		// Interface to the isModified flag, which is true when an object has been create.
+		public function setIsModified(t:Boolean) : void {
+			this.isModified = t;
+		}
+		public function getIsModified():Boolean {
+			return this.isModified;
 		}
 	}
 }

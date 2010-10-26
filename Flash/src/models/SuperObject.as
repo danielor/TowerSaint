@@ -12,5 +12,9 @@ package models
 		function draw(drag:Boolean, map:Map, photo:PhotoAssets) : void;
 		function display() : TextFlow;
 		function setPosition(pos:LatLng) : void;
+		
+		// Interface to the isModified flag, which is true when an object has been create.
+		function setIsModified(t:Boolean) : void;
+		function getIsModified():Boolean;
 	}
 }
