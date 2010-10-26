@@ -47,6 +47,9 @@
 			import flash.net.*;
 			import flash.utils.Dictionary;
 			
+			import managers.UserObjectManager;
+			import managers.states.TowerSaintServiceState;
+			
 			import models.Bounds;
 			import models.Location;
 			import models.Portal;
@@ -107,6 +110,8 @@
 			[Bindable] public var _photo:PhotoAssets = new PhotoAssets();
 			
 			// Server data
+			[Bindable] public var _serverState:TowerSaintServiceState;
+			[Bindable] public var _userObjectManager:UserObjectManager;
 			private static const URL:String = "http://localhost:8083";
 			private static const userRemoteServiceString:String = "user";
 			private static const portalRemoteServiceString:String = "portal";
@@ -125,12 +130,12 @@
 				
 
 				// Initialize the services needed with the server over amf
-				initializeServicesToGoogleAppEngine();
+				this._serverState = new TowerSaintServiceState();
+				this._userObjectManager = new UserObjectManager(this.map, this._serverState, this._photo);
 				
 				// Get all objects within the bounds of the server.	
 				var bounds:LatLngBounds = this.map.getLatLngBounds();
-				getAllObjectsWithinBounds(bounds);
-				
+				this._userObjectManager.getAllObjectsWithinBounds(bounds);				
 
 				// Set an event listener upon the complete loading of the information
 				this.map.addEventListener(MapEvent.TILES_LOADED, onTilesLoaded);

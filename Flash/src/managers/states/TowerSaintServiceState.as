@@ -1,7 +1,9 @@
 package managers.states
 {
+	import flash.events.SecurityErrorEvent;
 	import flash.utils.Dictionary;
 	
+	import mx.controls.Alert;
 	import mx.messaging.ChannelSet;
 	import mx.messaging.channels.AMFChannel;
 	import mx.rpc.events.FaultEvent;
@@ -10,11 +12,11 @@ package managers.states
 	public class TowerSaintServiceState implements ServiceState
 	{
 		// String constants used to control the service state
-		private static const userRemoteServiceString:String = "user";
-		private static const portalRemoteServiceString:String = "portal";
-		private static const towerRemoteServiceString:String = "tower";
-		private static const roadRemoteServiceString:String = "road";	
-		private static const URL:String = "http://localhost:8083";
+		private const userRemoteServiceString:String = "user";
+		private const portalRemoteServiceString:String = "portal";
+		private const towerRemoteServiceString:String = "tower";
+		private const roadRemoteServiceString:String = "road";	
+		private const URL:String = "http://localhost:8083";
 
 		// Dictionary holds all of the remote objects
 		private var remoteObjectCollection:Dictionary;
@@ -22,17 +24,16 @@ package managers.states
 		public function TowerSaintServiceState()
 		{
 			// Initialize object
-			remoteObjectColection = new Dictionary();
-			initializeServices();
+			this.remoteObjectCollection = new Dictionary();
+			intializeServices();
 		}
 		
 		/* Return all of the server state constants */
 		public function getAllConstants():Array{
 			var listOfConstants:Array = new Array();
-			listOfConstants.push(userRemoteServiceString);
-			listOfConstants.push(portalRemoteServiceString);
-			listOfConstants.push(towerRemoteServiceString);
-			listOfConstants.push(roadRemoteServiceString);
+			listOfConstants.push(this.portalRemoteServiceString);
+			listOfConstants.push(this.towerRemoteServiceString);
+			listOfConstants.push(this.roadRemoteServiceString);
 			return listOfConstants;
 		}
 		
@@ -43,9 +44,16 @@ package managers.states
 			channels.addChannel(channel);
 			
 			var constants:Array = this.getAllConstants();
-			for(var remoteString:String in constants){
-				createRemoteObject(channels, remoteString);
+			for(var i:int = 0; i < constants.length; i++){
+				var s:String = constants[i] as String;
+				Alert.show(s);
+				createRemoteObject(channels, s);
 			}
+		}
+		
+		/* Return the services that are appropriate to this object */
+		public function getServices():Dictionary {
+			return this.remoteObjectCollection;
 		}
 		
 		/* Create the remote objects that corresponds to object services */
