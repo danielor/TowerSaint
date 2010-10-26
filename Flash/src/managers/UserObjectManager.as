@@ -70,7 +70,6 @@ package managers
 		*/
 		private function getObjectWithinBound(serviceString:String, bounds:Bounds) : void {
 			var servicesDictionary:Dictionary = this.serverState.getServices();
-			Alert.show(serviceString);
 			var _service:RemoteObject = servicesDictionary[serviceString] as RemoteObject;
 			
 			// The abstract call

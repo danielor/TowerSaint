@@ -46,7 +46,6 @@ package managers.states
 			var constants:Array = this.getAllConstants();
 			for(var i:int = 0; i < constants.length; i++){
 				var s:String = constants[i] as String;
-				Alert.show(s);
 				createRemoteObject(channels, s);
 			}
 		}

@@ -88,18 +88,7 @@
 			private var light:DirectionalLight3D;
 			private var listOfCannons:ArrayCollection = new ArrayCollection();
 			
-			// Map data
-			[Bindable]
-			public var listOfTowers:ArrayCollection = new ArrayCollection();
-			[Bindable]
-			private var listOfRoads:ArrayCollection = new ArrayCollection();
-			[Bindable]
-			private var listOfPortals:ArrayCollection = new ArrayCollection();
-			[Bindbale]
-			private var markerToModel:Dictionary = new Dictionary();
-			[Bindable]
-			private var currentMarker:Marker;
-			
+			// Map data			
 			protected const latOffset:Number = .001;
 			protected const lonOffset:Number = .001;
 			
@@ -112,12 +101,6 @@
 			// Server data
 			[Bindable] public var _serverState:TowerSaintServiceState;
 			[Bindable] public var _userObjectManager:UserObjectManager;
-			private static const URL:String = "http://localhost:8083";
-			private static const userRemoteServiceString:String = "user";
-			private static const portalRemoteServiceString:String = "portal";
-			private static const towerRemoteServiceString:String = "tower";
-			private static const roadRemoteServiceString:String = "road";
-			private var remoteObjectCollection:Dictionary = new Dictionary();
 			
 			// State variable
 			[Bindable] private var finishedLoadingMap:Boolean = false;
@@ -190,169 +173,14 @@
 				finishedLoadingMap = true;
 			}
 			
-			private function drawObjectOverlays(listOfObjects:ArrayCollection) : void {
-				for(var object:Object in listOfObjects){
-					// Parse dependent on the object
-					if(object is Tower){
-						drawTower(object as Tower);
-					}else if(object is Portal){
-						drawPortal(object as Portal);
-					}else if(object is Road){
-						drawRoad(object as Road);	
-					}
-				}
-			}
-			
-			private function onControlButtonClicked(event:MouseEvent){
+		
+			private function onControlButtonClicked(event:MouseEvent) : void{
 				var but:Button = event.currentTarget as Button;
 				if(but.name == "Submit"){
 					
 				}
 			}
 			
-			private function drawPortal(portal:Portal) : void {
-				// Extract the position associated with remoteObject(Tower)			
-				var firstPosition:LatLng = new LatLng(portal.endLocationLatitude, portal.endLocationLongitude);
-				var secondPosition:LatLng = new LatLng(portal.startLocationLatitude, portal.startLocationLongitude);
-				
-				// Create both portals
-				_drawPortal(firstPosition);
-				//_drawPortal(secondPosition);
-			}
-			
-			private function _drawPortal(pos:LatLng) : void {
-				// The portal icon
-				var portalIcon:BitmapAsset = new _photo.ThePortal() as BitmapAsset;
-				
-				// Create test overlays
-				var markerOptions : MarkerOptions = new MarkerOptions();
-				markerOptions.icon = portalIcon;
-				markerOptions.iconAlignment = MarkerOptions.ALIGN_HORIZONTAL_CENTER | MarkerOptions.ALIGN_BOTTOM;
-				markerOptions.hasShadow = false;
-				markerOptions.radius = 5;
-				
-				// Create the marker
-				var marker: Marker = new Marker(pos, markerOptions);				
-				this.map.addOverlay(marker);
-				
-			}
-			
-			private function drawRoad(road:Road) : void {
-				// Add a ground overlay
-				var roadIcon:BitmapAsset = getRoadFromNeighbors(road);
-			
-				// Extract the position associated with remoteObject(Tower)			
-				var gposition:LatLng = new LatLng(road.latitude, road.longitude);
-				
-				// Create test overlays
-				var markerOptions : MarkerOptions = new MarkerOptions();
-				markerOptions.icon = roadIcon;
-				markerOptions.iconAlignment = MarkerOptions.ALIGN_HORIZONTAL_CENTER | MarkerOptions.ALIGN_BOTTOM;
-				markerOptions.hasShadow = false;
-				markerOptions.radius = 5;
-				
-				// Create the marker and add the events
-				var marker: Marker = new Marker(gposition, markerOptions);				
-				marker.addEventListener( MapMouseEvent.MOUSE_DOWN, onRoadMouseDown);
-				this.map.addOverlay(marker);
-			}
-			
-			private function onRoadMouseDown(event:MapMouseEvent):void {
-				var pos:LatLng = event.latLng;				/* The position of the marker */
-				for(var i:Number = 0; i < listOfRoads.length; i++){
-					var r:Road = listOfRoads.getItemAt(i) as Road;
-					
-				}
-			}
-			
-			// Helper function for finding the type of road need to drawn
-			// on the map.
-			private function getRoadFromNeighbors(road:Road):BitmapAsset {
-				
-				// TODO: This value needs to be calculated properly so that depending on the
-				// neighbor list different bitmaps are used.
-				var neighborType:Number = 0;
-				// North - (0, 1)
-				// East - (0, 2)
-				// South - (0, 4)
-				// West - (0, 8)
-				switch(neighborType){
-					//case 0:
-					//	return new _photo.EastRoad() as BitmapAsset;
-					case 1:
-						return new _photo.NorthRoad() as BitmapAsset;
-					case 2:
-						return new _photo.EastRoad() as BitmapAsset;
-					case 3:
-						return new _photo.NorthEastRoad() as BitmapAsset;
-					case 4:
-						return new _photo.SouthRoad() as BitmapAsset;
-					case 5:
-						return new _photo.NorthSouthRoad() as BitmapAsset;
-					case 6:
-						return new _photo.SouthEastRoad() as BitmapAsset;
-					case 7:
-						return new _photo.NorthSouthEastRoad() as BitmapAsset;
-					case 8:
-						return new _photo.WestRoad() as BitmapAsset;
-					case 9:
-						return new _photo.NorthWestRoad() as BitmapAsset;
-					case 10:
-						return new _photo.EastWestRoad() as BitmapAsset;
-					case 11:
-						return new _photo.NorthEastWestRoad() as BitmapAsset;
-					case 12:
-						return new _photo.SouthWestRoad() as BitmapAsset;
-					case 13:
-						return new _photo.NorthSouthWestRoad() as BitmapAsset;
-					case 14:
-						return new _photo.SouthEastWestRoad() as BitmapAsset;
-					case 15:
-						return new _photo.NorthSouthEastWestRoad() as BitmapAsset;
-					default:
-						return new _photo.EastRoad() as BitmapAsset;
-				}
-			}
-			
-			private function drawTower(tower:Tower) : void {
-				// Add a test ground overlay
-				var towerIcon:BitmapAsset;
-				switch(tower.Level){
-					// Tower image
-					case 0:
-						towerIcon =  new _photo.TowerLevel0() as BitmapAsset;
-						break;
-					// Fort image
-					case 1:
-						towerIcon = new _photo.TowerLevel1() as BitmapAsset;
-						break;
-					// Castle image
-					case 2:
-						towerIcon = new _photo.TowerLevel2() as BitmapAsset;
-						break;
-					// TowerSaint image
-					case 3:
-						towerIcon = new _photo.TowerSaint() as BitmapAsset;
-						break;
-					default:
-						towerIcon =  new _photo.TowerLevel0() as BitmapAsset;
-						break;
-				}
-				
-				// Extract the position associated with remoteObject(Tower)			
-				var gposition:LatLng = new LatLng(tower.latitude, tower.longitude);
-
-				
-				// Create test overlays
-				var markerOptions : MarkerOptions = new MarkerOptions();
-				markerOptions.icon = towerIcon;
-				markerOptions.iconAlignment = MarkerOptions.ALIGN_HORIZONTAL_CENTER | MarkerOptions.ALIGN_BOTTOM;
-				markerOptions.hasShadow = true;
-				markerOptions.radius = 5;
-				var marker: Marker = new Marker(gposition, markerOptions);				
-				
-				this.map.addOverlay(marker);
-			}
 			
 			// Button handlers for the create amf objects
 			protected function onImageClick(event:MouseEvent) : void {
@@ -533,134 +361,7 @@
 				}
 			}
 			
-			// Server interface
-			protected function initializeServicesToGoogleAppEngine() : void {
-				var channel:AMFChannel = new AMFChannel("pyamf-channel", URL);
-				var channels:ChannelSet = new ChannelSet();
-				channels.addChannel(channel);
-				
-				// Create a remote object for each major class
-				createRemoteObject(channels, userRemoteServiceString);
-				createRemoteObject(channels, portalRemoteServiceString);
-				createRemoteObject(channels, towerRemoteServiceString);
-				createRemoteObject(channels, roadRemoteServiceString);
-			}
 			
-			protected function createRemoteObject(channel:ChannelSet, stringOfRemoteObject:String) : void {
-				// Create the remote object	
-				var remoteObject:RemoteObject = new RemoteObject(stringOfRemoteObject);
-				remoteObject.showBusyCursor = true;
-				remoteObject.channelSet = channel;
-				remoteObject.addEventListener(FaultEvent.FAULT, onRemoteServiceFault);
-				remoteObject.addEventListener(SecurityErrorEvent.SECURITY_ERROR, onRemoteServiceFault);
-			
-				// Store a reference to the remote object
-				remoteObjectCollection[stringOfRemoteObject] = remoteObject;
-			}
-			
-			protected function onRemoteServiceFault(event:FaultEvent) : void {
-				var errorMsg:String = "Service error:\n" + event.fault.faultCode;
-				Alert.show(event.fault.faultDetail, errorMsg);
-			}
-			
-			protected function onRemoteServiceSecurityError(event:SecurityErrorEvent) : void {
-				var errorMsg:String = "Service security error";
-				Alert.show(event.text, errorMsg);
-			}
-			
-			// Get all objects from the server within the bounds of the viewsable map
-			// bounds:google.maps.LatLngBounds of the current screen.
-			protected function getAllObjectsWithinBounds(bounds:LatLngBounds) : void {
-				// Get each one of the corresponding objects
-				getObjectWithinBound(portalRemoteServiceString, googleToAMFBounds(bounds));
-				getObjectWithinBound(towerRemoteServiceString, googleToAMFBounds(bounds));
-				getObjectWithinBound(roadRemoteServiceString, googleToAMFBounds(bounds));
-			}
-			
-			// Change the google object into a bounds object
-			protected function googleToAMFBounds(bounds:LatLngBounds):Bounds {
-				var bond:Bounds = new Bounds();
-				bond.northeastLocation = googleToAMFLocation(bounds.getNorthEast());				
-				bond.southwestLocation = googleToAMFLocation(bounds.getSouthWest());
-				return bond;
-			}
-			
-			// Change the google lat lng into a location object
-			protected function googleToAMFLocation(loc:LatLng):Location {
-				var myLoc:Location = new Location();
-				
-				// Set the latitude/longitude
-				myLoc.latitude = loc.lat();
-				myLoc.longitude = loc.lng();
-				myLoc.latIndex = int(myLoc.latitude / latOffset);
-				myLoc.lonIndex = int(myLoc.longitude / lonOffset);
-				
-				// Set the latitude/longitude index
-				
-				return myLoc;
-			}
-			
-			
-			protected function getObjectWithinBound(serviceString:String, bounds:Bounds) : void {
-				// Get the service
-				var _service:RemoteObject = remoteObjectCollection[serviceString] as RemoteObject;
-				
-				// Setup the abstract operation
-				var operation:AbstractOperation = _service.getOperation("getObjectInBounds");
-				if(serviceString == "portal"){
-					operation.addEventListener(ResultEvent.RESULT, onGetAllPortalObjectsFromServer);
-				}else if(serviceString == "tower"){
-					operation.addEventListener(ResultEvent.RESULT, onGetAllTowerObjectsFromServer);
-				}else if(serviceString == "road"){
-					operation.addEventListener(ResultEvent.RESULT, onGetAllRoadObjectsFromServer);
-				}
-				operation.send(bounds);
-			}
-			
-			protected function onGetAllPortalObjectsFromServer(event:ResultEvent) : void {
-				listOfPortals = event.result as ArrayCollection;
-				for(var i:Number = 0; i < listOfPortals.length; i++){
-					var p:Portal = listOfPortals.getItemAt(i) as Portal;
-					drawPortal(p);
-				}
-			}
-			
-			protected function onGetAllTowerObjectsFromServer(event:ResultEvent) : void {
-				listOfTowers = event.result as ArrayCollection;
-
-				for(var i:Number = 0; i < listOfTowers.length; i++){
-					var t:Tower = listOfTowers.getItemAt(i) as Tower;
-					drawTower(t);
-
-				}
-			}
-			
-			protected function onGetAllRoadObjectsFromServer(event:ResultEvent) : void {
-				listOfRoads = event.result as ArrayCollection;
-				for(var i:Number = 0; i < listOfRoads.length; i++){
-					var r:Road = listOfRoads.getItemAt(i) as Road;
-					drawRoad(r);
-				}
-			}
-			
-			protected function onGetAllObjectsFromServer(event:ResultEvent) : void {
-				// Get the array collection
-				var collection:ArrayCollection = event.result as ArrayCollection;
-				// Get the first item
-				var obj:Object = collection.getItemAt(0);
-
-				// Each object has its own services. This should function properly
-				if(obj is Portal){
-					listOfPortals = collection;
-					drawObjectOverlays(listOfPortals);
-				}else if(obj is Road){
-					listOfRoads = collection;
-					drawObjectOverlays(listOfRoads);
-				}else if(obj is Tower){
-					listOfTowers = collection;
-					drawObjectOverlays(listOfTowers);
-				}
-			}
 			
 			protected function onSendButtonClicked(event:MouseEvent) : void {
 				// The network connection
