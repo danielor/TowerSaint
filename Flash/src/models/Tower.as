@@ -5,6 +5,7 @@ package models
 	import com.google.maps.LatLng;
 	import com.google.maps.LatLngBounds;
 	import com.google.maps.Map;
+	import com.google.maps.MapMouseEvent;
 	import com.google.maps.overlays.Marker;
 	import com.google.maps.overlays.MarkerOptions;
 	
@@ -56,6 +57,26 @@ package models
 		
 		public function draw(drag:Boolean, map:Map, _photo:PhotoAssets) : void {
 			// Add a test ground overlay
+			var towerIcon:BitmapAsset = _getImage(_photo);
+			
+			// Extract the position associated with remoteObject(Tower)			
+			var gposition:LatLng = new LatLng(latitude, longitude);
+			
+			// Create test overlays
+			var markerOptions : MarkerOptions = new MarkerOptions();
+			markerOptions.icon = towerIcon;
+			markerOptions.iconAlignment = MarkerOptions.ALIGN_HORIZONTAL_CENTER | MarkerOptions.ALIGN_BOTTOM;
+			markerOptions.hasShadow = true;
+			markerOptions.radius = 5;
+			markerOptions.draggable = drag;
+			
+			// Create the marker
+			var marker: Marker = new Marker(gposition, markerOptions);				
+			marker.addEventListener(MapMouseEvent.CLICK, onMarkerClick);
+			map.addOverlay(marker);
+		}
+		
+		private function _getImage(_photo:PhotoAssets):BitmapAsset {
 			var towerIcon:BitmapAsset;
 			switch(Level){
 				// Tower image
@@ -78,22 +99,18 @@ package models
 					towerIcon =  new _photo.TowerLevel0() as BitmapAsset;
 					break;
 			}
-			// Extract the position associated with remoteObject(Tower)			
-			var gposition:LatLng = new LatLng(latitude, longitude);
-			
-			// Create test overlays
-			var markerOptions : MarkerOptions = new MarkerOptions();
-			markerOptions.icon = towerIcon;
-			markerOptions.iconAlignment = MarkerOptions.ALIGN_HORIZONTAL_CENTER | MarkerOptions.ALIGN_BOTTOM;
-			markerOptions.hasShadow = true;
-			markerOptions.radius = 5;
-			markerOptions.draggable = drag;
-			
-			// Create the marker
-			var marker: Marker = new Marker(gposition, markerOptions);				
-			map.addOverlay(marker);
+			return towerIcon
 		}
 		
+		public function getImage(photo:PhotoAssets):BitmapAsset {
+			return this._getImage(photo);
+		}
+		
+		private function onMarkerClick(event:MapMouseEvent) : void {
+			
+		}
+		
+		/* Return the textflow representation of the model */
 		public function display():TextFlow {
 			var textFlow:TextFlow = new TextFlow();
 			

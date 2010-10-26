@@ -27,16 +27,18 @@ package managers
 		public var serverState:TowerSaintServiceState;
 		public var listOfObjects:ArrayCollection;
 		public var photo:PhotoAssets;
+		public var focusPanelManager:FocusPanelManager;
 		
 		/*
 			Constructor - Takes in the map(view), and state constants
 		*/
-		public function UserObjectManager(m:Map, sS:TowerSaintServiceState, p:PhotoAssets)
+		public function UserObjectManager(m:Map, sS:TowerSaintServiceState, p:PhotoAssets, fPM:FocusPanelManager)
 		{
 			// The state variables
 			this.map = m;
 			this.serverState = sS;
 			this.photo = p;
+			this.focusPanelManager = fPM;
 			
 			// The containers
 			this.listOfObjects = new ArrayCollection();

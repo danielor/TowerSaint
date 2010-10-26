@@ -47,6 +47,7 @@
 			import flash.net.*;
 			import flash.utils.Dictionary;
 			
+			import managers.FocusPanelManager;
 			import managers.UserObjectManager;
 			import managers.states.TowerSaintServiceState;
 			
@@ -98,9 +99,10 @@
 			// The image data
 			[Bindable] public var _photo:PhotoAssets = new PhotoAssets();
 			
-			// Server data
+			// State/Manager data
 			[Bindable] public var _serverState:TowerSaintServiceState;
 			[Bindable] public var _userObjectManager:UserObjectManager;
+			[Bindable] public var _focusPanelManager:FocusPanelManager;
 			
 			// State variable
 			[Bindable] private var finishedLoadingMap:Boolean = false;
@@ -113,8 +115,9 @@
 				
 
 				// Initialize the services needed with the server over amf
+				this._focusPanelManager = new FocusPanelManager(focusImage, controlButton, bodyText, titleText);
 				this._serverState = new TowerSaintServiceState();
-				this._userObjectManager = new UserObjectManager(this.map, this._serverState, this._photo);
+				this._userObjectManager = new UserObjectManager(this.map, this._serverState, this._photo, this._focusPanelManager);
 				
 				// Get all objects within the bounds of the server.	
 				var bounds:LatLngBounds = this.map.getLatLngBounds();

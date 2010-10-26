@@ -5,6 +5,7 @@ package models
 	import com.google.maps.LatLng;
 	import com.google.maps.LatLngBounds;
 	import com.google.maps.Map;
+	import com.google.maps.MapMouseEvent;
 	import com.google.maps.overlays.Marker;
 	import com.google.maps.overlays.MarkerOptions;
 	
@@ -58,9 +59,15 @@ package models
 			
 			// Create the marker and add the events
 			var marker: Marker = new Marker(gposition, markerOptions);				
+			marker.addEventListener(MapMouseEvent.CLICK, onMarkerClick);
 			map.addOverlay(marker);
 		}
 
+		
+		private function onMarkerClick(event:MapMouseEvent) : void {
+			
+		}
+		
 		
 		public function getRoadFromNeighbors(_photo:PhotoAssets):BitmapAsset {
 			
@@ -109,6 +116,11 @@ package models
 			}
 		}
 		
+		public function getImage(photo:PhotoAssets):BitmapAsset {
+			return getRoadFromNeighbors(photo);			
+		}
+		
+		/* Return the textflow representation of the model */
 		public function display():TextFlow {
 			var textFlow:TextFlow = new TextFlow();
 			

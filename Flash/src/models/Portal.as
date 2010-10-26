@@ -85,10 +85,15 @@ package models
 		}
 		
 		private function onMarkerClick(event:MapMouseEvent) : void {
-			var tF:TextFlow = this.display();
 			
 		}
 		
+		/* Get the image of the bitmap asset */
+		public function getImage(photo:PhotoAssets):BitmapAsset {
+			return new photo.ThePortal() as BitmapAsset;
+		}
+
+		/* Return the textflow representation of the model */
 		public function display():TextFlow {
 			var textFlow:TextFlow = new TextFlow();
 			
