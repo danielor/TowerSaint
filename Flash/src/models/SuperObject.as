@@ -7,11 +7,13 @@ package models
 	
 	import flashx.textLayout.elements.TextFlow;
 	
+	import managers.FocusPanelManager;
+	
 	import mx.core.BitmapAsset;
 
 	public interface SuperObject
 	{
-		function draw(drag:Boolean, map:Map, photo:PhotoAssets) : void;
+		function draw(drag:Boolean, map:Map, photo:PhotoAssets, fpm:FocusPanelManager) : void;
 		function display() : TextFlow;
 		function setPosition(pos:LatLng) : void;
 		

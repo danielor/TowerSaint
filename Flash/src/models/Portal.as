@@ -13,6 +13,10 @@ package models
 	import flashx.textLayout.elements.SpanElement;
 	import flashx.textLayout.elements.TextFlow;
 	
+	import managers.FocusPanelManager;
+	
+	import models.map.TowerSaintMarker;
+	
 	import mx.core.BitmapAsset;
 
 	[Bindable]
@@ -50,7 +54,7 @@ package models
 		
 
 		
-		public function draw(drag:Boolean, map:Map, photo:PhotoAssets) : void {
+		public function draw(drag:Boolean, map:Map, photo:PhotoAssets, fpm:FocusPanelManager) : void {
 			// Extract the position associated with remoteObject(Tower)			
 			var firstPosition:LatLng = new LatLng(endLocationLatitude, endLocationLongitude);
 			var secondPosition:LatLng = new LatLng(startLocationLatitude, startLocationLongitude);
@@ -58,14 +62,14 @@ package models
 			// Create both portals
 			var bounds:LatLngBounds = map.getLatLngBounds();
 			if(bounds.containsLatLng(firstPosition)){
-				_drawPortal(firstPosition, photo, map, drag);
+				_drawPortal(firstPosition, photo, map, drag, fpm);
 			}
 			if(bounds.containsLatLng(secondPosition)){
-				_drawPortal(secondPosition, photo, map, drag);
+				_drawPortal(secondPosition, photo, map, drag, fpm);
 			}
 		}
 		
-		private function _drawPortal(pos:LatLng, photo:PhotoAssets, map:Map, drag:Boolean) : void {
+		private function _drawPortal(pos:LatLng, photo:PhotoAssets, map:Map, drag:Boolean, fpm:FocusPanelManager) : void {
 			// The portal icon
 			var portalIcon:BitmapAsset = new photo.ThePortal() as BitmapAsset;
 			
@@ -78,15 +82,12 @@ package models
 			markerOptions.draggable = drag;
 			
 			// Create the marker
-			var marker: Marker = new Marker(pos, markerOptions);
-			marker.addEventListener(MapMouseEvent.CLICK, onMarkerClick);
+			var marker:TowerSaintMarker = new TowerSaintMarker(this, pos, markerOptions);
+			marker.addEventListener(MapMouseEvent.CLICK, fpm.onMarkerClick);
 			map.addOverlay(marker);
 			
 		}
 		
-		private function onMarkerClick(event:MapMouseEvent) : void {
-			
-		}
 		
 		/* Get the image of the bitmap asset */
 		public function getImage(photo:PhotoAssets):BitmapAsset {

@@ -88,7 +88,7 @@ package managers
 			var tArray:ArrayCollection = event.result as ArrayCollection;
 			for(var i:Number = 0; i < tArray.length; i++){
 				var s:SuperObject = tArray.getItemAt(i) as SuperObject;
-				s.draw(false, this.map, this.photo);
+				s.draw(false, this.map, this.photo, this.focusPanelManager);
 			}
 		}
 		

@@ -13,6 +13,10 @@ package models
 	import flashx.textLayout.elements.SpanElement;
 	import flashx.textLayout.elements.TextFlow;
 	
+	import managers.FocusPanelManager;
+	
+	import models.map.TowerSaintMarker;
+	
 	import mx.core.BitmapAsset;
 
 	[Bindable]
@@ -41,7 +45,7 @@ package models
 			super();
 		}
 		
-		public function draw(drag:Boolean, map:Map, photo:PhotoAssets) : void{
+		public function draw(drag:Boolean, map:Map, photo:PhotoAssets, fpm:FocusPanelManager) : void{
 			
 			// Add a ground overlay
 			var roadIcon:BitmapAsset = getRoadFromNeighbors(photo);
@@ -57,17 +61,14 @@ package models
 			markerOptions.radius = 5;
 			markerOptions.draggable = drag;
 			
-			// Create the marker and add the events
-			var marker: Marker = new Marker(gposition, markerOptions);				
-			marker.addEventListener(MapMouseEvent.CLICK, onMarkerClick);
+			// Create the marker
+			var marker:TowerSaintMarker = new TowerSaintMarker(this, gposition, markerOptions);
+			marker.addEventListener(MapMouseEvent.CLICK, fpm.onMarkerClick);
 			map.addOverlay(marker);
 		}
 
 		
-		private function onMarkerClick(event:MapMouseEvent) : void {
-			
-		}
-		
+
 		
 		public function getRoadFromNeighbors(_photo:PhotoAssets):BitmapAsset {
 			

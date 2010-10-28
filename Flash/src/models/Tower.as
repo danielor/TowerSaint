@@ -13,6 +13,10 @@ package models
 	import flashx.textLayout.elements.SpanElement;
 	import flashx.textLayout.elements.TextFlow;
 	
+	import managers.FocusPanelManager;
+	
+	import models.map.TowerSaintMarker;
+	
 	import mx.core.BitmapAsset;
 
 	[Bindbale]
@@ -55,7 +59,7 @@ package models
 			super();
 		}
 		
-		public function draw(drag:Boolean, map:Map, _photo:PhotoAssets) : void {
+		public function draw(drag:Boolean, map:Map, _photo:PhotoAssets, fpm:FocusPanelManager) : void {
 			// Add a test ground overlay
 			var towerIcon:BitmapAsset = _getImage(_photo);
 			
@@ -71,8 +75,8 @@ package models
 			markerOptions.draggable = drag;
 			
 			// Create the marker
-			var marker: Marker = new Marker(gposition, markerOptions);				
-			marker.addEventListener(MapMouseEvent.CLICK, onMarkerClick);
+			var marker:TowerSaintMarker = new TowerSaintMarker(this, gposition, markerOptions);
+			marker.addEventListener(MapMouseEvent.CLICK, fpm.onMarkerClick);
 			map.addOverlay(marker);
 		}
 		

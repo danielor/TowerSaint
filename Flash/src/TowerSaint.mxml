@@ -115,7 +115,7 @@
 				
 
 				// Initialize the services needed with the server over amf
-				this._focusPanelManager = new FocusPanelManager(focusImage, controlButton, bodyText, titleText);
+				this._focusPanelManager = new FocusPanelManager(focusImage, controlButton, bodyText, titleText, _photo);
 				this._serverState = new TowerSaintServiceState();
 				this._userObjectManager = new UserObjectManager(this.map, this._serverState, this._photo, this._focusPanelManager);
 				
@@ -165,7 +165,7 @@
 					
 					// The draw function
 					obj.setPosition(pos);
-					obj.draw(true, this.map, _photo);
+					obj.draw(true, this.map, _photo, this._focusPanelManager);
 					obj.setIsModified(true);
 				
 					// The control button for sending info
