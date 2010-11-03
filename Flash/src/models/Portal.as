@@ -88,7 +88,6 @@ package models
 			
 		}
 		
-		
 		/* Get the image of the bitmap asset */
 		public function getImage(photo:PhotoAssets):BitmapAsset {
 			return new photo.ThePortal() as BitmapAsset;
@@ -103,13 +102,24 @@ package models
 		
 			// Add the span
 			var iSpan:SpanElement = new SpanElement();
-			iSpan.text = "portal";
+			iSpan.text = getString();
 		
 			// The span element
 			pGraph.addChild(iSpan);
 			textFlow.addChild(pGraph);
 			
 			return textFlow;
+		}
+		
+		public function getString() : String {
+			var s:String = "";
+			s += "HitPoints\t" + hitPoints.toString() + "\n";
+			s += "Level\t\t" + level.toString() + "\n";
+			s += "StartLatitude\t" + startLocationLatitude.toPrecision(5) + "\n";
+			s += "StartLongitude\t" + startLocationLongitude.toPrecision(5) + "\n";
+			s += "EndLatitude\t" + endLocationLatitude.toPrecision(5) + "\n";
+			s += "EndLongitude\t" + endLocationLongitude.toPrecision(5) + "\n";
+			return s;
 		}
 		
 		public function setPosition(pos:LatLng) : void {

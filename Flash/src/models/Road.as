@@ -130,13 +130,22 @@ package models
 			
 			// Add the span
 			var iSpan:SpanElement = new SpanElement();
-			iSpan.text = "road";
+			iSpan.text = getString();
 			
 			// The span element
 			pGraph.addChild(iSpan);
 			textFlow.addChild(pGraph);
 			
 			return textFlow;
+		}
+		
+		public function getString():String {
+			var s:String = "";
+			s+="HitPoints\t" + hitPoints.toString() + "\n";
+			s+="Level\t\t" + level.toString() + "\n";
+			s+="Latitude\t\t" + latitude.toPrecision(5) + "\n";
+			s+="Lognitude\t" + longitude.toPrecision(5) + "\n";
+			return s;
 		}
 		
 		public function setPosition(pos:LatLng) : void {

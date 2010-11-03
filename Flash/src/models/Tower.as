@@ -123,13 +123,34 @@ package models
 			
 			// Add the span
 			var iSpan:SpanElement = new SpanElement();
-			iSpan.text = "tower";
+			iSpan.text = getString();
 			
 			// The span element
 			pGraph.addChild(iSpan);
 			textFlow.addChild(pGraph);
 			
 			return textFlow;
+		}
+		
+		public function getString():String {
+			var s:String = "";
+			if(this.isCapital){
+				s+="Capital\n";
+			}
+			s+="Experience\t" + Experience.toString() + "\n";
+			s+="Speed\t\t" + Speed.toString() + "\n";
+			s+="Power\t\t" + Power.toString() + "\n";
+			s+="Armor\t\t" + Armor.toString() + "\n";
+			s+="Range\t\t" + Range.toString() + "\n";
+			s+="Accuracy\t" + Accuracy.toPrecision(2) + "\n";
+			s+="HitPoints\t" + HitPoints.toString() + "\n";
+			s+="Level\t\t" + Level.toString() + "\n";
+			s+="ManaProduction\t" + manaProduction.toString() + "\n";
+			s+="StoneProduction\t" + stoneProduction.toString() + "\n";
+			s+="WoodProduction\t" + woodProduction.toString() + "\n";
+			s+="Latitude\t\t" + latitude.toPrecision(5) + "\n";
+			s+="Longitude\t" + longitude.toPrecision(5) + "\n";
+			return s;
 		}
 		
 		public function setPosition(pos:LatLng) : void {

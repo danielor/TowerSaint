@@ -92,6 +92,7 @@
 			// Map data			
 			protected const latOffset:Number = .001;
 			protected const lonOffset:Number = .001;
+			private var initialMapDragCenter:LatLng;
 			
 			// My Cannonball
 			private var sphere:Sphere;
@@ -126,6 +127,58 @@
 				// Set an event listener upon the complete loading of the information
 				this.map.addEventListener(MapEvent.TILES_LOADED, onTilesLoaded);
 				this.map.addEventListener(MapMouseEvent.CLICK, onMapMouseClick);
+				this.map.addEventListener(MapMouseEvent.DRAG_START, onMapDragStart);
+				this.map.addEventListener(MapMouseEvent.DRAG_END, onMapDragEnd);
+			}
+			
+			// The drag events
+			private function onMapDragStart(event:MapMouseEvent) : void {
+				initialMapDragCenter = event.latLng;
+				
+			}
+			
+			private function onMapDragEnd(event:MapMouseEvent) : void {
+				var finalDragPosition:LatLng = event.latLng;
+				
+
+				
+				// The center of the map, and bounds
+				var center:LatLng = this.map.getCenter();
+				var bounds:LatLngBounds = this.map.getLatLngBounds();
+				
+				// Calculate the net distance to move
+				var netLatitude:Number = bounds.getNorth() - bounds.getSouth();
+				var netLongitude:Number = bounds.getWest() - bounds.getEast();
+				
+				// The net distance
+				var netDragLongitude:Number = finalDragPosition.lng() - initialMapDragCenter.lng();
+				var netDragLatitude:Number = finalDragPosition.lat() - initialMapDragCenter.lat();
+				
+				// The new center position
+				var newCenterLatitude:Number;
+				var newCenterLongitude:Number;
+				
+				if(netDragLongitude > netDragLatitude) {
+					if(netDragLongitude > 0.0){
+						newCenterLatitude = center.lat();
+						newCenterLongitude = center.lng() + netLongitude;
+					}else{
+						newCenterLatitude = center.lat();
+						newCenterLongitude = center.lng() - netLongitude;	
+					}
+				}else{
+					if(netDragLatitude > 0.0){
+						newCenterLatitude = center.lat() + netLatitude;
+						newCenterLongitude = center.lng();
+					}else{
+						newCenterLatitude = center.lat() - netLatitude;
+						newCenterLongitude = center.lng();
+					}
+				}
+				
+				// Create the new position, and pan to the new position
+				var newCenter:LatLng = new LatLng(newCenterLatitude, newCenterLongitude);
+				this.map.panTo(newCenter);
 			}
 			
 			// Create the basic polygon
