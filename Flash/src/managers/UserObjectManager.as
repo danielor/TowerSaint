@@ -29,6 +29,9 @@ package managers
 		public var photo:PhotoAssets;
 		public var focusPanelManager:FocusPanelManager;
 		
+		// The list of bounds
+		public var listOfBounds:ArrayCollection;
+		
 		/*
 			Constructor - Takes in the map(view), and state constants
 		*/
@@ -42,6 +45,7 @@ package managers
 			
 			// The containers
 			this.listOfObjects = new ArrayCollection();
+			this.listOfBounds = new ArrayCollection();
 		}
 		
 		/* 
@@ -49,20 +53,22 @@ package managers
 			The objects recived are drawn on the map
 		*/
 		public function getAllObjectsWithinBounds(bounds:LatLngBounds) : void {
-			// Clear the container
-			listOfObjects.removeAll();
-			
-			// Get all of the services
-			var a:Array = this.serverState.getAllConstants();
-			
-			// Get the bounds
-			var b:Bounds = new Bounds();
-			b.fromGoogleBounds(bounds);
-			
-			// Call the server
-			for(var i:int = 0; i < a.length; i++){
-				var s:String = a[i] as String;
-				getObjectWithinBound(s, b);
+			if(this.listOfBounds.getItemIndex(bounds) == -1){
+				// Add the bounds to the list
+				this.listOfBounds.addItem(bounds);
+				
+				// Get all of the services
+				var a:Array = this.serverState.getAllConstants();
+				
+				// Get the bounds
+				var b:Bounds = new Bounds();
+				b.fromGoogleBounds(bounds);
+				
+				// Call the server
+				for(var i:int = 0; i < a.length; i++){
+					var s:String = a[i] as String;
+					getObjectWithinBound(s, b);
+				}
 			}
 		}
 		

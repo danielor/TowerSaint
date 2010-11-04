@@ -32,6 +32,7 @@
 			import com.google.maps.Map;
 			import com.google.maps.MapEvent;
 			import com.google.maps.MapMouseEvent;
+			import com.google.maps.MapMoveEvent;
 			import com.google.maps.MapType;
 			import com.google.maps.ProjectionBase;
 			import com.google.maps.overlays.GroundOverlay;
@@ -93,6 +94,7 @@
 			protected const latOffset:Number = .001;
 			protected const lonOffset:Number = .001;
 			private var initialMapDragCenter:LatLng;
+			private var userMousePan:Boolean;
 			
 			// My Cannonball
 			private var sphere:Sphere;
@@ -129,6 +131,7 @@
 				this.map.addEventListener(MapMouseEvent.CLICK, onMapMouseClick);
 				this.map.addEventListener(MapMouseEvent.DRAG_START, onMapDragStart);
 				this.map.addEventListener(MapMouseEvent.DRAG_END, onMapDragEnd);
+				this.map.addEventListener(MapMoveEvent.MOVE_END, onMapMoveEnd);
 			}
 			
 			// The drag events
@@ -177,6 +180,21 @@
 				// Create the new position, and pan to the new position
 				var newCenter:LatLng = new LatLng(newCenterLatitude, newCenterLongitude);
 				this.map.panTo(newCenter);
+				
+				// Set the mouse pan to true
+				userMousePan = true;
+							
+			}
+			
+			private function onMapMoveEnd(event:MapMoveEvent) : void {
+				if(userMousePan == true && event.latLng == this.map.getCenter()){
+					// Load all of the data in the new location
+					var b:LatLngBounds = this.map.getLatLngBounds();
+					this._userObjectManager.getAllObjectsWithinBounds(b);
+				
+					// The user mouse pan
+					userMousePan = false;
+				}
 			}
 			
 			// Create the basic polygon
