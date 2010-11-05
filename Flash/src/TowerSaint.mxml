@@ -94,7 +94,10 @@
 			protected const latOffset:Number = .001;
 			protected const lonOffset:Number = .001;
 			private var initialMapDragCenter:LatLng;
+			private var initialMapDragMouse:LatLng;
 			private var userMousePan:Boolean;
+			private var centerOfMap:LatLng;
+			private var mapDimension:LatLng;
 			
 			// My Cannonball
 			private var sphere:Sphere;
@@ -114,16 +117,20 @@
 			// Map handlers. The map handler gets called after you are logged
 			// into facebook
 			private function onMapReady(event:Event) : void {
-				this.map.setCenter(new LatLng(42.366662,-71.106262), 11, MapType.NORMAL_MAP_TYPE);
+				// Setup the map location
+				centerOfMap = new LatLng(42.366662,-71.106262);
+				this.map.setCenter(centerOfMap, 11, MapType.NORMAL_MAP_TYPE);
 				
-
+				// Calculate the bounds of the map
+				var bounds:LatLngBounds = this.map.getLatLngBounds();
+				mapDimension = new LatLng(bounds.getNorth() - bounds.getSouth(), bounds.getWest() - bounds.getEast());
+				
 				// Initialize the services needed with the server over amf
 				this._focusPanelManager = new FocusPanelManager(focusImage, controlButton, bodyText, titleText, _photo);
 				this._serverState = new TowerSaintServiceState();
 				this._userObjectManager = new UserObjectManager(this.map, this._serverState, this._photo, this._focusPanelManager);
 				
 				// Get all objects within the bounds of the server.	
-				var bounds:LatLngBounds = this.map.getLatLngBounds();
 				this._userObjectManager.getAllObjectsWithinBounds(bounds);				
 
 				// Set an event listener upon the complete loading of the information
@@ -136,8 +143,7 @@
 			
 			// The drag events
 			private function onMapDragStart(event:MapMouseEvent) : void {
-				initialMapDragCenter = event.latLng;
-				
+				initialMapDragMouse = event.latLng;
 			}
 			
 			private function onMapDragEnd(event:MapMouseEvent) : void {
@@ -148,12 +154,10 @@
 				var bounds:LatLngBounds = this.map.getLatLngBounds();
 				
 				// Calculate the net distance to move
-				var netLatitude:Number = bounds.getNorth() - bounds.getSouth();
-				var netLongitude:Number = bounds.getWest() - bounds.getEast();
-				
+			
 				// The net distance
-				var netDragLongitude:Number = finalDragPosition.lng() - initialMapDragCenter.lng();
-				var netDragLatitude:Number = finalDragPosition.lat() - initialMapDragCenter.lat();
+				var netDragLongitude:Number = finalDragPosition.lng() - initialMapDragMouse.lng();
+				var netDragLatitude:Number = finalDragPosition.lat() - initialMapDragMouse.lat();
 				
 				// The new center position
 				var newCenterLatitude:Number;
@@ -161,25 +165,25 @@
 				
 				if(Math.abs(netDragLongitude) > Math.abs(netDragLatitude)) {
 					if(netDragLongitude > 0.0){
-						newCenterLatitude = center.lat();
-						newCenterLongitude = center.lng() + netLongitude;
+						newCenterLatitude = centerOfMap.lat();
+						newCenterLongitude = centerOfMap.lng() +  mapDimension.lng();
 					}else{
-						newCenterLatitude = center.lat();
-						newCenterLongitude = center.lng() - netLongitude;	
+						newCenterLatitude = centerOfMap.lat();
+						newCenterLongitude = centerOfMap.lng() - mapDimension.lng();	
 					}
 				}else{
 					if(netDragLatitude > 0.0){
-						newCenterLatitude = center.lat() + netLatitude;
-						newCenterLongitude = center.lng();
+						newCenterLatitude = centerOfMap.lat() + mapDimension.lat();
+						newCenterLongitude = centerOfMap.lng();
 					}else{
-						newCenterLatitude = center.lat() - netLatitude;
-						newCenterLongitude = center.lng();
+						newCenterLatitude = centerOfMap.lat() - mapDimension.lat();
+						newCenterLongitude = centerOfMap.lng();
 					}
 				}
 				
 				// Create the new position, and pan to the new position
-				var newCenter:LatLng = new LatLng(newCenterLatitude, newCenterLongitude);
-				this.map.panTo(newCenter);
+				centerOfMap = new LatLng(newCenterLatitude, newCenterLongitude);
+				this.map.panTo(centerOfMap);
 				
 				// Set the mouse pan to true
 				userMousePan = true;
@@ -187,7 +191,7 @@
 			}
 			
 			private function onMapMoveEnd(event:MapMoveEvent) : void {
-				if(userMousePan == true && event.latLng == this.map.getCenter()){
+				if(userMousePan == true && event.latLng.equals(centerOfMap)){
 					// Load all of the data in the new location
 					var b:LatLngBounds = this.map.getLatLngBounds();
 					this._userObjectManager.getAllObjectsWithinBounds(b);

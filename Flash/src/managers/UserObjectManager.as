@@ -2,6 +2,7 @@ package managers
 {
 	import assets.PhotoAssets;
 	
+	import com.google.maps.LatLng;
 	import com.google.maps.LatLngBounds;
 	import com.google.maps.Map;
 	
@@ -53,10 +54,10 @@ package managers
 			The objects recived are drawn on the map
 		*/
 		public function getAllObjectsWithinBounds(bounds:LatLngBounds) : void {
-			if(this.listOfBounds.getItemIndex(bounds) == -1){
+			if(!hasBounds(bounds)){
 				// Add the bounds to the list
 				this.listOfBounds.addItem(bounds);
-				
+				Alert.show(this.listOfBounds.toString());
 				// Get all of the services
 				var a:Array = this.serverState.getAllConstants();
 				
@@ -70,6 +71,20 @@ package managers
 					getObjectWithinBound(s, b);
 				}
 			}
+		}
+		
+		/* 
+			Private function used to diminish the laod on the server by only get data in
+			latlngbounds that is not part of the arrayCollection of bounds
+		*/
+		private function hasBounds(bounds:LatLngBounds) :Boolean {
+			for(var i:int = 0; i < this.listOfBounds.length; i++){
+				var innerBounds:LatLngBounds = this.listOfBounds.getItemAt(i) as LatLngBounds;
+				if(innerBounds.equals(bounds)){
+					return true;
+				}
+			}
+			return false;
 		}
 		
 		/*
