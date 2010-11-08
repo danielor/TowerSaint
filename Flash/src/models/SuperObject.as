@@ -23,5 +23,8 @@ package models
 		
 		// Get the image representation
 		function getImage(photo:PhotoAssets):BitmapAsset;
+		
+		// Returns true if the object is current visible on the map
+		function isVisible(map:Map):Boolean;
 	}
 }

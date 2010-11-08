@@ -17,6 +17,7 @@ package managers
 	import mx.controls.Alert;
 	import mx.rpc.AbstractOperation;
 	import mx.rpc.events.ResultEvent;
+	import mx.rpc.http.AbstractOperation;
 	import mx.rpc.remoting.RemoteObject;
 	
 	public class UserObjectManager
@@ -32,6 +33,9 @@ package managers
 		
 		// The list of bounds
 		public var listOfBounds:ArrayCollection;
+	
+		// Networking variables
+		public var listOfOpenConnections:ArrayCollection;
 		
 		/*
 			Constructor - Takes in the map(view), and state constants
@@ -47,6 +51,7 @@ package managers
 			// The containers
 			this.listOfObjects = new ArrayCollection();
 			this.listOfBounds = new ArrayCollection();
+			this.listOfOpenConnections = new ArrayCollection();
 		}
 		
 		/* 
@@ -100,6 +105,29 @@ package managers
 			operation.addEventListener(ResultEvent.RESULT, onGetAllObjects);	
 			operation.send(bounds);
 			
+			// List of open abstract operations
+			this.listOfOpenConnections.addItem(operation);
+		}
+		
+		/*
+		Remove the first instance of the abstract operation, that has an open
+		connection with the server.
+		*/
+		private function removeFirstOperationFromOpenConnection(op:mx.rpc.AbstractOperation) : void{
+			for(var i:int = 0; i <this.listOfOpenConnections.length; i++){
+				var cOp:AbstractOperation = this.listOfOpenConnections[i] as AbstractOperation;
+				if(cOp == op){
+					this.listOfOpenConnections.removeItemAt(i);
+					return;
+				}
+			}	
+		}
+		
+		/* 
+		Returns true if there are any open connections
+		*/
+		private function hasOpenConnections():Boolean {
+			return (this.listOfOpenConnections.length == 0);
 		}
 		
 		/* 
@@ -111,7 +139,53 @@ package managers
 				var s:SuperObject = tArray.getItemAt(i) as SuperObject;
 				s.draw(false, this.map, this.photo, this.focusPanelManager);
 			}
+			
+			// Save the list of objects
+			this.listOfObjects.addAll(tArray);
+			
+			// Get the abstract operation that has finished
+			var op:AbstractOperation = event.target as AbstractOperation;
+			removeFirstOperationFromOpenConnection(op);
+			
+			// Check if all the open connections are closed
+			if(!hasOpenConnections()){
+				
+				// Draw the empire boundaries
+				drawEmpireBoundaries();
+			}
+			
 		}
+		
+		/*
+			Function draws the empire boundaries around super objects. First it must calculate
+			the boundary of all the object pieces. Then, it must check for intersections.
+			After finding the interesections, the relative power of an empire at that position 
+			is calculated to determine to whom belongs the  lattice point.
+		*/
+		public function drawEmpireBoundaries():void {
+			// Get all objects withint the current bounds
+			var listOfObjects:ArrayCollection = getObjectWithinBounds();
+			
+			
+		}
+		
+		/*
+			The user object stores all of the objects from the server. This function acts a filter
+			and returns only the objects that are currently being displayed by the map
+		*/
+		public function getObjectWithinBounds():ArrayCollection{
+			var objectsOnMap:ArrayCollection =  new ArrayCollection();
+			
+			for(var i:int = 0; i < this.listOfObjects.length; i++){
+				var s:SuperObject = this.listOfObjects[i] as SuperObject;
+				if(s.isVisible(this.map)){
+					
+				}
+			}
+			
+			return objectsOfMap;
+		}
+	
 		
 		/*
 			Function return all objects that have been modified in an array

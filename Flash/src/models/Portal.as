@@ -127,6 +127,16 @@ package models
 			startLocationLongitude = pos.lng();
 		}
 		
+		public function isVisible(map:Map):Boolean {
+			// Create the two positions
+			var eLoc:LatLng = new LatLng(this.endLocationLatitude, this.endLocationLongitude);
+			var sLoc:LatLng = new LatLng(this.startLocationLatitude, this.endLocationLatitude);
+			
+			// Check if either are within the bounds
+			var lB:LatLngBounds = map.getLatLngBounds();
+			return (lB.containsLatLng(eLoc) || lB.containsLatLng(sLoc));
+		}
+		
 		// Interface to the isModified flag, which is true when an object has been create.
 		public function setIsModified(t:Boolean) : void {
 			this.isModified = t;

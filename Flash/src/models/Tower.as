@@ -132,6 +132,14 @@ package models
 			return textFlow;
 		}
 		
+		public function isVisible(map:Map):Boolean {
+			// Get the location
+			var loc:LatLng = new LatLng(this.latitude, this.longitude);
+			var b:LatLngBounds = map.getLatLngBounds();
+			
+			return b.containsLatLng(loc);
+		}
+		
 		public function getString():String {
 			var s:String = "";
 			if(this.isCapital){
