@@ -17,6 +17,7 @@ package managers.states
 		private const towerRemoteServiceString:String = "tower";
 		private const roadRemoteServiceString:String = "road";	
 		private const URL:String = "http://localhost:8083";
+		private const latticeGranularity:Number = .001;
 
 		// Dictionary holds all of the remote objects
 		private var remoteObjectCollection:Dictionary;
@@ -53,6 +54,11 @@ package managers.states
 		/* Return the services that are appropriate to this object */
 		public function getServices():Dictionary {
 			return this.remoteObjectCollection;
+		}
+		
+		/* Return the lattice granurality */
+		public function getLatticeGranularity():Number {
+			return this.latticeGranularity;
 		}
 		
 		/* Create the remote objects that corresponds to object services */

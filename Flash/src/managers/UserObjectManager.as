@@ -79,6 +79,16 @@ package managers
 		}
 		
 		/* 
+			Function asynchronously gets all objects withing influence range of the visible
+			bounds of the map. The objects are used to calculate the empire boundaries.
+		*/
+		public function getAllObjectsWithinInfluenceOfBounds(bounds:LatLngBounds) : void {
+			if(!hasBounds(bounds)){
+				
+			}
+		}
+		
+		/* 
 			Private function used to diminish the laod on the server by only get data in
 			latlngbounds that is not part of the arrayCollection of bounds
 		*/

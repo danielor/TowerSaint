@@ -8,6 +8,7 @@ import pyamf, random, string, logging
 from pyamf import amf3
 from pyamf.flex import ArrayCollection, ObjectProxy
 from models import User, Road, Tower, Portal, Location, Bounds
+from constants import Constants
 
 def drange(start, stop, step):
     """Get the range"""
@@ -16,7 +17,7 @@ def drange(start, stop, step):
         yield r
         r += step
 
-def createListOfLocations(latlng, latOffset = .001, lonOffset = .001, numberOfLocations = 5):
+def createListOfLocations(latlng, numberOfLocations = 5):
     """Create a list of locations"""
     southwestLocation = latlng.southwestLocation
     northeastLocation = latlng.northeastLocation
@@ -26,8 +27,8 @@ def createListOfLocations(latlng, latOffset = .001, lonOffset = .001, numberOfLo
     longitudeList = [northeastLocation['longitude'], southwestLocation['longitude']]
     minLatitude, maxLatitude = min(latitudeList), max(latitudeList)
     minLongitude, maxLongitude = min(longitudeList), max(longitudeList)
-    listOfLatitude = [a for a in drange(minLatitude, maxLatitude, latOffset)]
-    listOfLongitude = [l for l in drange(minLongitude, maxLongitude, lonOffset)]
+    listOfLatitude = [a for a in drange(minLatitude, maxLatitude, Constants.latOffset())]
+    listOfLongitude = [l for l in drange(minLongitude, maxLongitude, Constants.lonOffset())]
     
     # The number of the proxy
     listOfLocation = []
@@ -36,8 +37,8 @@ def createListOfLocations(latlng, latOffset = .001, lonOffset = .001, numberOfLo
         # Create the location data
         longitude = listOfLongitude[random.randrange(0, len(listOfLongitude) - 1)]
         latitude = listOfLatitude[random.randrange(0, len(listOfLatitude) - 1)]
-        longitudeIndex = int(longitude / lonOffset)
-        latitudeIndex = int(latitude / latOffset)
+        longitudeIndex = int(longitude / Constants.lonOffset())
+        latitudeIndex = int(latitude / Constants.latOffset())
         
         # Create the location, and the object proxy
         l = createLocation(latitudeIndex, longitudeIndex, latitude, longitude)
@@ -64,29 +65,8 @@ def createListOfPairs(seq):
     except StopIteration:
         return
 
-# The AMF objects - AMF requires these classes to be effectively empty since the
-# package embeds its own constructors for different use cases.
-
-""""
-class Portal(object):
-    pass
-class Location(object):
-    pass
-
-class Road(object):
-    pass
-
-class Bounds(object):
-    pass
-
-class User(object):
-    pass
-
-class Tower(object):
-    pass
-"""
 # Factory functions to create the objects
-def createPortal(hitPoints, level, user):
+def createPortal(hitPoints, level, user, firstL, secondL):
     """
     hitPoints - the number of hit points associated with the portal
     level - the level associated with the portal
@@ -96,6 +76,16 @@ def createPortal(hitPoints, level, user):
     p.hitPoints = hitPoints
     p.level = level
     p.user = user
+    p.startLocationLatitude = firstL.latitude
+    p.startLocationLongitude = firstL.longitude
+    p.startLocationLatitudeIndex = firstL.latIndex
+    p.startLocationLongitudeIndex = firstL.lonIndex
+    
+    # The end location
+    p.endLocationLatitude = secondL.latitude
+    p.endLocationLongitude = secondL.longitude
+    p.endLocationLatitudeIndex = secondL.latIndex
+    p.endLocationLongitudeIndex = secondL.lonIndex
     return p
     
 def createLocation(latIndex, lonIndex, latitude, longitude):
@@ -106,11 +96,15 @@ def createLocation(latIndex, lonIndex, latitude, longitude):
     l.longitude = longitude
     return l
         
-def createRoad(hitPoints, level, user):
+def createRoad(hitPoints, level, user, l):
     r = Road()
     r.hitPoints = hitPoints
     r.level = level
     r.user = user
+    r.latIndex = l.latIndex
+    r.lonIndex = l.lonIndex
+    r.latitude = l.latitude
+    r.longitude = l.longitude
     return r
 
 def createBounds(southwestLocation, northeastLocation):
@@ -133,7 +127,7 @@ def createUser(FacebookID, Experience, Empire, isEmperor, completeManaProduction
 
 def createTower(Experience, Speed, Power, Armor, Range, Accuracy,
                  HitPoints, isIsolated, isCapital, hasRuler, user,
-                 manaProduction, stoneProduction, woodProduction, level):
+                 manaProduction, stoneProduction, woodProduction, level, l):
     t = Tower()
     t.Experience = Experience
     t.Speed = Speed
@@ -150,6 +144,10 @@ def createTower(Experience, Speed, Power, Armor, Range, Accuracy,
     t.stoneProduction = stoneProduction
     t.woodProduction = woodProduction
     t.Level = level
+    t.latIndex = l.latIndex
+    t.lonIndex = l.lonIndex
+    t.latitude = l.latitude
+    t.longitude = l.longitude
     return t
         
 
@@ -158,10 +156,17 @@ def createTower(Experience, Speed, Power, Armor, Range, Accuracy,
 class TowerService(object):
     def __init__(self):
         """Constructor"""
+        self.numberOfObjectsPerBound = 5
         
     def getObjectInBounds(self, latlng):
         """Get all tower objects within the bounds"""
-        listOfLocations = createListOfLocations(latlng)
+
+        # Return the array collection
+        return ArrayCollection(self._createListOfTowers(latlng, self.numberOfObjectsPerBound))
+    
+    def _createListOfTowers(self, bounds, howMany):
+        """Create a list of towers in the bounds"""
+        listOfLocations = createListOfLocations(bounds, howMany)
         u = createRandomUser()
         u.put()
         
@@ -174,33 +179,53 @@ class TowerService(object):
                                                   random.randint(0, 10), random.randint(0, 10), random.random(),
                                                   random.randint(0, 1000), random.randint(0, 1) == 0, random.randint(0, 1) == 0,
                                                   random.randint(0, 1) == 0, u, random.randint(0, 1000), random.randint(0, 1000),
-                                                  random.randint(0, 1000), random.randint(0, 4))
+                                                  random.randint(0, 1000), random.randint(0, 4), l)
             
-            # Extract the tower
-            tower.latIndex = l.latIndex
-            tower.lonIndex = l.lonIndex
-            tower.latitude = l.latitude
-            tower.longitude = l.longitude
-            
-            
-            logging.error(tower.longitude)
-            logging.error(tower.latitude)
+            tower.put()
             # Get the proxy
             listOfTowers.append(tower)
+        return listOfTowers
+    
+    def getObjectInFunctionalBounds(self, bounds):
+        """
+        Get *all* objects that influence the visible screen. Objects outside of the
+        map bounds can influence the drawing of the map bounds. The objects created randomly
+        off the screen should be cached, so as to be consistent when the user pans. 
+        """
+        """
+        southwestLocation = bounds.southwestLocation
+        northeastLocation = bounds.northeastLocation
         
-        # Return the array collection
-        return ArrayCollection(listOfTowers)
+        # Get the range of the latitude/longitude
+        latitudeList = [northeastLocation['latitude'], southwestLocation['latitude']]
+        longitudeList = [northeastLocation['longitude'], southwestLocation['longitude']]
         
+        # Create the bounds
+        fBoundSouthWest = Location(min(latitudeList) - Constants.latOffset() * Constants.maxInfluence(),  
+                                    max(latitudeList)  + Constants.latOffset() * Constants.maxInfluence())
+        fBoundNorthEast = Location(min(longitudeList) - Constants.lonOffset() * Constants.maxInfluence(), 
+                                      max(longitudeList)  + Constants.lonOffset() * Constants.maxInfluence())
+        
+        # The functional bounds of the pieces. Get the object of the service type in the bound
+        functionalBounds = Bounds(fBoundSouthWest, fBoundNorthEast)
+        """
+        # The list of towers
+        listOfTowers = []
+        #listOfTowers.extend([f for f in Tower.getObjectInBounds(functionalBounds)])
+        if len(listOfTowers) < self.numberOfObjectsPerBound:
+            pass
 
 class PortalService(object):
     def __init__(self):
         """Constructor"""
+        self.numberOfObjectsPerBound = 5
+
     
     def getObjectInBounds(self, latlng):
         """Get all tower objects within the bounds"""
         
         # Create the objects
-        listOfLocations = createListOfLocations(latlng)
+        listOfLocations = createListOfLocations(latlng, self.numberOfObjectsPerBound)
         u = createRandomUser()
         u.put()
         listOfPairs = createListOfPairs(listOfLocations)
@@ -211,34 +236,28 @@ class PortalService(object):
         for firstL, secondL in listOfPairs:
             portal = createPortal(random.randint(0, 1000), random.randint(0, 10), u)
             
-            # The start location
-            portal.startLocationLatitude = firstL.latitude
-            portal.startLocationLongitude = firstL.longitude
-            portal.startLocationLatitudeIndex = firstL.latIndex
-            portal.startLocationLongitudeIndex = firstL.lonIndex
-            
-            # The end location
-            portal.endLocationLatitude = secondL.latitude
-            portal.endLocationLongitude = secondL.longitude
-            portal.endLocationLatitudeIndex = secondL.latIndex
-            portal.endLocationLongitudeIndex = secondL.lonIndex
-            
-            logging.error("Portal" + str(portal.endLocationLatitude))
-            logging.error("Portal" + str(portal.endLocationLongitude))
-            
             # Create the proxy
             listOfPortals.append(portal)
         
         return ArrayCollection(listOfPortals)
+    
+    def getObjectInFunctionalBounds(self, bounds):
+        """
+        Get *all* objects that influence the visible screen. Objects outside of the
+        map bounds can influence the drawing of the map bounds. The objects created randomly
+        off the screen should be cached, so as to be consistent when the user pans. 
+        """
 
         
 class RoadService(object):
     def __init__(self):
         """Constructor"""
+        self.numberOfObjectsPerBound = 5
+
     
     def getObjectInBounds(self, latlng):
         """Get all tower objects within the bounds"""
-        listOfLocations = createListOfLocations(latlng)
+        listOfLocations = createListOfLocations(latlng, self.numberOfObjectsPerBound)
         u = createRandomUser()
         u.put()
         
@@ -249,18 +268,18 @@ class RoadService(object):
             # Create the road
             road = createRoad(random.randint(0, 1000),random.randint(0, 10), u)
             
-            # Extract the tower
-            road.latIndex = l.latIndex
-            road.lonIndex = l.lonIndex
-            road.latitude = l.latitude
-            road.longitude = l.longitude
-            
             # The proxy
             listOfRoads.append(road)
             
         return ArrayCollection(listOfRoads)
 
-    
+    def getObjectInFunctionalBounds(self, bounds):
+        """
+        Get *all* objects that influence the visible screen. Objects outside of the
+        map bounds can influence the drawing of the map bounds. The objects created randomly
+        off the screen should be cached, so as to be consistent when the user pans. 
+        """
+        
     
 def register_classes(AMF_NAMESPACE = 'models'):
     """Register the amf classes in a namespace"""
