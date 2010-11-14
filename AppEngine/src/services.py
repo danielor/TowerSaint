@@ -7,8 +7,7 @@ from google.appengine.ext import db
 import pyamf, random, string, logging
 from pyamf import amf3
 from pyamf.flex import ArrayCollection, ObjectProxy
-from models import User, Road, Tower, Portal, Location, Bounds
-from constants import Constants
+from models import User, Road, Tower, Portal, Location, Bounds, Constants
 
 def drange(start, stop, step):
     """Get the range"""

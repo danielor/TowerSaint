@@ -17,7 +17,6 @@ package managers
 	import mx.controls.Alert;
 	import mx.rpc.AbstractOperation;
 	import mx.rpc.events.ResultEvent;
-	import mx.rpc.http.AbstractOperation;
 	import mx.rpc.remoting.RemoteObject;
 	
 	public class UserObjectManager
@@ -123,6 +122,7 @@ package managers
 		Remove the first instance of the abstract operation, that has an open
 		connection with the server.
 		*/
+	
 		private function removeFirstOperationFromOpenConnection(op:mx.rpc.AbstractOperation) : void{
 			for(var i:int = 0; i <this.listOfOpenConnections.length; i++){
 				var cOp:AbstractOperation = this.listOfOpenConnections[i] as AbstractOperation;
@@ -133,12 +133,14 @@ package managers
 			}	
 		}
 		
+		
 		/* 
 		Returns true if there are any open connections
 		*/
 		private function hasOpenConnections():Boolean {
 			return (this.listOfOpenConnections.length == 0);
 		}
+		
 		
 		/* 
 			Draw all of the objects one gets from the server
@@ -157,12 +159,14 @@ package managers
 			var op:AbstractOperation = event.target as AbstractOperation;
 			removeFirstOperationFromOpenConnection(op);
 			
+		
 			// Check if all the open connections are closed
 			if(!hasOpenConnections()){
 				
 				// Draw the empire boundaries
 				drawEmpireBoundaries();
 			}
+			
 			
 		}
 		
@@ -172,6 +176,7 @@ package managers
 			After finding the interesections, the relative power of an empire at that position 
 			is calculated to determine to whom belongs the  lattice point.
 		*/
+		
 		public function drawEmpireBoundaries():void {
 			// Get all objects withint the current bounds
 			var listOfObjects:ArrayCollection = getObjectWithinBounds();
@@ -183,6 +188,7 @@ package managers
 			The user object stores all of the objects from the server. This function acts a filter
 			and returns only the objects that are currently being displayed by the map
 		*/
+		
 		public function getObjectWithinBounds():ArrayCollection{
 			var objectsOnMap:ArrayCollection =  new ArrayCollection();
 			
@@ -193,8 +199,9 @@ package managers
 				}
 			}
 			
-			return objectsOfMap;
+			return objectsOnMap;
 		}
+		
 	
 		
 		/*

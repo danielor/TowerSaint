@@ -4,9 +4,36 @@ Created on Sep 16, 2010
 @author: danielo
 '''
 from google.appengine.ext import db
-import logging
+import logging, random, string
 from math import fabs
-from constants import Constants
+from xml.etree import cElementTree as cTree
+
+def createRandomString(length = 10):
+    """Create the random string"""
+    return "".join([random.choice(string.letters) for _ in range(length)])
+
+"""
+A class full of the constants used to runs the game
+"""
+class Constants(object):
+    """Server side constants"""
+    # TODO: Make these accurate.
+    @classmethod
+    def latIndex(cls):
+        """The distance between latitude lattice points"""
+        return .001                 
+    
+    @classmethod
+    def lonIndex(cls):
+        """The distance between longitude lattice points"""
+        return .001                
+    
+    @classmethod
+    def maxInfluence(cls):
+        """The maximum influence(in lattice points) any object can have"""
+        return 10
+    
+    
 
 class User(db.Model):
     """The user of the game"""
@@ -17,12 +44,49 @@ class User(db.Model):
     completeManaProduction = db.IntegerProperty()
     completeStoneProduction = db.IntegerProperty()
     completeWoodProduction = db.IntegerProperty()
+    
+    def toXML(self):
+        """Return an xml representation of the google app engine model"""
+        return """<User>
+                    <facebookid>%s</facebookid>
+                    <completewoodproduction>%s</completewoodproduction>
+                    <completestoneproduction>%s</completestoneproduction>
+                    <completemanaproduction>%s</completemanaproduction>
+                    <isemperor>%s</isemperor>
+                    <empire>%s</empire>
+                    <experience>%s</experience>
+                 </User>""" % (self.FacebookID, self.completeWoodProduction, self.completeStoneProduction,
+                               self.completeManaProduction, self.isEmperor, self.Empire, self.Experience)
 
-class FilterPlugin(object):
+    @staticmethod
+    def createRandomUser(self):
+        """Create a random user"""
+        u = User()
+        u.FacebookID = random.random()
+        u.Experience = random.randint(0, 1000)
+        u.Empire = createRandomString()
+        u.isEmperor = random.randint(0, 1) == 0
+        u.completeManaProduction = random.randint(0, 1000)
+        u.completeStoneProduction = random.randint(0, 1000)
+        u.completeWoodProduction = random.randint(0, 1000)
+        return u
+        
+        
+class BoundsPlugin(object):
     """
     The filter plugin adds filter functionality to all of the model object.
     Static methods will be inherited by all of children methods
     """
+    @staticmethod
+    def createRandomObjectInBounds(cls, bounds):
+        """
+        Function expects a @class-model.Bounds objects as the argument, and
+        returns a random object in the bounds
+        """
+        obj = cls.createRandomObject()
+        obj.setRandomlyInBounds(bounds)
+        return obj
+    
     @staticmethod
     def getObjectInBounds(cls, bounds):
         """
@@ -61,21 +125,26 @@ class FilterPlugin(object):
         Return a list of location index pairs
         """
         raise NotImplementedError("FilterPlugin.getLocation Need to implement in inherited class")
+    
+    def setRandomlyInBounds(self, bounds):
+        """
+        Setup an object randomly in some model.Bounds
+        """
+        raise NotImplementedError("FilterPlugin.getLocation Need to implement in inherited class")
+    # TODO: STart Here
+    @staticmethod
+    def createRandomObject(cls):
+        """
+        Create a random object of a certain type
+        """
+        raise NotImplementedError("FilterPlugin.createRandomObject needs to be implemented in inherited class")
 
-
-class Road(db.Model, FilterPlugin):
+class Road(db.Model, BoundsPlugin):
     """The road object integrates with AMF"""
     # Descriptive
     hitPoints = db.IntegerProperty()
     level = db.IntegerProperty()
     
-    # The index represesents the lattice site on the map
-    latIndex = db.IntegerProperty()
-    lonIndex = db.IntegerProperty()
-    
-    # The geolocation
-    latitude = db.FloatProperty()
-    longitude = db.FloatProperty()
     
     # A Reference to the user
     user = db.ReferenceProperty(User)
@@ -89,8 +158,39 @@ class Road(db.Model, FilterPlugin):
     def getLocationIndex(self):
         """Get the lat/lon indices"""
         return [("latIndex", "lonIndex")]
+    
+    def toXML(self):
+        """Return an xml representation of the google app engine model"""
+        return """<Road>
+                    <hitpoints>%s</hitpoints>
+                    <level>%s</level>
+                    <latitude>%s</latitude>
+                    <longitude>%s</longitude>
+                    %s
+                  </Road>""" %(self.hitPoints, self.level, self.latitude, self.longitude, self.user.toXML())
 
-class Tower(db.Model, FilterPlugin):
+    def setRandomlyInBounds(self, bounds):
+        """
+        Setup an object randomly in some model.Bounds
+        """
+        location = bounds.createRandomLocationInBounds()
+        self.latitude = location.latitude
+        self.longitude = location.longitude
+        self.latIndex = self.latitude / Constants.latIndex()
+        self.lonIndex = self.longitude / Constants.lonIndex()
+        
+    @staticmethod
+    def createRandomObject(cls):
+        """
+        Create a random Road
+        """
+        r = Road()
+        r.hitPoints = random.randint(0, 1000)
+        r.level = random.randint(0, 10)
+        r.user = User.createRandomUser()
+        return r
+    
+class Tower(db.Model, BoundsPlugin):
     """The tower object integrates with AMF"""
     # Description of the objects
     Experience = db.IntegerProperty()
@@ -123,23 +223,70 @@ class Tower(db.Model, FilterPlugin):
         """Get the lat/lon indices"""
         return [("latIndex", "lonIndex")]
     
-class Portal(db.Model):
+    def toXML(self):
+        """Return an xml representation of the google app engine model"""
+        return """<Tower>
+                    <experience>%s</experience>
+                    <speed>%s</speed>
+                    <power>%s</power>
+                    <armor>%s</armor>
+                    <range>%s</range>
+                    <accuracy>%s</accuracy>
+                    <hitpoints>%s</hitpoints>
+                    <isisolated>%s</isisolated>
+                    <iscapital>%s</iscapital>
+                    <hasruler>%s</hasruler>
+                    <level>%s</level>
+                    <manaproduction>%s</manaproduction>
+                    <stoneproduction>%s</stoneproduction>
+                    <woodproduction>%s</woodproduction>
+                    <latitude>%s</latitude>
+                    <longitude>%s</longitude>
+                    %s
+                  </Tower>""" % (self.Experience, self.Speed, self.Power, self.Armor, self.Range,
+                                 self.Accuracy, self.HitPoints, self.isIsolated, self.isCapital,
+                                 self.hasRuler, self.Level, self.manaProduction, self.stoneProduction,
+                                 self.woodProduction, self.latitude, self.longitude, self.user.toXML())
+
+
+    def setRandomlyInBounds(self, bounds):
+        """
+        Setup an object randomly in some model.Bounds
+        """
+        location = bounds.createRandomLocationInBounds()
+        self.latitude = location.latitude
+        self.longitude = location.longitude
+        self.latIndex = self.latitude / Constants.latIndex()
+        self.lonIndex = self.longitude / Constants.lonIndex()
+        
+    @staticmethod
+    def createRandomObject(cls):
+        """
+        Create a random Tower
+        """
+        t = Tower()
+        t.Experience = random.randint(0, 1000)
+        t.Speed = random.randint(0, 10)
+        t.Power = random.randint(0, 10)
+        t.Armor = random.randint(0, 10)
+        t.Range = random.randint(0, 10)
+        t.Accuracy = random.random()
+        t.HitPoints = random.randint(0, 1000)
+        t.isIsolated = random.randint(0, 1) == 0
+        t.isCapital = random.randint(0, 1) == 0
+        t.hasRuler = random.randint(0, 1) == 0
+        t.user = User.createRandomUser()
+        t.Level = random.randint(0, 4)
+        t.stoneProduction = random.randint(0, 1000)
+        t.woodProduction = random.randint(0, 1000)
+        t.manaProduction = random.randint(0, 1000)
+        return t
+
+class Portal(db.Model, BoundsPlugin):
     """The portal objects integrates with AMF"""
     # Descriptive
     hitPoints = db.IntegerProperty()
     level = db.IntegerProperty()
-    
-    # The start location
-    startLocationLatitude = db.FloatProperty()
-    startLocationLongitude = db.FloatProperty()
-    startLocationLatitudeIndex = db.IntegerProperty()
-    startLocationLongitudeIndex = db.IntegerProperty()
-            
-    # The end location
-    endLocationLatitude = db.FloatProperty()
-    endLocationLongitude = db.FloatProperty()
-    endLocationLatitudeIndex = db.IntegerProperty()
-    endLocationLongitudeIndex = db.IntegerProperty()
     
     # A Reference to the user
     user = db.ReferenceProperty(User)
@@ -154,11 +301,53 @@ class Portal(db.Model):
     endLocationLatitudeIndex = db.IntegerProperty()
     endLocationLongitudeIndex = db.IntegerProperty()
     
+    
+    def setRandomlyInBounds(self, bounds):
+        """
+        Setup an object randomly in some model.Bounds
+        """
+        location = bounds.createRandomLocationInBounds()
+        if random.randint(0, 1) == 0:
+            self.startLocationLatitude = location.latitude
+            self.startLocationLongitude = location.longitude
+            self.startLocationLatitudeIndex = self.latitude / Constants.latIndex()
+            self.startLocationLongitudeIndex = self.longitude / Constants.lonIndex()
+        else:
+            self.endLocationLatitude = location.latitude
+            self.endLocationLongitude = location.longitude
+            self.endLocationLatitudeIndex = self.latitude / Constants.latIndex()
+            self.endLocationLongitudeIndex = self.longitude / Constants.lonIndex()
+
+    
     def getLocationIndex(self):
         """Get the lat/lon indices"""
         return [("startLocationLatitudeIndex", "startLocationLongitudeIndex"),
                 ("endLocationLatitudeIndex", "endLocationLongitudeIndex")]
 
+    def toXML(self):
+        """Return an xml representation of the google app engine model"""
+        return """<Portal>
+                    <hitpoints>%s</hitpoints>
+                    <level>%s</level>
+                    <startlatitude>%s</startlatitude>
+                    <startlongitude>%s</startlongitude>
+                    <endlatitude>%s</endlatitude>
+                    <endlongitude>%s</endlongitude>
+                    %s
+                  </Portal>""" %(self.hitPoints, self.level, self.startLocationLatitude,
+                                 self.startLocationLongitude, self.endLocationLatitude,
+                                 self.endLocationLongitude, self.user.toXML())
+
+    @staticmethod
+    def createRandomObject(cls):
+        """
+        Create a random Portal
+        """
+        p = Portal()
+        p.hitPoints = random.randint(0, 1000)
+        p.level = random.randint(0, 10)
+        p.user = User.createRandomUser()
+        return p
 class Location(db.Model):
     """The location object integrates with AMF"""
     # The index represesents the lattice site on the map
@@ -181,6 +370,12 @@ class Bounds(db.Model):
         height = fabs(self.southwestLocation.latitude - self.northeastLocation.latitude)
         return width * height
     
+    def createRandomLocationInBounds(self):
+        """Create a random location in the bounds"""
+        randomLatitude = random.randrange(self.southwestLocation.latitude, self.northeastLocation.latitude)
+        randomLongitude = random.randrange(self.southwestLocation.longitude, self.northeastLocation.longitude)
+        return Location(randomLatitude, randomLongitude)
+    
     @staticmethod
     def createBoundsFromAMFData(cls, bounds):
         """
@@ -200,6 +395,26 @@ class Bounds(db.Model):
         # Return a Bounds objects
         return Bounds(fBoundSouthWest, fBoundNorthEast)
     
+    @staticmethod
+    def createBoundsFromPhoneXMLData(cls, data):
+        """
+        Convert the xml data into an object. The format of the xml is defined
+        in the iphone appication
+        """
+        xml = cTree.ElementTree(cTree.fromstring(data))
+        
+        # Get the objects from the xml
+        sWLatitude = cls.dataFromXML(xml, "bounds/southwestlocation/latitude")
+        sWLongitude = cls.dataFromXML(xml, "bounds/southwestlocation/longitude")
+        nELatitude = cls.dataFromXML(xml, "bounds/northeastlocation/latitude")
+        nELongitude = cls.dataFromXML(xml, "bounds/northeastlocation/longitude")
+   
+        # Create the location
+        sWLocation = Location(sWLatitude, sWLongitude)
+        nELocation = Location(nELatitude, nELongitude)
+        
+        # Return the bounds
+        return Bounds(sWLocation, nELocation)
     @staticmethod
     def createAllBoundsAroundCentralBound(cls, bounds):
         """
@@ -262,3 +477,8 @@ class Bounds(db.Model):
         boundList.append(rightBound)
         
         return boundList
+    
+    def dataFromXML(self, xml, name):
+        """Get the data from the xml corresponding to elem"""
+        element = xml.find(name)
+        return element.text

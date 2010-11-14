@@ -21,6 +21,7 @@ from google.appengine.ext.webapp.util import run_wsgi_app
 from pyamf.remoting.gateway.google import WebAppGateway
 from services import TowerService, PortalService, RoadService
 from services import register_classes
+from pages import BoundsPage
 
 class MainPage(webapp.RequestHandler):
     def get(self):
@@ -48,7 +49,7 @@ def main():
     # Create a gateway to the amf services
     gateway = WebAppGateway(services, logger=logging, debug=debug_enabled)
 
-    application_paths = [('/', gateway), ('/helloworld', MainPage)]
+    application_paths = [('/', gateway), ('/helloworld', MainPage), ('/bunds', BoundsPage)]
     application = webapp.WSGIApplication(application_paths, debug=debug_enabled)
 
     run_wsgi_app(application)

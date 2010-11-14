@@ -1,0 +1,2 @@
+In file included from /Users/danielo/Documents/TowerSaintIphone/User.m:9:
+/Users/danielo/Documents/TowerSaintIphone/User.h:9:24: error: Cocoa/Cocoa.h: No such file or directory

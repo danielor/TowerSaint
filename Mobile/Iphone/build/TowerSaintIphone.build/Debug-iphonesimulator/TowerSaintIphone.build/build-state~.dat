@@ -1,0 +1,315 @@
+TTowerSaintIphone
+v7
+r0
+t311295897.710189
+cCheck dependencies
+cProcessInfoPlistFile /Users/danielo/Documents/TowerSaintIphone/build/Debug-iphonesimulator/TowerSaintIphone.app/Info.plist TowerSaintIphone-Info.plist
+cCompileXIB /Users/danielo/Documents/TowerSaintIphone/FlipsideView.xib
+cCompileXIB /Users/danielo/Documents/TowerSaintIphone/MainView.xib
+cCompileXIB /Users/danielo/Documents/TowerSaintIphone/MainWindow.xib
+cProcessPCH /var/folders/Tk/TkHyfwUGH8mbQGY9y9tuzk+++TI/-Caches-/com.apple.Xcode.501/SharedPrecompiledHeaders/TowerSaintIphone_Prefix-bazecsnabljhiybldaikkwjfmlyx/TowerSaintIphone_Prefix.pch.gch TowerSaintIphone_Prefix.pch normal i386 objective-c com.apple.compilers.gcc.4_2
+cCompileC build/TowerSaintIphone.build/Debug-iphonesimulator/TowerSaintIphone.build/Objects-normal/i386/main.o /Users/danielo/Documents/TowerSaintIphone/main.m normal i386 objective-c com.apple.compilers.gcc.4_2
+cCompileC build/TowerSaintIphone.build/Debug-iphonesimulator/TowerSaintIphone.build/Objects-normal/i386/TowerSaintIphoneAppDelegate.o /Users/danielo/Documents/TowerSaintIphone/Classes/TowerSaintIphoneAppDelegate.m normal i386 objective-c com.apple.compilers.gcc.4_2
+cCompileC build/TowerSaintIphone.build/Debug-iphonesimulator/TowerSaintIphone.build/Objects-normal/i386/MainViewController.o /Users/danielo/Documents/TowerSaintIphone/Classes/MainViewController.m normal i386 objective-c com.apple.compilers.gcc.4_2
+cCompileC build/TowerSaintIphone.build/Debug-iphonesimulator/TowerSaintIphone.build/Objects-normal/i386/FlipsideViewController.o /Users/danielo/Documents/TowerSaintIphone/Classes/FlipsideViewController.m normal i386 objective-c com.apple.compilers.gcc.4_2
+cLd /Users/danielo/Documents/TowerSaintIphone/build/Debug-iphonesimulator/TowerSaintIphone.app/TowerSaintIphone normal i386
+cGenerateDSYMFile /Users/danielo/Documents/TowerSaintIphone/build/Debug-iphonesimulator/TowerSaintIphone.app.dSYM /Users/danielo/Documents/TowerSaintIphone/build/Debug-iphonesimulator/TowerSaintIphone.app/TowerSaintIphone
+cTouch /Users/danielo/Documents/TowerSaintIphone/build/Debug-iphonesimulator/TowerSaintIphone.app
+
+N/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator4.0.sdk
+c000000004C818D0B0000000000000132
+t1283558667
+s306
+
+N/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator4.0.sdk/System/Library/Frameworks/CoreGraphics.framework/CoreGraphics
+c000000004BFDFE39000000000027C7D0
+t1274936889
+s2607056
+
+N/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator4.0.sdk/System/Library/Frameworks/Foundation.framework/Foundation
+c000000004BFDFE7C000000000029D5D0
+t1274936956
+s2741712
+
+N/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator4.0.sdk/System/Library/Frameworks/Foundation.framework/Headers/Foundation.h
+c000000004BFDFE6E0000000000001466
+t1274936942
+s5222
+
+N/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator4.0.sdk/System/Library/Frameworks/UIKit.framework/Headers/UIKit.h
+c000000004C0470BB00000000000009CD
+t1275359419
+s2509
+
+N/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator4.0.sdk/System/Library/Frameworks/UIKit.framework/UIKit
+c000000004C0471620000000001D47210
+t1275359586
+s30700048
+
+N/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator4.0.sdk/usr/include/Availability.h
+c000000004BF4CBF90000000000001A3B
+t1274334201
+s6715
+
+N/Users/danielo/Documents/TowerSaintIphone/Classes/FlipsideViewController.h
+c000000004CDDC80F000000000000023E
+t1289603087
+s574
+i<UIKit/UIKit.h>
+
+N/Users/danielo/Documents/TowerSaintIphone/Classes/FlipsideViewController.m
+c000000004CDDC80F0000000000000463
+t1289603087
+s1123
+i"FlipsideViewController.h"
+
+N/Users/danielo/Documents/TowerSaintIphone/Classes/MainViewController.h
+c000000004CDDC80F0000000000000141
+t1289603087
+s321
+i"FlipsideViewController.h"
+
+N/Users/danielo/Documents/TowerSaintIphone/Classes/MainViewController.m
+c000000004CDDC80F00000000000005E0
+t1289603087
+s1504
+i"MainViewController.h"
+
+N/Users/danielo/Documents/TowerSaintIphone/Classes/TowerSaintIphoneAppDelegate.h
+c000000004CDDC80F00000000000001FD
+t1289603087
+s509
+i<UIKit/UIKit.h>
+
+N/Users/danielo/Documents/TowerSaintIphone/Classes/TowerSaintIphoneAppDelegate.m
+c000000004CDDC80F0000000000000AC3
+t1289603087
+s2755
+i"TowerSaintIphoneAppDelegate.h"
+i"MainViewController.h"
+
+N/Users/danielo/Documents/TowerSaintIphone/FlipsideView.xib
+c000000004CDDC80F0000000000004C67
+t1289603087
+s19559
+
+N/Users/danielo/Documents/TowerSaintIphone/MainView.xib
+c000000004CDDC80F0000000000004655
+t1289603087
+s18005
+
+N/Users/danielo/Documents/TowerSaintIphone/MainWindow.xib
+c000000004CDDC80F00000000000050BC
+t1289603087
+s20668
+
+N/Users/danielo/Documents/TowerSaintIphone/TowerSaintIphone_Prefix.pch
+c000000004CDDC80F0000000000000152
+t1289603087
+s338
+i<Availability.h>
+i<Foundation/Foundation.h>
+i<UIKit/UIKit.h>
+
+N/Users/danielo/Documents/TowerSaintIphone/build/Debug-iphonesimulator/TowerSaintIphone.app
+t1289603097
+s272
+
+N/Users/danielo/Documents/TowerSaintIphone/build/Debug-iphonesimulator/TowerSaintIphone.app.dSYM
+t1289603097
+s102
+
+N/Users/danielo/Documents/TowerSaintIphone/build/Debug-iphonesimulator/TowerSaintIphone.app/FlipsideView.nib
+t1289603094
+s1194
+
+N/Users/danielo/Documents/TowerSaintIphone/build/Debug-iphonesimulator/TowerSaintIphone.app/Info.plist
+t1289603094
+s633
+
+N/Users/danielo/Documents/TowerSaintIphone/build/Debug-iphonesimulator/TowerSaintIphone.app/MainView.nib
+t1289603094
+s1378
+
+N/Users/danielo/Documents/TowerSaintIphone/build/Debug-iphonesimulator/TowerSaintIphone.app/MainWindow.nib
+t1289603095
+s1158
+
+N/Users/danielo/Documents/TowerSaintIphone/build/Debug-iphonesimulator/TowerSaintIphone.app/PkgInfo
+t1289603094
+s8
+
+N/Users/danielo/Documents/TowerSaintIphone/build/Debug-iphonesimulator/TowerSaintIphone.app/TowerSaintIphone
+t1289603097
+s19432
+
+N/Users/danielo/Documents/TowerSaintIphone/build/TowerSaintIphone.build/Debug-iphonesimulator/TowerSaintIphone.build/Objects-normal/i386/FlipsideViewController.o
+t1289603097
+s37740
+
+N/Users/danielo/Documents/TowerSaintIphone/build/TowerSaintIphone.build/Debug-iphonesimulator/TowerSaintIphone.build/Objects-normal/i386/MainViewController.o
+t1289603097
+s37400
+
+N/Users/danielo/Documents/TowerSaintIphone/build/TowerSaintIphone.build/Debug-iphonesimulator/TowerSaintIphone.build/Objects-normal/i386/TowerSaintIphone.LinkFileList
+c000000004CDDC8160000000000000273
+t1289603094
+s627
+
+N/Users/danielo/Documents/TowerSaintIphone/build/TowerSaintIphone.build/Debug-iphonesimulator/TowerSaintIphone.build/Objects-normal/i386/TowerSaintIphoneAppDelegate.o
+t1289603097
+s48252
+
+N/Users/danielo/Documents/TowerSaintIphone/build/TowerSaintIphone.build/Debug-iphonesimulator/TowerSaintIphone.build/Objects-normal/i386/main.o
+t1289603097
+s6308
+
+N/Users/danielo/Documents/TowerSaintIphone/main.m
+c000000004CDDC80F0000000000000176
+t1289603087
+s374
+i<UIKit/UIKit.h>
+
+N/var/folders/Tk/TkHyfwUGH8mbQGY9y9tuzk+++TI/-Caches-/com.apple.Xcode.501/SharedPrecompiledHeaders/TowerSaintIphone_Prefix-bazecsnabljhiybldaikkwjfmlyx/TowerSaintIphone_Prefix.pch.gch
+t1289603096
+s15232016
+
+NTowerSaintIphone-Info.plist
+c000000004CDDC80F000000000000038D
+t1289603087
+s909
+
+CCheck dependencies
+r0
+lSLF07#2@18"Check dependencies311295894#311295894#0(0"0(0#1#0"32088628383449192#0"0#
+
+CCompileC build/TowerSaintIphone.build/Debug-iphonesimulator/TowerSaintIphone.build/Objects-normal/i386/FlipsideViewController.o /Users/danielo/Documents/TowerSaintIphone/Classes/FlipsideViewController.m normal i386 objective-c com.apple.compilers.gcc.4_2
+s311295897.096060
+e311295897.185995
+r1
+xCompileC
+xbuild/TowerSaintIphone.build/Debug-iphonesimulator/TowerSaintIphone.build/Objects-normal/i386/FlipsideViewController.o
+x/Users/danielo/Documents/TowerSaintIphone/Classes/FlipsideViewController.m
+xnormal
+xi386
+xobjective-c
+xcom.apple.compilers.gcc.4_2
+lSLF07#2@82"Compile /Users/danielo/Documents/TowerSaintIphone/Classes/FlipsideViewController.m311295897#311295897#0(0"0(0#0#74"/Users/danielo/Documents/TowerSaintIphone/Classes/FlipsideViewController.m8611508288#2158"    cd /Users/danielo/Documents/TowerSaintIphone    setenv LANG en_US.US-ASCII    setenv PATH "/Developer/Platforms/iPhoneSimulator.platform/Developer/usr/bin:/Developer/usr/bin:/usr/bin:/bin:/usr/sbin:/sbin"    /Developer/Platforms/iPhoneSimulator.platform/Developer/usr/bin/gcc-4.2 -x objective-c -arch i386 -fmessage-length=0 -pipe -std=c99 -Wno-trigraphs -fpascal-strings -fasm-blocks -O0 -Wreturn-type -Wunused-variable -D__IPHONE_OS_VERSION_MIN_REQUIRED=30200 -isysroot /Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator4.0.sdk -fvisibility=hidden -mmacosx-version-min=10.6 -gdwarf-2 -fobjc-abi-version=2 -fobjc-legacy-dispatch -iquote /Users/danielo/Documents/TowerSaintIphone/build/TowerSaintIphone.build/Debug-iphonesimulator/TowerSaintIphone.build/TowerSaintIphone-generated-files.hmap -I/Users/danielo/Documents/TowerSaintIphone/build/TowerSaintIphone.build/Debug-iphonesimulator/TowerSaintIphone.build/TowerSaintIphone-own-target-headers.hmap -I/Users/danielo/Documents/TowerSaintIphone/build/TowerSaintIphone.build/Debug-iphonesimulator/TowerSaintIphone.build/TowerSaintIphone-all-target-headers.hmap -iquote /Users/danielo/Documents/TowerSaintIphone/build/TowerSaintIphone.build/Debug-iphonesimulator/TowerSaintIphone.build/TowerSaintIphone-project-headers.hmap -F/Users/danielo/Documents/TowerSaintIphone/build/Debug-iphonesimulator -I/Users/danielo/Documents/TowerSaintIphone/build/Debug-iphonesimulator/include -I/Users/danielo/Documents/TowerSaintIphone/build/TowerSaintIphone.build/Debug-iphonesimulator/TowerSaintIphone.build/DerivedSources/i386 -I/Users/danielo/Documents/TowerSaintIphone/build/TowerSaintIphone.build/Debug-iphonesimulator/TowerSaintIphone.build/DerivedSources -include /var/folders/Tk/TkHyfwUGH8mbQGY9y9tuzk+++TI/-Caches-/com.apple.Xcode.501/SharedPrecompiledHeaders/TowerSaintIphone_Prefix-bazecsnabljhiybldaikkwjfmlyx/TowerSaintIphone_Prefix.pch -c /Users/danielo/Documents/TowerSaintIphone/Classes/FlipsideViewController.m -o /Users/danielo/Documents/TowerSaintIphone/build/TowerSaintIphone.build/Debug-iphonesimulator/TowerSaintIphone.build/Objects-normal/i386/FlipsideViewController.o0#
+
+CCompileC build/TowerSaintIphone.build/Debug-iphonesimulator/TowerSaintIphone.build/Objects-normal/i386/MainViewController.o /Users/danielo/Documents/TowerSaintIphone/Classes/MainViewController.m normal i386 objective-c com.apple.compilers.gcc.4_2
+s311295897.079743
+e311295897.180987
+r1
+xCompileC
+xbuild/TowerSaintIphone.build/Debug-iphonesimulator/TowerSaintIphone.build/Objects-normal/i386/MainViewController.o
+x/Users/danielo/Documents/TowerSaintIphone/Classes/MainViewController.m
+xnormal
+xi386
+xobjective-c
+xcom.apple.compilers.gcc.4_2
+lSLF07#2@78"Compile /Users/danielo/Documents/TowerSaintIphone/Classes/MainViewController.m311295897#311295897#0(0"0(0#0#70"/Users/danielo/Documents/TowerSaintIphone/Classes/MainViewController.m8611592128#2150"    cd /Users/danielo/Documents/TowerSaintIphone    setenv LANG en_US.US-ASCII    setenv PATH "/Developer/Platforms/iPhoneSimulator.platform/Developer/usr/bin:/Developer/usr/bin:/usr/bin:/bin:/usr/sbin:/sbin"    /Developer/Platforms/iPhoneSimulator.platform/Developer/usr/bin/gcc-4.2 -x objective-c -arch i386 -fmessage-length=0 -pipe -std=c99 -Wno-trigraphs -fpascal-strings -fasm-blocks -O0 -Wreturn-type -Wunused-variable -D__IPHONE_OS_VERSION_MIN_REQUIRED=30200 -isysroot /Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator4.0.sdk -fvisibility=hidden -mmacosx-version-min=10.6 -gdwarf-2 -fobjc-abi-version=2 -fobjc-legacy-dispatch -iquote /Users/danielo/Documents/TowerSaintIphone/build/TowerSaintIphone.build/Debug-iphonesimulator/TowerSaintIphone.build/TowerSaintIphone-generated-files.hmap -I/Users/danielo/Documents/TowerSaintIphone/build/TowerSaintIphone.build/Debug-iphonesimulator/TowerSaintIphone.build/TowerSaintIphone-own-target-headers.hmap -I/Users/danielo/Documents/TowerSaintIphone/build/TowerSaintIphone.build/Debug-iphonesimulator/TowerSaintIphone.build/TowerSaintIphone-all-target-headers.hmap -iquote /Users/danielo/Documents/TowerSaintIphone/build/TowerSaintIphone.build/Debug-iphonesimulator/TowerSaintIphone.build/TowerSaintIphone-project-headers.hmap -F/Users/danielo/Documents/TowerSaintIphone/build/Debug-iphonesimulator -I/Users/danielo/Documents/TowerSaintIphone/build/Debug-iphonesimulator/include -I/Users/danielo/Documents/TowerSaintIphone/build/TowerSaintIphone.build/Debug-iphonesimulator/TowerSaintIphone.build/DerivedSources/i386 -I/Users/danielo/Documents/TowerSaintIphone/build/TowerSaintIphone.build/Debug-iphonesimulator/TowerSaintIphone.build/DerivedSources -include /var/folders/Tk/TkHyfwUGH8mbQGY9y9tuzk+++TI/-Caches-/com.apple.Xcode.501/SharedPrecompiledHeaders/TowerSaintIphone_Prefix-bazecsnabljhiybldaikkwjfmlyx/TowerSaintIphone_Prefix.pch -c /Users/danielo/Documents/TowerSaintIphone/Classes/MainViewController.m -o /Users/danielo/Documents/TowerSaintIphone/build/TowerSaintIphone.build/Debug-iphonesimulator/TowerSaintIphone.build/Objects-normal/i386/MainViewController.o0#
+
+CCompileC build/TowerSaintIphone.build/Debug-iphonesimulator/TowerSaintIphone.build/Objects-normal/i386/TowerSaintIphoneAppDelegate.o /Users/danielo/Documents/TowerSaintIphone/Classes/TowerSaintIphoneAppDelegate.m normal i386 objective-c com.apple.compilers.gcc.4_2
+s311295896.875331
+e311295897.095955
+r1
+xCompileC
+xbuild/TowerSaintIphone.build/Debug-iphonesimulator/TowerSaintIphone.build/Objects-normal/i386/TowerSaintIphoneAppDelegate.o
+x/Users/danielo/Documents/TowerSaintIphone/Classes/TowerSaintIphoneAppDelegate.m
+xnormal
+xi386
+xobjective-c
+xcom.apple.compilers.gcc.4_2
+lSLF07#2@87"Compile /Users/danielo/Documents/TowerSaintIphone/Classes/TowerSaintIphoneAppDelegate.m311295896#311295897#0(0"0(0#0#79"/Users/danielo/Documents/TowerSaintIphone/Classes/TowerSaintIphoneAppDelegate.m8612348512#2168"    cd /Users/danielo/Documents/TowerSaintIphone    setenv LANG en_US.US-ASCII    setenv PATH "/Developer/Platforms/iPhoneSimulator.platform/Developer/usr/bin:/Developer/usr/bin:/usr/bin:/bin:/usr/sbin:/sbin"    /Developer/Platforms/iPhoneSimulator.platform/Developer/usr/bin/gcc-4.2 -x objective-c -arch i386 -fmessage-length=0 -pipe -std=c99 -Wno-trigraphs -fpascal-strings -fasm-blocks -O0 -Wreturn-type -Wunused-variable -D__IPHONE_OS_VERSION_MIN_REQUIRED=30200 -isysroot /Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator4.0.sdk -fvisibility=hidden -mmacosx-version-min=10.6 -gdwarf-2 -fobjc-abi-version=2 -fobjc-legacy-dispatch -iquote /Users/danielo/Documents/TowerSaintIphone/build/TowerSaintIphone.build/Debug-iphonesimulator/TowerSaintIphone.build/TowerSaintIphone-generated-files.hmap -I/Users/danielo/Documents/TowerSaintIphone/build/TowerSaintIphone.build/Debug-iphonesimulator/TowerSaintIphone.build/TowerSaintIphone-own-target-headers.hmap -I/Users/danielo/Documents/TowerSaintIphone/build/TowerSaintIphone.build/Debug-iphonesimulator/TowerSaintIphone.build/TowerSaintIphone-all-target-headers.hmap -iquote /Users/danielo/Documents/TowerSaintIphone/build/TowerSaintIphone.build/Debug-iphonesimulator/TowerSaintIphone.build/TowerSaintIphone-project-headers.hmap -F/Users/danielo/Documents/TowerSaintIphone/build/Debug-iphonesimulator -I/Users/danielo/Documents/TowerSaintIphone/build/Debug-iphonesimulator/include -I/Users/danielo/Documents/TowerSaintIphone/build/TowerSaintIphone.build/Debug-iphonesimulator/TowerSaintIphone.build/DerivedSources/i386 -I/Users/danielo/Documents/TowerSaintIphone/build/TowerSaintIphone.build/Debug-iphonesimulator/TowerSaintIphone.build/DerivedSources -include /var/folders/Tk/TkHyfwUGH8mbQGY9y9tuzk+++TI/-Caches-/com.apple.Xcode.501/SharedPrecompiledHeaders/TowerSaintIphone_Prefix-bazecsnabljhiybldaikkwjfmlyx/TowerSaintIphone_Prefix.pch -c /Users/danielo/Documents/TowerSaintIphone/Classes/TowerSaintIphoneAppDelegate.m -o /Users/danielo/Documents/TowerSaintIphone/build/TowerSaintIphone.build/Debug-iphonesimulator/TowerSaintIphone.build/Objects-normal/i386/TowerSaintIphoneAppDelegate.o0#
+
+CCompileC build/TowerSaintIphone.build/Debug-iphonesimulator/TowerSaintIphone.build/Objects-normal/i386/main.o /Users/danielo/Documents/TowerSaintIphone/main.m normal i386 objective-c com.apple.compilers.gcc.4_2
+s311295896.873536
+e311295897.079628
+r1
+xCompileC
+xbuild/TowerSaintIphone.build/Debug-iphonesimulator/TowerSaintIphone.build/Objects-normal/i386/main.o
+x/Users/danielo/Documents/TowerSaintIphone/main.m
+xnormal
+xi386
+xobjective-c
+xcom.apple.compilers.gcc.4_2
+lSLF07#2@56"Compile /Users/danielo/Documents/TowerSaintIphone/main.m311295896#311295897#0(0"0(0#0#48"/Users/danielo/Documents/TowerSaintIphone/main.m8612648960#2114"    cd /Users/danielo/Documents/TowerSaintIphone    setenv LANG en_US.US-ASCII    setenv PATH "/Developer/Platforms/iPhoneSimulator.platform/Developer/usr/bin:/Developer/usr/bin:/usr/bin:/bin:/usr/sbin:/sbin"    /Developer/Platforms/iPhoneSimulator.platform/Developer/usr/bin/gcc-4.2 -x objective-c -arch i386 -fmessage-length=0 -pipe -std=c99 -Wno-trigraphs -fpascal-strings -fasm-blocks -O0 -Wreturn-type -Wunused-variable -D__IPHONE_OS_VERSION_MIN_REQUIRED=30200 -isysroot /Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator4.0.sdk -fvisibility=hidden -mmacosx-version-min=10.6 -gdwarf-2 -fobjc-abi-version=2 -fobjc-legacy-dispatch -iquote /Users/danielo/Documents/TowerSaintIphone/build/TowerSaintIphone.build/Debug-iphonesimulator/TowerSaintIphone.build/TowerSaintIphone-generated-files.hmap -I/Users/danielo/Documents/TowerSaintIphone/build/TowerSaintIphone.build/Debug-iphonesimulator/TowerSaintIphone.build/TowerSaintIphone-own-target-headers.hmap -I/Users/danielo/Documents/TowerSaintIphone/build/TowerSaintIphone.build/Debug-iphonesimulator/TowerSaintIphone.build/TowerSaintIphone-all-target-headers.hmap -iquote /Users/danielo/Documents/TowerSaintIphone/build/TowerSaintIphone.build/Debug-iphonesimulator/TowerSaintIphone.build/TowerSaintIphone-project-headers.hmap -F/Users/danielo/Documents/TowerSaintIphone/build/Debug-iphonesimulator -I/Users/danielo/Documents/TowerSaintIphone/build/Debug-iphonesimulator/include -I/Users/danielo/Documents/TowerSaintIphone/build/TowerSaintIphone.build/Debug-iphonesimulator/TowerSaintIphone.build/DerivedSources/i386 -I/Users/danielo/Documents/TowerSaintIphone/build/TowerSaintIphone.build/Debug-iphonesimulator/TowerSaintIphone.build/DerivedSources -include /var/folders/Tk/TkHyfwUGH8mbQGY9y9tuzk+++TI/-Caches-/com.apple.Xcode.501/SharedPrecompiledHeaders/TowerSaintIphone_Prefix-bazecsnabljhiybldaikkwjfmlyx/TowerSaintIphone_Prefix.pch -c /Users/danielo/Documents/TowerSaintIphone/main.m -o /Users/danielo/Documents/TowerSaintIphone/build/TowerSaintIphone.build/Debug-iphonesimulator/TowerSaintIphone.build/Objects-normal/i386/main.o0#
+
+CCompileXIB /Users/danielo/Documents/TowerSaintIphone/FlipsideView.xib
+s311295894.325229
+e311295894.974365
+r1
+xCompileXIB
+x/Users/danielo/Documents/TowerSaintIphone/FlipsideView.xib
+oCouldn't open shared capabilities memory GSCapabilities (No such file or directory)
+oCouldn't open shared capabilities memory GSCapabilities (No such file or directory)
+oCouldn't open shared capabilities memory GSCapabilities (No such file or directory)
+lSLF07#2@27"CompileXIB FlipsideView.xib311295894#311295894#0(252"Couldn't open shared capabilities memory GSCapabilities (No such file or directory)Couldn't open shared capabilities memory GSCapabilities (No such file or directory)Couldn't open shared capabilities memory GSCapabilities (No such file or directory)0(0#0#58"/Users/danielo/Documents/TowerSaintIphone/FlipsideView.xib8611770976#592"    cd /Users/danielo/Documents/TowerSaintIphone    setenv IBC_MINIMUM_COMPATIBILITY_VERSION 4.0    setenv PATH "/Developer/Platforms/iPhoneSimulator.platform/Developer/usr/bin:/Developer/usr/bin:/usr/bin:/bin:/usr/sbin:/sbin"    /Developer/usr/bin/ibtool --errors --warnings --notices --output-format human-readable-text --compile /Users/danielo/Documents/TowerSaintIphone/build/Debug-iphonesimulator/TowerSaintIphone.app/FlipsideView.nib /Users/danielo/Documents/TowerSaintIphone/FlipsideView.xib --sdk /Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator4.0.sdk0#
+
+CCompileXIB /Users/danielo/Documents/TowerSaintIphone/MainView.xib
+s311295894.335990
+e311295894.974595
+r1
+xCompileXIB
+x/Users/danielo/Documents/TowerSaintIphone/MainView.xib
+oCouldn't open shared capabilities memory GSCapabilities (No such file or directory)
+lSLF07#2@23"CompileXIB MainView.xib311295894#311295894#0(84"Couldn't open shared capabilities memory GSCapabilities (No such file or directory)0(0#0#54"/Users/danielo/Documents/TowerSaintIphone/MainView.xib8611110336#584"    cd /Users/danielo/Documents/TowerSaintIphone    setenv IBC_MINIMUM_COMPATIBILITY_VERSION 4.0    setenv PATH "/Developer/Platforms/iPhoneSimulator.platform/Developer/usr/bin:/Developer/usr/bin:/usr/bin:/bin:/usr/sbin:/sbin"    /Developer/usr/bin/ibtool --errors --warnings --notices --output-format human-readable-text --compile /Users/danielo/Documents/TowerSaintIphone/build/Debug-iphonesimulator/TowerSaintIphone.app/MainView.nib /Users/danielo/Documents/TowerSaintIphone/MainView.xib --sdk /Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator4.0.sdk0#
+
+CCompileXIB /Users/danielo/Documents/TowerSaintIphone/MainWindow.xib
+s311295894.974707
+e311295895.464181
+r1
+xCompileXIB
+x/Users/danielo/Documents/TowerSaintIphone/MainWindow.xib
+oCouldn't open shared capabilities memory GSCapabilities (No such file or directory)
+lSLF07#2@25"CompileXIB MainWindow.xib311295894#311295895#0(84"Couldn't open shared capabilities memory GSCapabilities (No such file or directory)0(0#0#56"/Users/danielo/Documents/TowerSaintIphone/MainWindow.xib8607146976#588"    cd /Users/danielo/Documents/TowerSaintIphone    setenv IBC_MINIMUM_COMPATIBILITY_VERSION 4.0    setenv PATH "/Developer/Platforms/iPhoneSimulator.platform/Developer/usr/bin:/Developer/usr/bin:/usr/bin:/bin:/usr/sbin:/sbin"    /Developer/usr/bin/ibtool --errors --warnings --notices --output-format human-readable-text --compile /Users/danielo/Documents/TowerSaintIphone/build/Debug-iphonesimulator/TowerSaintIphone.app/MainWindow.nib /Users/danielo/Documents/TowerSaintIphone/MainWindow.xib --sdk /Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator4.0.sdk0#
+
+CGenerateDSYMFile /Users/danielo/Documents/TowerSaintIphone/build/Debug-iphonesimulator/TowerSaintIphone.app.dSYM /Users/danielo/Documents/TowerSaintIphone/build/Debug-iphonesimulator/TowerSaintIphone.app/TowerSaintIphone
+s311295897.548292
+e311295897.677085
+r1
+xGenerateDSYMFile
+x/Users/danielo/Documents/TowerSaintIphone/build/Debug-iphonesimulator/TowerSaintIphone.app.dSYM
+x/Users/danielo/Documents/TowerSaintIphone/build/Debug-iphonesimulator/TowerSaintIphone.app/TowerSaintIphone
+lSLF07#2@136"GenerateDSYMFile build/Debug-iphonesimulator/TowerSaintIphone.app.dSYM build/Debug-iphonesimulator/TowerSaintIphone.app/TowerSaintIphone311295897#311295897#0(0"0(0#0#107"/Users/danielo/Documents/TowerSaintIphone/build/Debug-iphonesimulator/TowerSaintIphone.app/TowerSaintIphone8611565984#419"    cd /Users/danielo/Documents/TowerSaintIphone    setenv PATH "/Developer/Platforms/iPhoneSimulator.platform/Developer/usr/bin:/Developer/usr/bin:/usr/bin:/bin:/usr/sbin:/sbin"    /Developer/usr/bin/dsymutil /Users/danielo/Documents/TowerSaintIphone/build/Debug-iphonesimulator/TowerSaintIphone.app/TowerSaintIphone -o /Users/danielo/Documents/TowerSaintIphone/build/Debug-iphonesimulator/TowerSaintIphone.app.dSYM0#
+
+CLd /Users/danielo/Documents/TowerSaintIphone/build/Debug-iphonesimulator/TowerSaintIphone.app/TowerSaintIphone normal i386
+s311295897.186095
+e311295897.548188
+r1
+xLd
+x/Users/danielo/Documents/TowerSaintIphone/build/Debug-iphonesimulator/TowerSaintIphone.app/TowerSaintIphone
+xnormal
+xi386
+lSLF07#2@112"Link /Users/danielo/Documents/TowerSaintIphone/build/Debug-iphonesimulator/TowerSaintIphone.app/TowerSaintIphone311295897#311295897#0(0"0(0#0#0"8611295104#960"    cd /Users/danielo/Documents/TowerSaintIphone    setenv MACOSX_DEPLOYMENT_TARGET 10.6    setenv PATH "/Developer/Platforms/iPhoneSimulator.platform/Developer/usr/bin:/Developer/usr/bin:/usr/bin:/bin:/usr/sbin:/sbin"    /Developer/Platforms/iPhoneSimulator.platform/Developer/usr/bin/gcc-4.2 -arch i386 -isysroot /Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator4.0.sdk -L/Users/danielo/Documents/TowerSaintIphone/build/Debug-iphonesimulator -F/Users/danielo/Documents/TowerSaintIphone/build/Debug-iphonesimulator -filelist /Users/danielo/Documents/TowerSaintIphone/build/TowerSaintIphone.build/Debug-iphonesimulator/TowerSaintIphone.build/Objects-normal/i386/TowerSaintIphone.LinkFileList -mmacosx-version-min=10.6 -Xlinker -objc_abi_version -Xlinker 2 -framework Foundation -framework UIKit -framework CoreGraphics -o /Users/danielo/Documents/TowerSaintIphone/build/Debug-iphonesimulator/TowerSaintIphone.app/TowerSaintIphone0#
+
+CProcessInfoPlistFile /Users/danielo/Documents/TowerSaintIphone/build/Debug-iphonesimulator/TowerSaintIphone.app/Info.plist TowerSaintIphone-Info.plist
+s311295894.287588
+e311295894.325120
+r1
+xProcessInfoPlistFile
+x/Users/danielo/Documents/TowerSaintIphone/build/Debug-iphonesimulator/TowerSaintIphone.app/Info.plist
+xTowerSaintIphone-Info.plist
+lSLF07#2@35"Process TowerSaintIphone-Info.plist311295894#311295894#0(0"0(0#0#69"/Users/danielo/Documents/TowerSaintIphone/TowerSaintIphone-Info.plist12948282727596144#515"    cd /Users/danielo/Documents/TowerSaintIphone    setenv PATH "/Developer/Platforms/iPhoneSimulator.platform/Developer/usr/bin:/Developer/usr/bin:/usr/bin:/bin:/usr/sbin:/sbin"    builtin-infoPlistUtility TowerSaintIphone-Info.plist -genpkginfo /Users/danielo/Documents/TowerSaintIphone/build/Debug-iphonesimulator/TowerSaintIphone.app/PkgInfo -expandbuildsettings -format binary -platform iphonesimulator -o /Users/danielo/Documents/TowerSaintIphone/build/Debug-iphonesimulator/TowerSaintIphone.app/Info.plist0#
+
+CProcessPCH /var/folders/Tk/TkHyfwUGH8mbQGY9y9tuzk+++TI/-Caches-/com.apple.Xcode.501/SharedPrecompiledHeaders/TowerSaintIphone_Prefix-bazecsnabljhiybldaikkwjfmlyx/TowerSaintIphone_Prefix.pch.gch TowerSaintIphone_Prefix.pch normal i386 objective-c com.apple.compilers.gcc.4_2
+s311295895.464345
+e311295896.873229
+r1
+xProcessPCH
+x/var/folders/Tk/TkHyfwUGH8mbQGY9y9tuzk+++TI/-Caches-/com.apple.Xcode.501/SharedPrecompiledHeaders/TowerSaintIphone_Prefix-bazecsnabljhiybldaikkwjfmlyx/TowerSaintIphone_Prefix.pch.gch
+xTowerSaintIphone_Prefix.pch
+xnormal
+xi386
+xobjective-c
+xcom.apple.compilers.gcc.4_2
+lSLF07#2@38"Precompile TowerSaintIphone_Prefix.pch311295895#311295896#0(0"0(0#0#69"/Users/danielo/Documents/TowerSaintIphone/TowerSaintIphone_Prefix.pch8608930400#1994"    cd /Users/danielo/Documents/TowerSaintIphone    setenv LANG en_US.US-ASCII    setenv PATH "/Developer/Platforms/iPhoneSimulator.platform/Developer/usr/bin:/Developer/usr/bin:/usr/bin:/bin:/usr/sbin:/sbin"    /Developer/Platforms/iPhoneSimulator.platform/Developer/usr/bin/gcc-4.2 -x objective-c-header -arch i386 -fmessage-length=0 -pipe -std=c99 -Wno-trigraphs -fpascal-strings -fasm-blocks -O0 -Wreturn-type -Wunused-variable -D__IPHONE_OS_VERSION_MIN_REQUIRED=30200 -isysroot /Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator4.0.sdk -fvisibility=hidden -mmacosx-version-min=10.6 -gdwarf-2 -fobjc-abi-version=2 -fobjc-legacy-dispatch -iquote /Users/danielo/Documents/TowerSaintIphone/build/TowerSaintIphone.build/Debug-iphonesimulator/TowerSaintIphone.build/TowerSaintIphone-generated-files.hmap -I/Users/danielo/Documents/TowerSaintIphone/build/TowerSaintIphone.build/Debug-iphonesimulator/TowerSaintIphone.build/TowerSaintIphone-own-target-headers.hmap -I/Users/danielo/Documents/TowerSaintIphone/build/TowerSaintIphone.build/Debug-iphonesimulator/TowerSaintIphone.build/TowerSaintIphone-all-target-headers.hmap -iquote /Users/danielo/Documents/TowerSaintIphone/build/TowerSaintIphone.build/Debug-iphonesimulator/TowerSaintIphone.build/TowerSaintIphone-project-headers.hmap -F/Users/danielo/Documents/TowerSaintIphone/build/Debug-iphonesimulator -I/Users/danielo/Documents/TowerSaintIphone/build/Debug-iphonesimulator/include -I/Users/danielo/Documents/TowerSaintIphone/build/TowerSaintIphone.build/Debug-iphonesimulator/TowerSaintIphone.build/DerivedSources/i386 -I/Users/danielo/Documents/TowerSaintIphone/build/TowerSaintIphone.build/Debug-iphonesimulator/TowerSaintIphone.build/DerivedSources -c /Users/danielo/Documents/TowerSaintIphone/TowerSaintIphone_Prefix.pch -o /var/folders/Tk/TkHyfwUGH8mbQGY9y9tuzk+++TI/-Caches-/com.apple.Xcode.501/SharedPrecompiledHeaders/TowerSaintIphone_Prefix-bazecsnabljhiybldaikkwjfmlyx/TowerSaintIphone_Prefix.pch.gch0#
+
+CTouch /Users/danielo/Documents/TowerSaintIphone/build/Debug-iphonesimulator/TowerSaintIphone.app
+s311295897.677205
+e311295897.710120
+r1
+xTouch
+x/Users/danielo/Documents/TowerSaintIphone/build/Debug-iphonesimulator/TowerSaintIphone.app
+lSLF07#2@96"Touch /Users/danielo/Documents/TowerSaintIphone/build/Debug-iphonesimulator/TowerSaintIphone.app311295897#311295897#0(0"0(0#0#0"8611479136#293"    cd /Users/danielo/Documents/TowerSaintIphone    setenv PATH "/Developer/Platforms/iPhoneSimulator.platform/Developer/usr/bin:/Developer/usr/bin:/usr/bin:/bin:/usr/sbin:/sbin"    /usr/bin/touch -c /Users/danielo/Documents/TowerSaintIphone/build/Debug-iphonesimulator/TowerSaintIphone.app0#
+
