@@ -58,7 +58,7 @@ class User(db.Model):
                  </User>""" % (self.FacebookID, self.completeWoodProduction, self.completeStoneProduction,
                                self.completeManaProduction, self.isEmperor, self.Empire, self.Experience)
 
-    @staticmethod
+    @classmethod
     def createRandomUser(self):
         """Create a random user"""
         u = User()
@@ -69,6 +69,7 @@ class User(db.Model):
         u.completeManaProduction = random.randint(0, 1000)
         u.completeStoneProduction = random.randint(0, 1000)
         u.completeWoodProduction = random.randint(0, 1000)
+        u.put()
         return u
         
         
@@ -77,7 +78,7 @@ class BoundsPlugin(object):
     The filter plugin adds filter functionality to all of the model object.
     Static methods will be inherited by all of children methods
     """
-    @staticmethod
+    @classmethod
     def createRandomObjectInBounds(cls, bounds):
         """
         Function expects a @class-model.Bounds objects as the argument, and
@@ -87,7 +88,7 @@ class BoundsPlugin(object):
         obj.setRandomlyInBounds(bounds)
         return obj
     
-    @staticmethod
+    @classmethod
     def getObjectInBounds(cls, bounds):
         """
         Function expects a @class-model.Bounds objects as the argument
@@ -131,8 +132,8 @@ class BoundsPlugin(object):
         Setup an object randomly in some model.Bounds
         """
         raise NotImplementedError("FilterPlugin.getLocation Need to implement in inherited class")
-    # TODO: STart Here
-    @staticmethod
+
+    @classmethod
     def createRandomObject(cls):
         """
         Create a random object of a certain type
@@ -152,8 +153,8 @@ class Road(db.Model, BoundsPlugin):
     # The latitude and longitude associated with the objects
     lonIndex = db.IntegerProperty()
     latIndex = db.IntegerProperty()
-    latitude = db.IntegerProperty() 
-    longitude = db.IntegerProperty()
+    latitude = db.FloatProperty() 
+    longitude = db.FloatProperty()
 
     def getLocationIndex(self):
         """Get the lat/lon indices"""
@@ -176,10 +177,10 @@ class Road(db.Model, BoundsPlugin):
         location = bounds.createRandomLocationInBounds()
         self.latitude = location.latitude
         self.longitude = location.longitude
-        self.latIndex = self.latitude / Constants.latIndex()
-        self.lonIndex = self.longitude / Constants.lonIndex()
+        self.latIndex = int(self.latitude / Constants.latIndex())
+        self.lonIndex = int(self.longitude / Constants.lonIndex())
         
-    @staticmethod
+    @classmethod
     def createRandomObject(cls):
         """
         Create a random Road
@@ -216,8 +217,8 @@ class Tower(db.Model, BoundsPlugin):
     # The latitude and longitude associated with the objects
     lonIndex = db.IntegerProperty()
     latIndex = db.IntegerProperty()
-    latitude = db.IntegerProperty() 
-    longitude = db.IntegerProperty()
+    latitude = db.FloatProperty() 
+    longitude = db.FloatProperty()
     
     def getLocationIndex(self):
         """Get the lat/lon indices"""
@@ -256,10 +257,10 @@ class Tower(db.Model, BoundsPlugin):
         location = bounds.createRandomLocationInBounds()
         self.latitude = location.latitude
         self.longitude = location.longitude
-        self.latIndex = self.latitude / Constants.latIndex()
-        self.lonIndex = self.longitude / Constants.lonIndex()
+        self.latIndex = int(self.latitude / Constants.latIndex())
+        self.lonIndex = int(self.longitude / Constants.lonIndex())
         
-    @staticmethod
+    @classmethod
     def createRandomObject(cls):
         """
         Create a random Tower
@@ -307,16 +308,17 @@ class Portal(db.Model, BoundsPlugin):
         Setup an object randomly in some model.Bounds
         """
         location = bounds.createRandomLocationInBounds()
+
         if random.randint(0, 1) == 0:
             self.startLocationLatitude = location.latitude
             self.startLocationLongitude = location.longitude
-            self.startLocationLatitudeIndex = self.latitude / Constants.latIndex()
-            self.startLocationLongitudeIndex = self.longitude / Constants.lonIndex()
+            self.startLocationLatitudeIndex = int(self.startLocationLatitude / Constants.latIndex())
+            self.startLocationLongitudeIndex = int(self.startLocationLongitude / Constants.lonIndex())
         else:
             self.endLocationLatitude = location.latitude
             self.endLocationLongitude = location.longitude
-            self.endLocationLatitudeIndex = self.latitude / Constants.latIndex()
-            self.endLocationLongitudeIndex = self.longitude / Constants.lonIndex()
+            self.endLocationLatitudeIndex = int(self.endLocationLatitude / Constants.latIndex())
+            self.endLocationLongitudeIndex = int(self.endLocationLongitude / Constants.lonIndex())
 
     
     def getLocationIndex(self):
@@ -338,7 +340,7 @@ class Portal(db.Model, BoundsPlugin):
                                  self.startLocationLongitude, self.endLocationLatitude,
                                  self.endLocationLongitude, self.user.toXML())
 
-    @staticmethod
+    @classmethod
     def createRandomObject(cls):
         """
         Create a random Portal
@@ -358,6 +360,9 @@ class Location(db.Model):
     latitude = db.FloatProperty()
     longitude = db.FloatProperty()
     
+    def __str__(self):
+        return "<Location %s, %s, %s, %s>" % (self.latIndex, self.lonIndex, self.latitude, self.longitude)
+    
 
 class Bounds(db.Model):
     """The bound object integrates with AMF"""
@@ -370,13 +375,17 @@ class Bounds(db.Model):
         height = fabs(self.southwestLocation.latitude - self.northeastLocation.latitude)
         return width * height
     
+    def __str__(self):
+        return "<Bounds %s, %s>" % (self.southwestLocation, self.northeastLocation)
+    
     def createRandomLocationInBounds(self):
         """Create a random location in the bounds"""
-        randomLatitude = random.randrange(self.southwestLocation.latitude, self.northeastLocation.latitude)
-        randomLongitude = random.randrange(self.southwestLocation.longitude, self.northeastLocation.longitude)
-        return Location(randomLatitude, randomLongitude)
+        randomLatitude = random.uniform(self.southwestLocation.latitude, self.northeastLocation.latitude)
+        randomLongitude = random.uniform(self.southwestLocation.longitude, self.northeastLocation.longitude)
+        return Location(latIndex = int(randomLatitude / Constants.latIndex()), lonIndex = int(randomLongitude / Constants.lonIndex()), 
+                        latitude = randomLatitude, longitude = randomLongitude)
     
-    @staticmethod
+    @classmethod
     def createBoundsFromAMFData(cls, bounds):
         """
         Extract the relevant information from the AMF data
@@ -389,13 +398,19 @@ class Bounds(db.Model):
         longitudeList = [northeastLocation['longitude'], southwestLocation['longitude']]
         
         # Create the bounds
-        fBoundSouthWest = Location(min(latitudeList), max(latitudeList))
-        fBoundNorthEast = Location(min(longitudeList), max(longitudeList))
+        minLat, minLon = min(latitudeList), min(longitudeList)
+        maxLat, maxLon = max(latitudeList), max(longitudeList)
+        fBoundSouthWest = Location(latIndex = int(minLat / Constants.latIndex()), lonIndex = int(minLon / Constants.lonIndex()), 
+                                   latitude = minLat, longitude = minLon)
+        fBoundNorthEast =  Location(latIndex = int(maxLat / Constants.latIndex()), lonIndex = int(maxLon / Constants.lonIndex()), 
+                                    latitude = maxLat, longitude = maxLon)
+        fBoundSouthWest.put()
+        fBoundNorthEast.put()
         
         # Return a Bounds objects
-        return Bounds(fBoundSouthWest, fBoundNorthEast)
+        return Bounds(southwestLocation = fBoundSouthWest, northeastLocation = fBoundNorthEast)
     
-    @staticmethod
+    @classmethod
     def createBoundsFromPhoneXMLData(cls, data):
         """
         Convert the xml data into an object. The format of the xml is defined
@@ -415,7 +430,7 @@ class Bounds(db.Model):
         
         # Return the bounds
         return Bounds(sWLocation, nELocation)
-    @staticmethod
+    @classmethod
     def createAllBoundsAroundCentralBound(cls, bounds):
         """
         Function create all bounds around a central bound. The central bound is the visible bound.

@@ -26,8 +26,8 @@ def createListOfLocations(latlng, numberOfLocations = 5):
     longitudeList = [northeastLocation['longitude'], southwestLocation['longitude']]
     minLatitude, maxLatitude = min(latitudeList), max(latitudeList)
     minLongitude, maxLongitude = min(longitudeList), max(longitudeList)
-    listOfLatitude = [a for a in drange(minLatitude, maxLatitude, Constants.latOffset())]
-    listOfLongitude = [l for l in drange(minLongitude, maxLongitude, Constants.lonOffset())]
+    listOfLatitude = [a for a in drange(minLatitude, maxLatitude, Constants.latIndex())]
+    listOfLongitude = [l for l in drange(minLongitude, maxLongitude, Constants.lonIndex())]
     
     # The number of the proxy
     listOfLocation = []
@@ -36,8 +36,8 @@ def createListOfLocations(latlng, numberOfLocations = 5):
         # Create the location data
         longitude = listOfLongitude[random.randrange(0, len(listOfLongitude) - 1)]
         latitude = listOfLatitude[random.randrange(0, len(listOfLatitude) - 1)]
-        longitudeIndex = int(longitude / Constants.lonOffset())
-        latitudeIndex = int(latitude / Constants.latOffset())
+        longitudeIndex = int(longitude / Constants.lonIndex())
+        latitudeIndex = int(latitude / Constants.latIndex())
         
         # Create the location, and the object proxy
         l = createLocation(latitudeIndex, longitudeIndex, latitude, longitude)
@@ -165,21 +165,16 @@ class TowerService(object):
     
     def _createListOfTowers(self, bounds, howMany):
         """Create a list of towers in the bounds"""
-        listOfLocations = createListOfLocations(bounds, howMany)
-        u = createRandomUser()
-        u.put()
+            
+        # Create the objects
+        b = Bounds.createBoundsFromAMFData(bounds)
         
         # List of objects
         listOfTowers = []
         
         # From the list of locations 
-        for l in listOfLocations:
-            tower = createTower(random.randint(0, 1000), random.randint(0, 10), random.randint(0, 10),
-                                                  random.randint(0, 10), random.randint(0, 10), random.random(),
-                                                  random.randint(0, 1000), random.randint(0, 1) == 0, random.randint(0, 1) == 0,
-                                                  random.randint(0, 1) == 0, u, random.randint(0, 1000), random.randint(0, 1000),
-                                                  random.randint(0, 1000), random.randint(0, 4), l)
-            
+        for _ in range(howMany):
+            tower = Tower.createRandomObjectInBounds(b)
             tower.put()
             # Get the proxy
             listOfTowers.append(tower)
@@ -224,16 +219,13 @@ class PortalService(object):
         """Get all tower objects within the bounds"""
         
         # Create the objects
-        listOfLocations = createListOfLocations(latlng, self.numberOfObjectsPerBound)
-        u = createRandomUser()
-        u.put()
-        listOfPairs = createListOfPairs(listOfLocations)
+        b = Bounds.createBoundsFromAMFData(latlng)
         
         # The list of portals
         listOfPortals = []
         
-        for firstL, secondL in listOfPairs:
-            portal = createPortal(random.randint(0, 1000), random.randint(0, 10), u)
+        for _ in range(self.numberOfObjectsPerBound):
+            portal = Portal.createRandomObjectInBounds(b)
             
             # Create the proxy
             listOfPortals.append(portal)
@@ -256,16 +248,15 @@ class RoadService(object):
     
     def getObjectInBounds(self, latlng):
         """Get all tower objects within the bounds"""
-        listOfLocations = createListOfLocations(latlng, self.numberOfObjectsPerBound)
-        u = createRandomUser()
-        u.put()
+        # Create the objects
+        b = Bounds.createBoundsFromAMFData(latlng)
         
         # The list of road
         listOfRoads = []
-        for l in listOfLocations:
+        for _ in range(self.numberOfObjectsPerBound):
             
             # Create the road
-            road = createRoad(random.randint(0, 1000),random.randint(0, 10), u)
+            road = Road.createRandomObjectInBounds(b)
             
             # The proxy
             listOfRoads.append(road)
