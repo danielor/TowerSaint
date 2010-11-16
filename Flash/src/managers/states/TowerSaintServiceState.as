@@ -17,7 +17,9 @@ package managers.states
 		private const towerRemoteServiceString:String = "tower";
 		private const roadRemoteServiceString:String = "road";	
 		private const URL:String = "http://localhost:8083";
-		private const latticeGranularity:Number = .001;
+		private const latOffset:Number = .001;					/* Latitude granularity */
+		private const lonOffset:Number = .001;					/* Longitude granularity */
+		private const maxInfluence:Number = 10;					/* The max influence */
 
 		// Dictionary holds all of the remote objects
 		private var remoteObjectCollection:Dictionary;
@@ -57,9 +59,16 @@ package managers.states
 		}
 		
 		/* Return the lattice granurality */
-		public function getLatticeGranularity():Number {
-			return this.latticeGranularity;
+		public function getLatOffset():Number {
+			return this.latOffset;
 		}
+		public function getLonOffset():Number {
+			return this.lonOffset;
+		}
+		public function getMaxInfluence():Number {
+			return this.maxInfluence;
+		}
+		
 		
 		/* Create the remote objects that corresponds to object services */
 		private function createRemoteObject(channel:ChannelSet, remoteString:String) : void{

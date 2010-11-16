@@ -168,5 +168,23 @@ package models
 		public function getIsModified():Boolean {
 			return this.isModified;
 		}
+		
+		public function getMaxInfluence():Number {
+			switch(this.level){
+				case 1:
+					return 1.;
+				case 2:
+					return 2.;
+				case 3:
+					return 5.;
+				case 4:
+					return 10.;
+				default:
+					return 1.;
+			}
+		}
+		public function getPosition(b:LatLngBounds):LatLng{
+			return new LatLng(this.latitude, this.longitude);
+		}
 	}
 }

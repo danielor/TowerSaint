@@ -144,5 +144,29 @@ package models
 		public function getIsModified():Boolean {
 			return this.isModified;
 		}
+		
+		public function getMaxInfluence():Number {
+			switch(this.level){
+				case 1:
+					return 1.;
+				case 2:
+					return 2.;
+				case 3:
+					return 5.;
+				case 4:
+					return 10.;
+				default:
+					return 1.;
+			}
+		}
+		public function getPosition(b:LatLngBounds):LatLng{
+			var sL:LatLng = new LatLng(this.startLocationLatitude, this.startLocationLongitude);
+			var eL:LatLng = new LatLng(this.endLocationLatitude, this.endLocationLongitude);
+			if(b.containsLatLng(sL)){
+				return sL;
+			}else{
+				return eL;
+			}
+		}
 	}
 }

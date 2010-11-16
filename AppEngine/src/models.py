@@ -497,3 +497,4 @@ class Bounds(db.Model):
         """Get the data from the xml corresponding to elem"""
         element = xml.find(name)
         return element.text
+    
