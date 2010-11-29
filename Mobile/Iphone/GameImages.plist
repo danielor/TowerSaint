@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>New item</key>
+	<dict>
+		<key>Icon</key>
+		<string>Crown.png</string>
+	</dict>
+	<key>New item - 2</key>
+	<dict>
+		<key>Icon</key>
+		<string>EastRoad.png</string>
+	</dict>
+	<key>New item - 3</key>
+	<dict>
+		<key>Icon</key>
+		<string>EastWestRoad.png</string>
+	</dict>
+	<key>New item - 4</key>
+	<dict>
+		<key>Icon</key>
+		<string>NorthEastRoad.png</string>
+	</dict>
+	<key>New item - 5</key>
+	<dict>
+		<key>Icon</key>
+		<string>NorthEastWestRoad.png</string>
+	</dict>
+	<key>New item - 6</key>
+	<dict>
+		<key>Icon</key>
+		<string>NorthRoad.png</string>
+	</dict>
+	<key>New item - 7</key>
+	<dict>
+		<key>Icon</key>
+		<string>NorthSouthEastRoad.png</string>
+	</dict>
+	<key>New item - 8</key>
+	<dict>
+		<key>Icon</key>
+		<string>NorthSouthEastWestRoad.png</string>
+	</dict>
+	<key>New item - 9</key>
+	<dict>
+		<key>Icon</key>
+		<string>NorthWestRoad.png</string>
+	</dict>
+	<key>New item - 10</key>
+	<dict>
+		<key>Icon</key>
+		<string>Portal.png</string>
+	</dict>
+	<key>New item - 11</key>
+	<dict>
+		<key>Icon</key>
+		<string>SouthEastRoad.png</string>
+	</dict>
+	<key>New item - 12</key>
+	<dict>
+		<key>Icon</key>
+		<string>SouthEastWestRoad.png</string>
+	</dict>
+	<key>New item - 13</key>
+	<dict>
+		<key>Icon</key>
+		<string>Tower_Level0.png</string>
+	</dict>
+	<key>New item - 14</key>
+	<dict>
+		<key>Icon</key>
+		<string>Tower_Level1.png</string>
+	</dict>
+	<key>New item - 15</key>
+	<dict>
+		<key>Icon</key>
+		<string>Tower_Level2.png</string>
+	</dict>
+	<key>New item - 16</key>
+	<dict>
+		<key>Icon</key>
+		<string>TowerSaint.png</string>
+	</dict>
+	<key>New item - 16 - 2</key>
+	<dict>
+		<key>Icon</key>
+		<string>WestRoad.png</string>
+	</dict>
+</dict>
+</plist>

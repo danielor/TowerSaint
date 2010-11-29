@@ -13,7 +13,17 @@
 
 @synthesize FacebookID, Experience, Empire, isEmperor;
 @synthesize completeManaProduction, completeStoneProduction;
-@synthesize completeWoodProduction;
+@synthesize completeWoodProduction, gameImage, isActive;
+@synthesize coordinate;
+
+-(id) init {
+	self = [super init];
+	if (self != nil) {
+		isActive = NO;
+	}
+	return self;
+	
+}
 
 -(void) parseXMLElement:(NSMutableString*)currentElementValue elementName:(NSString*)elementName {
 	NSString * string = [NSString stringWithString:currentElementValue];
@@ -38,8 +48,45 @@
 		[self setCompleteWoodProduction:[trimmedString intValue]];
 	}
 	if([elementName isEqualToString:@"facebookid"]){
-		[self setFacebookID:[trimmedString floatValue]];
+		[self setFacebookID:[trimmedString intValue]];
 	}
 }
+
+-(UIImage*) getGameImage{
+	return gameImage;
+}
+
+-(NSString*) getImageString {
+	return [[NSString alloc] initWithString:@"Crown.png"];
+}
+
+
+
+-(void) setState:(NSInteger)i{
+	
+}
+
+- (void)setValueOfCoordinate:(CLLocationCoordinate2D)newCoordinate{
+	self.coordinate = newCoordinate;
+}
+
+-(BOOL) getIsActive{
+	return isActive;
+}
+
+
+-(void) release {
+	[Empire release];
+	[gameImage release];
+}
+
+-(NSInteger) getState{
+	return 0;
+}
+
+-(NSString*) getCharacteristicXMLString{
+	return [[NSString alloc] initWithString:@"User"];
+}
+
 
 @end

@@ -12,7 +12,7 @@
 @implementation Road
 
 @synthesize hitPoints, level, user, location;
-@synthesize parseState;
+@synthesize parseState, gameImage;
 
 -(id) init {
 	self = [super init];
@@ -24,7 +24,7 @@
 }
 
 -(void) parseXMLElement:(NSMutableString*)currentElementValue elementName:(NSString*)elementName {
-	if(parseState == kParseUser){
+	if(parseState == kParseUserRoad){
 		[self.user parseXMLElement:currentElementValue elementName:elementName];
 	}else {
 		NSString * string = [NSString stringWithString:currentElementValue];
@@ -37,10 +37,10 @@
 			[self setLevel:[trimmedString intValue]];
 		}
 		if([elementName isEqualToString:@"latitude"]){
-			self.location.latitude = [trimmedString floatValue];
+			location.latitude = [trimmedString floatValue];
 		}
 		if([elementName isEqualToString:@"longitude"]){
-			self.location.longitude = [trimmedString floatValue];
+			location.longitude = [trimmedString floatValue];
 		}
 	}
 }
@@ -48,5 +48,26 @@
 -(void) setState:(NSInteger)i {
 	parseState = i;
 }
+
+-(NSInteger) getState {
+	return parseState;	
+}
+
+-(NSString*) getImageString{
+	return [[NSString alloc] initWithString:@"EastRoad.png"];
+}
+
+-(UIImage*) getGameImage{
+	return gameImage;
+}
+
+-(void) release {
+	[gameImage release];
+}
+
+-(NSString*) getCharacteristicXMLString{
+	return [[NSString alloc] initWithString:@"Road"];
+}
+
 
 @end

@@ -12,12 +12,13 @@
 @implementation ModelConnectionAndParse
 
 @synthesize connection, dataFromConnection, parser, currentElementValue;
-@synthesize resultDelegate, listOfData, currentModel;
+@synthesize resultDelegate, listOfData, currentModel, queueOfConnections;
 
 -(id) init {
 	self = [super init];
 	if (self != nil) {
 		dataFromConnection = [[NSMutableData alloc] init];
+		queueOfConnections = [[NSMutableArray alloc] init];
 	}
 	return self;
 }
@@ -25,10 +26,15 @@
 -(void) parseConnectionAndRespond:(NSURLRequest*)r response:(id<ModelConnectionResultDelegate>) rD{
 	// Setup the connection/response
 	self.resultDelegate = rD;
-	connection = [[NSURLConnection alloc] initWithRequest:r delegate:self startImmediately:YES]; 
+	
+	// If there is no connections. Run it.
+	if ([queueOfConnections count] == 0) {
+		connection = [[NSURLConnection alloc] initWithRequest:r delegate:self startImmediately:YES]; 
+	}
+	[queueOfConnections addObject:r];
 }
 
-(void) parseServerData {
+-(void) parseServerData {
 	// Parse the data if we have it.
 	if([dataFromConnection length] != 0){
 		// Release a previous instance of the parser
@@ -43,6 +49,16 @@
 		if(succcess){
 			// Give the data to the main view to display.
 			[self.resultDelegate handleResultsFromServer:listOfData];
+			
+			// Remove the current object. If there are more objects run them.
+			[queueOfConnections removeObjectAtIndex:0];
+			[connection release];
+			if ([queueOfConnections count] != 0) {
+				NSURLRequest * r = (NSURLRequest*)[queueOfConnections objectAtIndex:0];
+				connection = [[NSURLConnection alloc] initWithRequest:r delegate:self startImmediately:YES];
+			}
+			
+			[listOfData release];
 		}
 	}
 }
@@ -57,6 +73,18 @@
 		}
 		
 		listOfData = [[NSMutableArray alloc] init];
+	}else if([elementName isEqualToString:@"Tower"]){
+		currentModel = [[Tower alloc] init];
+	}else if([elementName isEqualToString:@"Portal"]){
+		currentModel = [[Portal alloc] init];
+	}else if([elementName isEqualToString:@"Road"]){
+		currentModel = [[Road alloc] init];
+	}else if([elementName isEqualToString:@"User"]){
+		if(currentModel == nil){
+			currentModel = [[User alloc] init];
+		}else {
+			[currentModel setState:0];
+		}
 	}
 	
 }
@@ -68,23 +96,20 @@
 	[currentElementValue appendString:string];
 }
 
-- (void) parser:(NSXMLParser*)parser didStartElement:(NSString*)elementName namespaceURI:(NSString*)namespaceURI qualifiedName:(NSString*)qName{
-	if([elementName isEqualToString:@"Tower"]){
-		currentModel = [[Tower alloc] init];
-	}else if([elementName isEqualToString:@"Portal"]){
-		currentModel = [[Portal alloc] init];
-	}else if([elementName isEqualToString:@"Road"]){
-		currentModel = [[Road alloc] init];
-	}else if([elementName isEqualToString:@"User"]){
-		[currentModel setState:0];
-	}
-}
 
 - (void) parser:(NSXMLParser*)parser didEndElement:(NSString*)elementName namespaceURI:(NSString*)namespaceURI qualifiedName:(NSString*)qName{
-	if([elementName isEqualToString:@"Tower"] || [elementName isEqualToString:@"Portal"] || [elementName isEqualToString:@"Road"]){
-		[listOfData addObject:self.currentModel];
-		[self.currentModel release];
-	}else if([elementName isEqualToString:@"User"]){
+	if(currentModel){
+		NSString * c = [currentModel getCharacteristicXMLString];
+		if([c isEqualToString:elementName]){
+			[listOfData addObject:currentModel];
+			[currentModel release];
+			currentModel = nil;
+			[c release];
+			return;
+		}
+		[c release];
+	}
+	if([elementName isEqualToString:@"User"]){
 		[currentModel setState:1];
 	}else{
 		// Parse the element
@@ -108,6 +133,12 @@
 
 - (void)connection:(NSURLConnection *)t didFailWithError:(NSError *)error {
 	[self parseServerData];
+}
+
+- (void)dealloc {
+	[queueOfConnections release];
+	[dataFromConnection release];
+	[super dealloc];
 }
 
 @end

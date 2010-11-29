@@ -6,8 +6,7 @@
 //  Copyright 2010 TowerSaint. All rights reserved.
 //
 
-#import <Cocoa/Cocoa.h>
-
+#import "Model.h"
 
 @interface Bounds : NSObject {
 	CLLocationCoordinate2D southwestLocation;					/* The latlng coordinates */

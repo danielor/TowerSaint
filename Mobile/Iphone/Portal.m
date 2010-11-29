@@ -13,6 +13,7 @@
 
 @synthesize hitPoints, level, startLocation;
 @synthesize endLocation, user, parseState;
+@synthesize gameImage;
 
 -(id) init {
 	self = [super init];
@@ -25,7 +26,7 @@
 
 // The interface to/from xml shold be consistent with the Google App Engine xml format.
 -(void) parseXMLElement:(NSMutableString*)currentElementValue elementName:(NSString*)elementName {
-	if(parseState == kParseUser){
+	if(parseState == kParseUserPortal){
 		[self.user parseXMLElement:currentElementValue elementName:elementName];
 	}else{
 		NSString * string = [NSString stringWithString:currentElementValue];
@@ -38,16 +39,16 @@
 			[self setLevel:[trimmedString intValue]];
 		}
 		if([currentElementValue isEqualToString:@"startlatitude"]){
-			self.startLocation.latitude = [trimmedString floatValue];
+			startLocation.latitude = [trimmedString floatValue];
 		}
 		if([currentElementValue isEqualToString:@"startlongitude"]){
-			self.startLocation.longitude = [trimmedString floatValue];
+			startLocation.longitude = [trimmedString floatValue];
 		}
 		if([currentElementValue isEqualToString:@"endlatitude"]){
-			self.endLocation.latitude = [trimmedString floatValue];
+			endLocation.latitude = [trimmedString floatValue];
 		}
 		if([currentElementValue isEqualToString:@"endlongitude"]){
-			self.endLocation.longitude = [trimmedString floatValue];
+			endLocation.longitude = [trimmedString floatValue];
 		}
 	}
 }
@@ -56,5 +57,25 @@
 	parseState = i;
 }
 
+-(UIImage*) getGameImage {
+	return gameImage;
+}
+
+-(NSString*) getImageString {
+	return [[NSString alloc] initWithString:@"Portal.png"];
+}
+
+
+-(NSInteger) getState {
+	return parseState;	
+}
+
+-(void) release {
+	[gameImage release];
+}
+
+-(NSString*) getCharacteristicXMLString{
+	return [[NSString alloc] initWithString:@"Portal"];
+}
 
 @end

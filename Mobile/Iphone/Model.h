@@ -6,11 +6,20 @@
 //  Copyright 2010 TowerSaint. All rights reserved.
 //
 
-#import <Cocoa/Cocoa.h>
 
 
 @protocol Model
 @required
 -(void) parseXMLElement:(NSMutableString*)cE elementName:(NSString*)eN;
 -(void) setState:(NSInteger)i;
+-(void) release;
+-(NSString*) getCharacteristicXMLString;
+-(NSInteger) getState;
 @end
+
+@protocol GameImageProtocol
+@required
+-(UIImage*) getGameImage;
+-(NSString*) getImageString;
+@end
+

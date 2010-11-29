@@ -26,8 +26,8 @@
 }
 
 -(NSString*) toXML {
-	NSString * xml = [[NSString alloc] initWithString:@"<bounds><southwestlocation><latitude>%f</latitude><longitude>%f</longitude></southwestlocation>
-					  <northeastlocation><latitude>%f</latitude><longitude>%f</longitude></northeastlocation></bounds>", southwestLocation.latitude,
+	NSString * xml = [[NSString alloc] initWithFormat:@"<bounds><southwestlocation><latitude>%f</latitude><longitude>%f</longitude></southwestlocation>" \
+					  @"<northeastlocation><latitude>%f</latitude><longitude>%f</longitude></northeastlocation></bounds>", southwestLocation.latitude,
 					  southwestLocation.longitude, northeastLocation.latitude, northeastLocation.longitude];
 	return xml;
 }

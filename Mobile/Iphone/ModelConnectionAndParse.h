@@ -6,7 +6,6 @@
 //  Copyright 2010 TowerSaint. All rights reserved.
 //
 
-#import <Cocoa/Cocoa.h>
 #import "Tower.h"
 #import "Road.h"
 #import "Portal.h"
@@ -26,13 +25,21 @@ typedef enum {
 	parsePortal,
 } modelParse;
 
-@interface ModelConnectionAndParse : NSObject {
+typedef enum {
+	activeConnection =0,
+	doneConnection,
+} connState;
+
+@interface ModelConnectionAndParse : NSObject<NSXMLParserDelegate > {
 	// The object necessary to make the model connection function properly
 	NSURLConnection * connection;					/* The url connection to the server */
 	NSMutableData * dataFromConnection;				/* Th unparsed data from the connection */
 	NSXMLParser * parser;							/* Parser used to parse server data */
 	NSMutableString * currentElementValue;			/* The current value of the xml data */
 	NSMutableArray	* listOfData;					/* The list of objects from the server */
+	
+	// A queue of connections
+	NSMutableArray * queueOfConnections;			/* The queue of the connections */
 
 	// The current objects
 	id<Model> currentModel;
@@ -49,6 +56,7 @@ typedef enum {
 @property(nonatomic, assign) id<ModelConnectionResultDelegate> resultDelegate;
 @property(nonatomic, retain) id<Model> currentModel;
 @property(nonatomic, retain) NSMutableArray * listOfData;
+@property(nonatomic, retain) NSMutableArray * queueOfConnections;
 
 // Initialize with request
 -(id) init;

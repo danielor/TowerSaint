@@ -6,16 +6,23 @@
 //  Copyright 2010 TowerSaint. All rights reserved.
 //
 
-#import <Cocoa/Cocoa.h>
 #import "Bounds.h"
 
-static NSString * URL = @"http://localhost:8083";
+typedef enum {
+	requestUserInfo = 0,
+	reqeustObjectsInBounds,
+} lastURLRequest;
 
 // Class creates request managers that talk to the server in a particular way.
 @interface URLRequestManager : NSObject {
-	
+	NSInteger lastRequest;
 }
 
--(NSURLRequest *) getAllObjectsInBounds:(Bounds*)b;
+@property(nonatomic) NSInteger lastRequest;
+
+// Url requests
+-(id) init;
+-(NSMutableURLRequest *) getAllObjectsInBounds:(Bounds*)b;
+-(NSMutableURLRequest *) getUserInformation:(NSInteger)fbid;
 
 @end

@@ -6,15 +6,15 @@
 //  Copyright 2010 TowerSaint. All rights reserved.
 //
 
-#import <Cocoa/Cocoa.h>
 #import "Model.h"
+#import "User.h"
 
 typedef enum {
 	kParseUser = 0,
 	kParseTower,
 } parseTowerState;
 
-@interface Tower : NSObject<Model> {
+@interface Tower : NSObject<Model, GameImageProtocol> {
 	// Stats about the tower.
 	NSInteger Experience;
 	NSInteger Speed;
@@ -38,6 +38,9 @@ typedef enum {
 	
 	// Parsing information
 	NSInteger parseState;
+	
+	// The Game Image associated with the model
+	UIImage * gameImage;
 }
 
 @property(nonatomic) NSInteger Experience;
@@ -53,7 +56,7 @@ typedef enum {
 @property(nonatomic) NSInteger Level;
 @property(nonatomic, retain) User * user;
 @property(nonatomic) NSInteger manaProduction;
-@property(nonatomic) NSInteger stonePrdouction;
+@property(nonatomic) NSInteger stoneProduction;
 @property(nonatomic) NSInteger woodProduction;
 @property(nonatomic) CLLocationCoordinate2D location;
 @property(nonatomic) NSInteger parseState;
@@ -61,6 +64,14 @@ typedef enum {
 // The interface to/from xml shold be consistent with the Google App Engine xml format.
 -(void) parseXMLElement:(NSMutableString*)cE elementName:(NSString*)eN;
 -(void) setState:(NSInteger)i;
+-(NSInteger) getState;
+-(void) release;
+-(NSString*) getCharacteristicXMLString;
+
+// The Game image protocol
+-(UIImage*) getGameImage;
+-(NSString*) getImageString;
+
 
 
 @end

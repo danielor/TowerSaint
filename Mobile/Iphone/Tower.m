@@ -14,7 +14,7 @@
 @synthesize Experience, Speed, Power, Armor, Range, Accuracy;
 @synthesize HitPoints, isIsolated, isCapital, hasRuler, Level;
 @synthesize user, manaProduction, stoneProduction, woodProduction;
-@synthesize location;
+@synthesize location, parseState;
 
 -(id) init {
 	self = [super init];
@@ -70,7 +70,7 @@
 			[self setManaProduction:[trimmedString intValue]];
 		}
 		if([elementName isEqualToString:@"stoneproduction"]){
-			[self setStonePrdouction:[trimmedString intValue]];
+			[self setStoneProduction:[trimmedString intValue]];
 		}
 		if([elementName isEqualToString:@"woodproduction"]){
 			[self setWoodProduction:[trimmedString intValue]];
@@ -86,6 +86,38 @@
 
 -(void) setState:(NSInteger)i {
 	parseState = i;
+}
+
+
+-(UIImage*) getGameImage {
+	return gameImage;
+}
+
+-(NSString*) getImageString {
+	if(Level == 0){
+		return [[NSString alloc] initWithString:@"Tower_Level0.png"];
+	}else if(Level == 1){
+		return [[NSString alloc] initWithString:@"Tower_Level1.png"];
+	}else if(Level == 2){
+		return [[NSString alloc] initWithString:@"Tower_Level2.png"];
+	}else if(Level == 3){
+		return [[NSString alloc] initWithString:@"TowerSaint.png"];
+	}else{
+		return [[NSString alloc] initWithString:@"Tower_Level0.png"];
+	}
+}
+
+-(NSInteger) getState {
+	return parseState;	
+}
+
+
+-(void) release {
+	[gameImage release];
+}
+
+-(NSString*) getCharacteristicXMLString{
+	return [[NSString alloc] initWithString:@"Tower"];
 }
 
 @end
