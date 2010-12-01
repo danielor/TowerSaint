@@ -11,8 +11,8 @@ package managers
 	import managers.states.TowerSaintServiceState;
 	
 	import models.Bounds;
-	import models.EmpireBoundary;
 	import models.SuperObject;
+	import models.User;
 	
 	import mx.collections.ArrayCollection;
 	import mx.controls.Alert;
@@ -25,6 +25,9 @@ package managers
 		// The map
 		public var map:Map;
 		
+		// The user
+		public var user:User;
+		
 		// State variables
 		public var serverState:TowerSaintServiceState;
 		public var listOfObjects:ArrayCollection;
@@ -33,7 +36,6 @@ package managers
 		
 		// The list of bounds
 		public var listOfBounds:ArrayCollection;
-		public var listOfBoundary:ArrayCollection;
 	
 		// Networking variables
 		public var listOfOpenConnections:ArrayCollection;
@@ -41,10 +43,11 @@ package managers
 		/*
 			Constructor - Takes in the map(view), and state constants
 		*/
-		public function UserObjectManager(m:Map, sS:TowerSaintServiceState, p:PhotoAssets, fPM:FocusPanelManager)
+		public function UserObjectManager(m:Map, uU:User, sS:TowerSaintServiceState, p:PhotoAssets, fPM:FocusPanelManager)
 		{
 			// The state variables
 			this.map = m;
+			this.user = uU;
 			this.serverState = sS;
 			this.photo = p;
 			this.focusPanelManager = fPM;
@@ -52,7 +55,6 @@ package managers
 			// The containers
 			this.listOfObjects = new ArrayCollection();
 			this.listOfBounds = new ArrayCollection();
-			this.listOfBoundary = new ArrayCollection();
 			this.listOfOpenConnections = new ArrayCollection();
 		}
 		
@@ -64,7 +66,7 @@ package managers
 			if(!hasBounds(bounds)){
 				// Add the bounds to the list
 				this.listOfBounds.addItem(bounds);
-
+				//Alert.show(this.listOfBounds.toString());
 				// Get all of the services
 				var a:Array = this.serverState.getAllConstants();
 				
@@ -86,27 +88,7 @@ package managers
 		*/
 		public function getAllObjectsWithinInfluenceOfBounds(bounds:LatLngBounds) : void {
 			if(!hasBounds(bounds)){
-				// Extend the size of the bounds
-				var nE:LatLng = bounds.getNorthEast();
-				var sW:LatLng = bounds.getSouthWest();
-				var eNE:LatLng = new LatLng(nE.lat() + this.serverState.getLatOffset() * this.serverState.getMaxInfluence(),
-										    nE.lng() + this.serverState.getLonOffset() * this.serverState.getMaxInfluence());
-				var eSW:LatLng = new LatLng(sW.lat() - this.serverState.getLatOffset() * this.serverState.getMaxInfluence(),
-											sW.lng() - this.serverState.getLonOffset() * this.serverState.getMaxInfluence());
-				bounds.extend(eNE);
-				bounds.extend(eSW);
 				
-				// Add the bounds to the list
-				this.listOfBounds.addItem(bounds);
-				var b:Bounds = new Bounds();
-				b.fromGoogleBounds(bounds);
-				
-				// Get all the services
-				var a:Array = this.serverState.getAllConstants();
-				for(var i:int = 0; i < a.length; i++){
-					var s:String = a[i] as String;
-					getObjectWithinBound(s, b);
-				}
 			}
 		}
 		
@@ -203,12 +185,8 @@ package managers
 		public function drawEmpireBoundaries():void {
 			// Get all objects withint the current bounds
 			var listOfObjects:ArrayCollection = getObjectWithinBounds();
-			var currentBounds:LatLngBounds = this.map.getLatLngBounds();
 			
-			// Create the boundary
-			var boundary:EmpireBoundary = new EmpireBoundary(this.map, this.serverState, currentBounds);
-			boundary.draw(listOfObjects);
-			this.listOfBoundary.addItem(boundary);
+			
 		}
 		
 		/*
@@ -222,14 +200,49 @@ package managers
 			for(var i:int = 0; i < this.listOfObjects.length; i++){
 				var s:SuperObject = this.listOfObjects[i] as SuperObject;
 				if(s.isVisible(this.map)){
-					objectsOnMap.addItem(s);
+					
 				}
 			}
 			
 			return objectsOnMap;
 		}
 		
-	
+		/* 
+			Updates all objects belonging to the user
+		*/
+		
+		public function updateTowerSaintService():void
+		{
+			var modified_objects:Array = getAllModifiedObjects();
+			
+			var servicesDictionary:Dictionary = this.serverState.getServices();
+			var _service:RemoteObject = servicesDictionary["update"] as RemoteObject;
+			
+			// The abstract call
+			var operation:AbstractOperation = _service.getOperation("saveUserObjects");
+			operation.addEventListener(ResultEvent.RESULT, onSaveUserObjects);	
+			operation.send(modified_objects);
+		}
+		
+		public function saveUser() : void
+		{
+			var servicesDictionary:Dictionary = this.serverState.getServices();
+			var _service:RemoteObject = servicesDictionary["update"] as RemoteObject;
+			
+			var operation:AbstractOperation = _service.getOperation("saveUser");
+			operation.addEventListener(ResultEvent.RESULT, onSaveUser);
+			operation.send(this.user);
+		}
+		
+		protected function onSaveUser(event:ResultEvent) : void
+		{
+			
+		}
+		
+		protected function onSaveUserObjects(event:ResultEvent) : void
+		{
+			
+		}
 		
 		/*
 			Function return all objects that have been modified in an array

@@ -15,11 +15,10 @@ package managers.states
 		private const userRemoteServiceString:String = "user";
 		private const portalRemoteServiceString:String = "portal";
 		private const towerRemoteServiceString:String = "tower";
-		private const roadRemoteServiceString:String = "road";	
-		private const URL:String = "http://localhost:8083";
-		private const latOffset:Number = .001;					/* Latitude granularity */
-		private const lonOffset:Number = .001;					/* Longitude granularity */
-		private const maxInfluence:Number = 10;					/* The max influence */
+		private const roadRemoteServiceString:String = "road";
+		private const updateServiceString:String = "update";
+		private const URL:String = "http://towersaint.appspot.com/";
+		private const latticeGranularity:Number = .001;
 
 		// Dictionary holds all of the remote objects
 		private var remoteObjectCollection:Dictionary;
@@ -37,6 +36,7 @@ package managers.states
 			listOfConstants.push(this.portalRemoteServiceString);
 			listOfConstants.push(this.towerRemoteServiceString);
 			listOfConstants.push(this.roadRemoteServiceString);
+			listOfConstants.push(this.updateServiceString);
 			return listOfConstants;
 		}
 		
@@ -59,16 +59,9 @@ package managers.states
 		}
 		
 		/* Return the lattice granurality */
-		public function getLatOffset():Number {
-			return this.latOffset;
+		public function getLatticeGranularity():Number {
+			return this.latticeGranularity;
 		}
-		public function getLonOffset():Number {
-			return this.lonOffset;
-		}
-		public function getMaxInfluence():Number {
-			return this.maxInfluence;
-		}
-		
 		
 		/* Create the remote objects that corresponds to object services */
 		private function createRemoteObject(channel:ChannelSet, remoteString:String) : void{

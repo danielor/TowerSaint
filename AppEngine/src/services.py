@@ -271,6 +271,16 @@ class RoadService(object):
         """
         
     
+class UpdateManager(object):
+    def __init__(self):
+        pass
+    def saveUserObjects(self, objects):
+        for piece in objects:
+            piece.put()
+    def saveUser(self, user):
+        user.put()
+    
+
 def register_classes(AMF_NAMESPACE = 'models'):
     """Register the amf classes in a namespace"""
     # set this so returned objects and arrays are bindable

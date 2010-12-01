@@ -15,11 +15,13 @@
 # limitations under the License.
 #
 import logging
+import os
 
 from google.appengine.ext import webapp
 from google.appengine.ext.webapp.util import run_wsgi_app
+from google.appengine.ext.webapp import template
 from pyamf.remoting.gateway.google import WebAppGateway
-from services import TowerService, PortalService, RoadService
+from services import TowerService, PortalService, RoadService, UpdateManager
 from services import register_classes
 from pages import BoundsPage
 
@@ -32,26 +34,38 @@ class MainPage(webapp.RequestHandler):
 def echo(data):
     return data
 
+class FacebookCanvas(webapp.RequestHandler):
+    def get(self):
+        template_values = {}
+        TEMPLATE_PATH = os.path.join(os.path.dirname(__file__), 'templates/facebook_canvas.html')
+        self.response.out.write(template.render(TEMPLATE_PATH, template_values))
+    
+
 
 def main():
     debug_enabled = True
-
+    
     services = {
         'myservice.echo': echo,
         'tower' : TowerService(),
         'portal' : PortalService(),
         'road' : RoadService(),
+        'update': UpdateManager()
     }
-
+    
     # Register the classes in the AMF namespace
     register_classes()
     
     # Create a gateway to the amf services
     gateway = WebAppGateway(services, logger=logging, debug=debug_enabled)
-
-    application_paths = [('/', gateway), ('/helloworld', MainPage), ('/bunds', BoundsPage)]
+    
+    application_paths = [   ('/', gateway),
+                            ('/facebook/', FacebookCanvas),
+                            ('/helloworld', MainPage), 
+                            ('/bunds', BoundsPage)
+                        ]
     application = webapp.WSGIApplication(application_paths, debug=debug_enabled)
-
+    
     run_wsgi_app(application)
 
 

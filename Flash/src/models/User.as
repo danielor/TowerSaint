@@ -15,9 +15,16 @@ package models
 		public var completeStoneProduction : Number;
 		public var completeWoodProduction : Number;
 		
-		public function User()
+		public function User(id:Number)
 		{
-			super();	
+			super();
+			this.FacebookID = id;
+			this.Experience = 0;
+			this.Empire = "Empire";
+			this.isEmperor = true;
+			this.completeManaProduction = 0;
+			this.completeStoneProduction = 0;
+			this.completeWoodProduction = 0;
 		}
 	}
 }

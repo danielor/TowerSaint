@@ -2,7 +2,7 @@
 <s:Application xmlns:fx="http://ns.adobe.com/mxml/2009" 
 			   xmlns:s="library://ns.adobe.com/flex/spark" 
 			   xmlns:mx="library://ns.adobe.com/flex/mx" 
-			   minWidth="955" minHeight="600" xmlns:maps="com.google.maps.*" currentState="start" width.inApp="1271" minWidth.inApp="1000">
+			   xmlns:maps="com.google.maps.*" currentState="start" creationComplete="initApp()" width="600" height="450">
 	<fx:Script>
 		<![CDATA[
 			import assets.PhotoAssets;
@@ -16,17 +16,7 @@
 			import away3dlite.materials.*;
 			import away3dlite.primitives.*;
 			
-			import com.facebook.Facebook;
-			import com.facebook.commands.friends.GetFriends;
-			import com.facebook.commands.users.GetInfo;
-			import com.facebook.data.friends.GetFriendsData;
-			import com.facebook.data.users.FacebookUser;
-			import com.facebook.data.users.FacebookUserCollection;
-			import com.facebook.data.users.GetInfoData;
-			import com.facebook.data.users.GetInfoFieldValues;
-			import com.facebook.events.FacebookEvent;
-			import com.facebook.net.FacebookCall;
-			import com.facebook.utils.FacebookSessionUtil;
+			import com.facebook.graph.Facebook;
 			import com.google.maps.LatLng;
 			import com.google.maps.LatLngBounds;
 			import com.google.maps.Map;
@@ -75,11 +65,11 @@
 		
 			
 			// The facebook data
-			protected var _sessionId:FacebookSessionUtil;
+			//protected var _sessionId:FacebookSessionUtil;
 			protected var _facebook:Facebook;
 			protected const API_KEY:String = "19c9fe5eb3168ff03f9277a78e88d095";
 			protected const SECRET:String = "7daf6801550ed6972685d7f8f52b2136";
-			[Bindable] protected var _user:FacebookUser = new FacebookUser();
+			[Bindable] protected var _user:User;
 			[Bindable] public var _friends:Array = new Array();
 			
 			// Away 3D data
@@ -114,6 +104,54 @@
 			[Bindable] private var finishedLoadingMap:Boolean = false;
 			[Bindable] public var imageState:ImageState = new ImageState();
 			
+			// Init App
+			protected function initApp() : void
+			{
+				Facebook.init("142447749129831", loginHandler);
+				//login();
+				Facebook.setCanvasSize(700, 500);
+				//Facebook.setCanvasAutoResize();
+				//this.login();
+			}
+			
+			protected function play() : void
+			{
+				this.login();
+				this.currentState = "inApp";
+				init3DView();
+			}
+			
+			protected function getMeHandler(response:Object, fail:Object) : void
+			{	
+				var f_id:Number = parseInt(response.id);
+				this._user = new User(f_id);
+				fb_name.text = response.name as String;
+			}
+			
+			protected function login() : void {
+				Facebook.login(loginHandler, {perms:"read_stream, publish_stream"});
+			}
+			
+			protected function logout() : void {
+				Facebook.logout(logoutHandler);
+				//currentState = "start";
+			}
+			
+			protected function loginHandler(response:Object, fail:Object) : void {
+				if (response) {
+					Facebook.api("/me", getMeHandler);
+					usrImage.source = Facebook.getImageUrl(response.uid, "small");
+					//init3DView();
+				}
+				else {
+					ExternalInterface.call("redirect","142447749129831", "read_stream,publish_stream","http://apps.facebook.com/TowerSaint/");
+				}
+			}
+			
+			protected function logoutHandler(response:Object, fail:Object) : void {
+				
+			}
+			
 			// Map handlers. The map handler gets called after you are logged
 			// into facebook
 			private function onMapReady(event:Event) : void {
@@ -128,11 +166,12 @@
 				// Initialize the services needed with the server over amf
 				this._focusPanelManager = new FocusPanelManager(focusImage, controlButton, bodyText, titleText, _photo);
 				this._serverState = new TowerSaintServiceState();
-				this._userObjectManager = new UserObjectManager(this.map, this._serverState, this._photo, this._focusPanelManager);
+				this._userObjectManager = new UserObjectManager(this.map, this._user, this._serverState, this._photo, this._focusPanelManager);
+				this._userObjectManager.saveUser();
 				
 				// Get all objects within the bounds of the server.	
-				this._userObjectManager.getAllObjectsWithinBounds(bounds);				
-
+				//this._userObjectManager.getAllObjectsWithinBounds(bounds);				
+				
 				// Set an event listener upon the complete loading of the information
 				this.map.addEventListener(MapEvent.TILES_LOADED, onTilesLoaded);
 				this.map.addEventListener(MapMouseEvent.CLICK, onMapMouseClick);
@@ -272,88 +311,7 @@
 					imageState.endObject = new Road();
 				}
 			}
-			
-
-			// The button handlers
-			protected function loginBtnClickHandler(event:MouseEvent) : void {
-				_sessionId = new FacebookSessionUtil(API_KEY, SECRET, loaderInfo);
-				_facebook = _sessionId.facebook;
-				_sessionId.addEventListener(FacebookEvent.CONNECT, onFacebookConnect);
-				_sessionId.addEventListener(FacebookEvent.WAITING_FOR_LOGIN, onWaitLogin);
-				_sessionId.addEventListener(FacebookEvent.ERROR, onError);
-				_sessionId.login();
-			}
-			
-			protected function onError(event:FacebookEvent) : void {
-				var alert:Alert = Alert.show(event.error.errorMsg, "Error!!");
-			}
-			
-			protected function logoutBtnClickHandler(event:MouseEvent) : void {
-				_sessionId.logout();
-				currentState = "start";
-				_user = new FacebookUser();
-
-			}
-			
-			// The facebook handlers
-			protected function onWaitLogin(event:FacebookEvent):void {
-				var alert:Alert = Alert.show("Click OK afer you log in Facebook", "Waiting for login");
-				alert.addEventListener(Event.CLOSE, onClose);
-			}
-			
-
-			
-			protected function onClose(event:Event):void{
-				_sessionId.validateLogin();	
-			}
-			
-			protected function onFacebookConnect(event:FacebookEvent) : void {
-				if(event.success){
-					currentState = "inApp";
-					
-					// Initialize the 3D view
-					init3DView();
-					
-					// Get the user information
-					var call:FacebookCall = _facebook.post(new GetInfo([_facebook.uid], [GetInfoFieldValues.ALL_VALUES]));
-					call.addEventListener(FacebookEvent.COMPLETE, onGetInfo);
-					
-					// Get the friend list
-					var friendListCall:FacebookCall = _facebook.post(new GetFriends(null, _facebook.uid));
-					friendListCall.addEventListener(FacebookEvent.COMPLETE, onGetFriendsList);
-				}else{
-					Alert.show("Error connecting to Facebook" + event.error.rawResult , "Error" + event.error.errorCode);
-				}
 				
-			}
-			
-			protected function onGetInfo(event : FacebookEvent) : void {
-				
-			}
-				
-			protected function onGetFriendsList(event:FacebookEvent) : void {
-				var _friendsUid:Array = new Array();
-				var users:FacebookUserCollection = (event.data as GetFriendsData).friends;
-				
-				// Iterate over the users
-				for(var i:int; i < users.length; i++){
-					_friendsUid.push((users.getItemAt(i) as FacebookUser).uid);
-				}
-				
-				var friendsDetailsCall:FacebookCall = _facebook.post(new GetInfo(_friendsUid, [GetInfoFieldValues.ALL_VALUES]));
-				friendsDetailsCall.addEventListener(FacebookEvent.COMPLETE, onFriendsGetInfo);
-			}
-		
-			protected function onFriendsGetInfo(event:FacebookEvent) : void {
-				var users:FacebookUserCollection = (event.data as GetInfoData).userCollection;
-				for(var i:int; i < users.length; i++){
-					var userInfoObject:Object = users.getItemAt(i);
-					_friends.push(userInfoObject.first_name as String);
-				}
-				// Setup up the data provider
-				friendsDetailGrid.dataProvider = _friends;
-			}
-			
 			// Away3D information
 			private function init3DView() : void {
 				// I am only initializing objects, since the 3D aspects of the
@@ -443,14 +401,14 @@
 			protected function onSendButtonClicked(event:MouseEvent) : void {
 				// The network connection
 				var netConnection:NetConnection = new NetConnection();
-				netConnection.connect("http://localhost:8083/");
+				netConnection.connect("http://towersaint.appspot.com/");
 				
 				// The responseder
-				var responder:Responder = new Responder(onSendButtonComplete, onSendButtonFail);
-				netConnection.call("myservice.echo", responder, sendServer.text);
+				//var responder:Responder = new Responder(onSendButtonComplete, onSendButtonFail);
+				//netConnection.call("myservice.echo", responder, sendServer.text);
 			}
 			
-			protected function onSendButtonComplete(results : String): void {
+		/*	protected function onSendButtonComplete(results : String): void {
 				reponseServer.text = results;	
 			}
 			
@@ -458,7 +416,7 @@
 				for each(var thisResult in results){
 					reponseServer.text += thisResult;
 				}
-			}
+			}*/
 		]]>
 	</fx:Script>
 	<s:states>
@@ -468,35 +426,37 @@
 	<fx:Declarations>
 		<!-- Place non-visual elements (e.g., services, value objects) here -->
 	</fx:Declarations>
-	<s:Panel x="231" y="76" width="100%" height="100%" includeIn="inApp" id="visPanel">
+	
+	<s:Label includeIn="inApp" id="fb_name"  left="100" top="10"/>
+	<mx:Image includeIn="inApp" id="usrImage" top="10" left="10"/>
+	<s:Button includeIn="inApp" x="462.05" y="28.95" label="Send" id="sendButton" click="onSendButtonClicked(event)"/>
+	
+	<s:VGroup includeIn="inApp" top="50" left="0" right="0" bottom="0">
 		<s:SpriteVisualElement id="mySprite"/>
-		<maps:Map x="0" y="0" id="map" width="100%" height="100%" mapevent_mapready="onMapReady(event)" key="ABQIAAAA5PSKhvT9XxMwIJsiXZLnshT2yXp_ZAY8_ufC3CFXhHIE1NvwkxSamfgDn9m0J6XvaIp6AGWbB8RA4A"/>
-	</s:Panel>
-	<s:Button includeIn="start" x="67" y="53" label="Login" id="loginButton" click ="loginBtnClickHandler(event)"/>
-	<s:Label includeIn="inApp" x="44" y="30" text="Welcome {_user.name}"/>
-	<mx:DataGrid includeIn="inApp" x="194" y="10" height="58" width="270" id="friendsDetailGrid">
-		<mx:columns>
-			<mx:DataGridColumn headerText="First Name" dataField="col1"/>
-		</mx:columns>
-	</mx:DataGrid>
-	<s:Button includeIn="inApp" x="488" y="30" label="Logout" click="logoutBtnClickHandler(event)"/>
-	<s:Panel includeIn="inApp" x="5" y="76" width="218" height="514" id="focusPanel">
-		<mx:Image x="10" y="10" width="114" height="114" id="focusImage"/>
-		<s:Button x="136" y="450" label="Upgrade" id="controlButton" click="onControlButtonClicked(event)"/>
-		<s:RichEditableText x="10" y="132" width="196" height="310" id="bodyText"/>
-		<s:RichEditableText x="132" y="10" height="114" id="titleText" width="74"/>
-	</s:Panel>
-	<s:TextInput includeIn="inApp" x="688" y="10" id="sendServer"/>
-	<s:TextInput includeIn="inApp" x="688" y="40" id="reponseServer"/>
-	<s:Label includeIn="inApp" x="599" y="18" text="Send"/>
-	<s:Label includeIn="inApp" x="599" y="48" text="Response"/>
-	<s:Button includeIn="inApp" x="856" y="11" label="Send" id="sendButton" click="onSendButtonClicked(event)"/>
-	<s:HGroup includeIn="inApp" x="975" y="10" width="151" height="58">
-		<mx:Image id = "towerImage" width="44" height="57" useHandCursor="true" buttonMode="true" click="onImageClick(event)"
-				  source="file:/Users/danielo/Documents/Adobe Flash Builder 4/TOWERSAINT/SRC/assets/pictures/Tower_Level0.png"/>
-		<mx:Image id = "portalImage" width="44" height="57" useHandCursor="true" buttonMode="true" click="onImageClick(event)" 
-				  source="file:/Users/danielo/Documents/Adobe Flash Builder 4/TOWERSAINT/SRC/assets/pictures/Portal.png"/>
-		<mx:Image id = "roadImage" width="44" height="57" useHandCursor="true" buttonMode="true" click="onImageClick(event)" 
-				  source="file:/Users/danielo/Documents/Adobe Flash Builder 4/TOWERSAINT/SRC/assets/pictures/NorthSouthEastWestRoad.png"/>
-	</s:HGroup>
+		<maps:Map id="map" width="100%" height="80%" mapevent_mapready="onMapReady(event)" key="ABQIAAAA5PSKhvT9XxMwIJsiXZLnshRuY2ov_d7VycCbWWSOGCBDsAAt-hR8Sm_XJMBhPBl_uN92LgpALJw6VA"/>
+		<s:HGroup width="100%" height="20%">
+			<s:Panel width="60%" height="100%" id="focusPanel">
+				<mx:Image x="10.15" y="-0.15" width="101" height="75" id="focusImage"/>
+				<s:Button x="136" y="450" label="Upgrade" id="controlButton" click="onControlButtonClicked(event)"/>
+				<s:RichEditableText x="133" y="5.75" width="392" height="62" id="bodyText"/>
+			</s:Panel>
+			<s:VGroup width="30%" height="100%">
+				<s:RichEditableText x="300" y="402.05" height="75" id="titleText" width="89"/>
+				<s:HGroup width="151" height="40" top="10" right="50">
+					<mx:Image id = "towerImage" width="44" height="57" useHandCursor="true" buttonMode="true" click="onImageClick(event)"
+							  source="@Embed(source='assets/pictures/Tower_Level0.png')"/>
+					<mx:Image id = "portalImage" width="44" height="57" useHandCursor="true" buttonMode="true" click="onImageClick(event)" 
+							  source="@Embed(source='assets/pictures/Portal.png')"/>
+					<mx:Image id = "roadImage" width="44" height="57" useHandCursor="true" buttonMode="true" click="onImageClick(event)" 
+							  source="@Embed(source='assets/pictures/NorthSouthEastWestRoad.png')"/>
+				</s:HGroup>
+			</s:VGroup>
+		</s:HGroup>	
+	</s:VGroup>
+	
+	<s:Button includeIn="start" x="315" y="221" label="Play" click="play()"/>
+	
+	
+	
+		
 </s:Application>
