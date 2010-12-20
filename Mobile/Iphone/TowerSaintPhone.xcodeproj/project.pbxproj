@@ -1,0 +1,584 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 45;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		1D3623260D0F684500981E51 /* TowerSaintPhoneAppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 1D3623250D0F684500981E51 /* TowerSaintPhoneAppDelegate.m */; };
+		1D60589B0D05DD56006BFB54 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 29B97316FDCFA39411CA2CEA /* main.m */; };
+		1D60589F0D05DD5A006BFB54 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1D30AB110D05D00D00671497 /* Foundation.framework */; };
+		1DF5F4E00D08C38300B7A737 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1DF5F4DF0D08C38300B7A737 /* UIKit.framework */; };
+		288765A50DF7441C002DB57D /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 288765A40DF7441C002DB57D /* CoreGraphics.framework */; };
+		2899E5220DE3E06400AC0155 /* TowerSaintPhoneViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 2899E5210DE3E06400AC0155 /* TowerSaintPhoneViewController.xib */; };
+		28AD733F0D9D9553002E5188 /* MainWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 28AD733E0D9D9553002E5188 /* MainWindow.xib */; };
+		28D7ACF80DDB3853001CB0EB /* TowerSaintPhoneViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 28D7ACF70DDB3853001CB0EB /* TowerSaintPhoneViewController.m */; };
+		E65C6A3812ADE30A0043CED5 /* FacebookViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = E65C6A3612ADE30A0043CED5 /* FacebookViewController.m */; };
+		E65C6A3912ADE30A0043CED5 /* FacebookViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = E65C6A3712ADE30A0043CED5 /* FacebookViewController.xib */; };
+		E65C6A3E12ADE3DC0043CED5 /* MapKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E65C6A3D12ADE3DC0043CED5 /* MapKit.framework */; };
+		E65C6A4212ADE3EB0043CED5 /* CoreLocation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E65C6A4112ADE3EB0043CED5 /* CoreLocation.framework */; };
+		E65C6B8012ADE99B0043CED5 /* TowerSaint.xcdatamodel in Sources */ = {isa = PBXBuildFile; fileRef = E65C6B7F12ADE99B0043CED5 /* TowerSaint.xcdatamodel */; };
+		E65C6B8212ADE9F20043CED5 /* CoreData.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E65C6B8112ADE9F20043CED5 /* CoreData.framework */; };
+		E65C6BB312ADFAD90043CED5 /* MainViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = E65C6BB112ADFAD90043CED5 /* MainViewController.m */; };
+		E65C6BB412ADFAD90043CED5 /* MainViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = E65C6BB212ADFAD90043CED5 /* MainViewController.xib */; };
+		E66B7CCB12B9901900DCBC9D /* ModelAnnotation.m in Sources */ = {isa = PBXBuildFile; fileRef = E66B7CCA12B9901900DCBC9D /* ModelAnnotation.m */; };
+		E6885DE312BEEA2A00D87081 /* Constants.m in Sources */ = {isa = PBXBuildFile; fileRef = E6885DE212BEEA2A00D87081 /* Constants.m */; };
+		E6AB58A012AF4EE5009EA891 /* FBDialog.bundle in Resources */ = {isa = PBXBuildFile; fileRef = E6AB588812AF4EE5009EA891 /* FBDialog.bundle */; };
+		E6AB58A112AF4EE5009EA891 /* NSObject+SBJSON.m in Sources */ = {isa = PBXBuildFile; fileRef = E6AB588C12AF4EE5009EA891 /* NSObject+SBJSON.m */; };
+		E6AB58A212AF4EE5009EA891 /* NSString+SBJSON.m in Sources */ = {isa = PBXBuildFile; fileRef = E6AB588E12AF4EE5009EA891 /* NSString+SBJSON.m */; };
+		E6AB58A312AF4EE5009EA891 /* SBJSON.m in Sources */ = {isa = PBXBuildFile; fileRef = E6AB589012AF4EE5009EA891 /* SBJSON.m */; };
+		E6AB58A412AF4EE5009EA891 /* SBJsonBase.m in Sources */ = {isa = PBXBuildFile; fileRef = E6AB589212AF4EE5009EA891 /* SBJsonBase.m */; };
+		E6AB58A512AF4EE5009EA891 /* SBJsonParser.m in Sources */ = {isa = PBXBuildFile; fileRef = E6AB589412AF4EE5009EA891 /* SBJsonParser.m */; };
+		E6AB58A612AF4EE5009EA891 /* SBJsonWriter.m in Sources */ = {isa = PBXBuildFile; fileRef = E6AB589612AF4EE5009EA891 /* SBJsonWriter.m */; };
+		E6AB58A712AF4EE5009EA891 /* FBRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = E6AB589912AF4EE5009EA891 /* FBRequest.m */; };
+		E6AB58A812AF4EE5009EA891 /* Facebook.m in Sources */ = {isa = PBXBuildFile; fileRef = E6AB589A12AF4EE5009EA891 /* Facebook.m */; };
+		E6AB58A912AF4EE5009EA891 /* FBLoginDialog.m in Sources */ = {isa = PBXBuildFile; fileRef = E6AB589D12AF4EE5009EA891 /* FBLoginDialog.m */; };
+		E6AB58AA12AF4EE5009EA891 /* FBDialog.m in Sources */ = {isa = PBXBuildFile; fileRef = E6AB589F12AF4EE5009EA891 /* FBDialog.m */; };
+		E6AB59AC12AF5983009EA891 /* ModelConnectionAndParse.m in Sources */ = {isa = PBXBuildFile; fileRef = E6AB599B12AF5983009EA891 /* ModelConnectionAndParse.m */; };
+		E6AB59AD12AF5983009EA891 /* URLRequestManager.m in Sources */ = {isa = PBXBuildFile; fileRef = E6AB599D12AF5983009EA891 /* URLRequestManager.m */; };
+		E6AB59AE12AF5983009EA891 /* Tower.m in Sources */ = {isa = PBXBuildFile; fileRef = E6AB59A012AF5983009EA891 /* Tower.m */; };
+		E6AB59AF12AF5983009EA891 /* Road.m in Sources */ = {isa = PBXBuildFile; fileRef = E6AB59A212AF5983009EA891 /* Road.m */; };
+		E6AB59B012AF5983009EA891 /* Portal.m in Sources */ = {isa = PBXBuildFile; fileRef = E6AB59A412AF5983009EA891 /* Portal.m */; };
+		E6AB59B112AF5983009EA891 /* User.m in Sources */ = {isa = PBXBuildFile; fileRef = E6AB59A612AF5983009EA891 /* User.m */; };
+		E6AB59B212AF5983009EA891 /* Bounds.m in Sources */ = {isa = PBXBuildFile; fileRef = E6AB59A912AF5983009EA891 /* Bounds.m */; };
+		E6AB59B312AF5983009EA891 /* ImageId.m in Sources */ = {isa = PBXBuildFile; fileRef = E6AB59AB12AF5983009EA891 /* ImageId.m */; };
+		E6AB59B712AF599C009EA891 /* CoreLocationController.m in Sources */ = {isa = PBXBuildFile; fileRef = E6AB59B612AF599C009EA891 /* CoreLocationController.m */; };
+		E6AB59BD12AF5C32009EA891 /* GameImages.plist in Resources */ = {isa = PBXBuildFile; fileRef = E6AB59BC12AF5C32009EA891 /* GameImages.plist */; };
+		E6AB59D412AF5C3C009EA891 /* Crown.png in Resources */ = {isa = PBXBuildFile; fileRef = E6AB59BF12AF5C3C009EA891 /* Crown.png */; };
+		E6AB59D512AF5C3C009EA891 /* EastRoad.png in Resources */ = {isa = PBXBuildFile; fileRef = E6AB59C012AF5C3C009EA891 /* EastRoad.png */; };
+		E6AB59D612AF5C3C009EA891 /* EastWestRoad.png in Resources */ = {isa = PBXBuildFile; fileRef = E6AB59C112AF5C3C009EA891 /* EastWestRoad.png */; };
+		E6AB59D712AF5C3C009EA891 /* NorthEastRoad.png in Resources */ = {isa = PBXBuildFile; fileRef = E6AB59C212AF5C3C009EA891 /* NorthEastRoad.png */; };
+		E6AB59D812AF5C3C009EA891 /* NorthEastWestRoad.png in Resources */ = {isa = PBXBuildFile; fileRef = E6AB59C312AF5C3C009EA891 /* NorthEastWestRoad.png */; };
+		E6AB59D912AF5C3C009EA891 /* NorthRoad.png in Resources */ = {isa = PBXBuildFile; fileRef = E6AB59C412AF5C3C009EA891 /* NorthRoad.png */; };
+		E6AB59DA12AF5C3C009EA891 /* NorthSouthEastRoad.png in Resources */ = {isa = PBXBuildFile; fileRef = E6AB59C512AF5C3C009EA891 /* NorthSouthEastRoad.png */; };
+		E6AB59DB12AF5C3C009EA891 /* NorthSouthEastWestRoad.png in Resources */ = {isa = PBXBuildFile; fileRef = E6AB59C612AF5C3C009EA891 /* NorthSouthEastWestRoad.png */; };
+		E6AB59DC12AF5C3C009EA891 /* NorthSouthRoad.png in Resources */ = {isa = PBXBuildFile; fileRef = E6AB59C712AF5C3C009EA891 /* NorthSouthRoad.png */; };
+		E6AB59DD12AF5C3C009EA891 /* NorthSouthWestRoad.png in Resources */ = {isa = PBXBuildFile; fileRef = E6AB59C812AF5C3C009EA891 /* NorthSouthWestRoad.png */; };
+		E6AB59DE12AF5C3C009EA891 /* NorthWestRoad.png in Resources */ = {isa = PBXBuildFile; fileRef = E6AB59C912AF5C3C009EA891 /* NorthWestRoad.png */; };
+		E6AB59DF12AF5C3C009EA891 /* Portal.png in Resources */ = {isa = PBXBuildFile; fileRef = E6AB59CA12AF5C3C009EA891 /* Portal.png */; };
+		E6AB59E012AF5C3C009EA891 /* SouthEastRoad.png in Resources */ = {isa = PBXBuildFile; fileRef = E6AB59CB12AF5C3C009EA891 /* SouthEastRoad.png */; };
+		E6AB59E112AF5C3C009EA891 /* SouthEastWestRoad.png in Resources */ = {isa = PBXBuildFile; fileRef = E6AB59CC12AF5C3C009EA891 /* SouthEastWestRoad.png */; };
+		E6AB59E212AF5C3C009EA891 /* SouthRoad.png in Resources */ = {isa = PBXBuildFile; fileRef = E6AB59CD12AF5C3C009EA891 /* SouthRoad.png */; };
+		E6AB59E312AF5C3C009EA891 /* SouthWestRoad.png in Resources */ = {isa = PBXBuildFile; fileRef = E6AB59CE12AF5C3C009EA891 /* SouthWestRoad.png */; };
+		E6AB59E412AF5C3C009EA891 /* Tower_Level0.png in Resources */ = {isa = PBXBuildFile; fileRef = E6AB59CF12AF5C3C009EA891 /* Tower_Level0.png */; };
+		E6AB59E512AF5C3C009EA891 /* Tower_Level1.png in Resources */ = {isa = PBXBuildFile; fileRef = E6AB59D012AF5C3C009EA891 /* Tower_Level1.png */; };
+		E6AB59E612AF5C3C009EA891 /* Tower_Level2.png in Resources */ = {isa = PBXBuildFile; fileRef = E6AB59D112AF5C3C009EA891 /* Tower_Level2.png */; };
+		E6AB59E712AF5C3C009EA891 /* TowerSaint.png in Resources */ = {isa = PBXBuildFile; fileRef = E6AB59D212AF5C3C009EA891 /* TowerSaint.png */; };
+		E6AB59E812AF5C3C009EA891 /* WestRoad.png in Resources */ = {isa = PBXBuildFile; fileRef = E6AB59D312AF5C3C009EA891 /* WestRoad.png */; };
+		E6AB59FB12AF5D46009EA891 /* CoreUser.m in Sources */ = {isa = PBXBuildFile; fileRef = E6AB59FA12AF5D46009EA891 /* CoreUser.m */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		1D30AB110D05D00D00671497 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
+		1D3623240D0F684500981E51 /* TowerSaintPhoneAppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TowerSaintPhoneAppDelegate.h; sourceTree = "<group>"; };
+		1D3623250D0F684500981E51 /* TowerSaintPhoneAppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TowerSaintPhoneAppDelegate.m; sourceTree = "<group>"; };
+		1D6058910D05DD3D006BFB54 /* TowerSaintPhone.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TowerSaintPhone.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		1DF5F4DF0D08C38300B7A737 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
+		288765A40DF7441C002DB57D /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
+		2899E5210DE3E06400AC0155 /* TowerSaintPhoneViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = TowerSaintPhoneViewController.xib; sourceTree = "<group>"; };
+		28AD733E0D9D9553002E5188 /* MainWindow.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = MainWindow.xib; sourceTree = "<group>"; };
+		28D7ACF60DDB3853001CB0EB /* TowerSaintPhoneViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TowerSaintPhoneViewController.h; sourceTree = "<group>"; };
+		28D7ACF70DDB3853001CB0EB /* TowerSaintPhoneViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TowerSaintPhoneViewController.m; sourceTree = "<group>"; };
+		29B97316FDCFA39411CA2CEA /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		32CA4F630368D1EE00C91783 /* TowerSaintPhone_Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TowerSaintPhone_Prefix.pch; sourceTree = "<group>"; };
+		8D1107310486CEB800E47090 /* TowerSaintPhone-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "TowerSaintPhone-Info.plist"; plistStructureDefinitionIdentifier = "com.apple.xcode.plist.structure-definition.iphone.info-plist"; sourceTree = "<group>"; };
+		E65C6A3512ADE30A0043CED5 /* FacebookViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FacebookViewController.h; sourceTree = "<group>"; };
+		E65C6A3612ADE30A0043CED5 /* FacebookViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FacebookViewController.m; sourceTree = "<group>"; };
+		E65C6A3712ADE30A0043CED5 /* FacebookViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = FacebookViewController.xib; sourceTree = "<group>"; };
+		E65C6A3D12ADE3DC0043CED5 /* MapKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MapKit.framework; path = System/Library/Frameworks/MapKit.framework; sourceTree = SDKROOT; };
+		E65C6A4112ADE3EB0043CED5 /* CoreLocation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreLocation.framework; path = System/Library/Frameworks/CoreLocation.framework; sourceTree = SDKROOT; };
+		E65C6B7F12ADE99B0043CED5 /* TowerSaint.xcdatamodel */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = wrapper.xcdatamodel; path = TowerSaint.xcdatamodel; sourceTree = "<group>"; };
+		E65C6B8112ADE9F20043CED5 /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = System/Library/Frameworks/CoreData.framework; sourceTree = SDKROOT; };
+		E65C6BB012ADFAD90043CED5 /* MainViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MainViewController.h; sourceTree = "<group>"; };
+		E65C6BB112ADFAD90043CED5 /* MainViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MainViewController.m; sourceTree = "<group>"; };
+		E65C6BB212ADFAD90043CED5 /* MainViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = MainViewController.xib; sourceTree = "<group>"; };
+		E66B7CC912B9901900DCBC9D /* ModelAnnotation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ModelAnnotation.h; sourceTree = "<group>"; };
+		E66B7CCA12B9901900DCBC9D /* ModelAnnotation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ModelAnnotation.m; sourceTree = "<group>"; };
+		E6885DE112BEEA2A00D87081 /* Constants.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Constants.h; sourceTree = "<group>"; };
+		E6885DE212BEEA2A00D87081 /* Constants.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Constants.m; sourceTree = "<group>"; };
+		E6AB588812AF4EE5009EA891 /* FBDialog.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; name = FBDialog.bundle; path = "../facebook-ios-sdk/src/FBDialog.bundle"; sourceTree = SOURCE_ROOT; };
+		E6AB588A12AF4EE5009EA891 /* JSON.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = JSON.h; sourceTree = "<group>"; };
+		E6AB588B12AF4EE5009EA891 /* NSObject+SBJSON.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSObject+SBJSON.h"; sourceTree = "<group>"; };
+		E6AB588C12AF4EE5009EA891 /* NSObject+SBJSON.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSObject+SBJSON.m"; sourceTree = "<group>"; };
+		E6AB588D12AF4EE5009EA891 /* NSString+SBJSON.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSString+SBJSON.h"; sourceTree = "<group>"; };
+		E6AB588E12AF4EE5009EA891 /* NSString+SBJSON.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSString+SBJSON.m"; sourceTree = "<group>"; };
+		E6AB588F12AF4EE5009EA891 /* SBJSON.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SBJSON.h; sourceTree = "<group>"; };
+		E6AB589012AF4EE5009EA891 /* SBJSON.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SBJSON.m; sourceTree = "<group>"; };
+		E6AB589112AF4EE5009EA891 /* SBJsonBase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SBJsonBase.h; sourceTree = "<group>"; };
+		E6AB589212AF4EE5009EA891 /* SBJsonBase.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SBJsonBase.m; sourceTree = "<group>"; };
+		E6AB589312AF4EE5009EA891 /* SBJsonParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SBJsonParser.h; sourceTree = "<group>"; };
+		E6AB589412AF4EE5009EA891 /* SBJsonParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SBJsonParser.m; sourceTree = "<group>"; };
+		E6AB589512AF4EE5009EA891 /* SBJsonWriter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SBJsonWriter.h; sourceTree = "<group>"; };
+		E6AB589612AF4EE5009EA891 /* SBJsonWriter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SBJsonWriter.m; sourceTree = "<group>"; };
+		E6AB589712AF4EE5009EA891 /* FBConnect.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = FBConnect.h; path = "../facebook-ios-sdk/src/FBConnect.h"; sourceTree = SOURCE_ROOT; };
+		E6AB589812AF4EE5009EA891 /* FBRequest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = FBRequest.h; path = "../facebook-ios-sdk/src/FBRequest.h"; sourceTree = SOURCE_ROOT; };
+		E6AB589912AF4EE5009EA891 /* FBRequest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = FBRequest.m; path = "../facebook-ios-sdk/src/FBRequest.m"; sourceTree = SOURCE_ROOT; };
+		E6AB589A12AF4EE5009EA891 /* Facebook.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Facebook.m; path = "../facebook-ios-sdk/src/Facebook.m"; sourceTree = SOURCE_ROOT; };
+		E6AB589B12AF4EE5009EA891 /* Facebook.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Facebook.h; path = "../facebook-ios-sdk/src/Facebook.h"; sourceTree = SOURCE_ROOT; };
+		E6AB589C12AF4EE5009EA891 /* FBLoginDialog.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = FBLoginDialog.h; path = "../facebook-ios-sdk/src/FBLoginDialog.h"; sourceTree = SOURCE_ROOT; };
+		E6AB589D12AF4EE5009EA891 /* FBLoginDialog.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = FBLoginDialog.m; path = "../facebook-ios-sdk/src/FBLoginDialog.m"; sourceTree = SOURCE_ROOT; };
+		E6AB589E12AF4EE5009EA891 /* FBDialog.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = FBDialog.h; path = "../facebook-ios-sdk/src/FBDialog.h"; sourceTree = SOURCE_ROOT; };
+		E6AB589F12AF4EE5009EA891 /* FBDialog.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = FBDialog.m; path = "../facebook-ios-sdk/src/FBDialog.m"; sourceTree = SOURCE_ROOT; };
+		E6AB599A12AF5983009EA891 /* ModelConnectionAndParse.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ModelConnectionAndParse.h; path = ../TowerSaintIphone/ModelConnectionAndParse.h; sourceTree = SOURCE_ROOT; };
+		E6AB599B12AF5983009EA891 /* ModelConnectionAndParse.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ModelConnectionAndParse.m; path = ../TowerSaintIphone/ModelConnectionAndParse.m; sourceTree = SOURCE_ROOT; };
+		E6AB599C12AF5983009EA891 /* URLRequestManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = URLRequestManager.h; path = ../TowerSaintIphone/URLRequestManager.h; sourceTree = SOURCE_ROOT; };
+		E6AB599D12AF5983009EA891 /* URLRequestManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = URLRequestManager.m; path = ../TowerSaintIphone/URLRequestManager.m; sourceTree = SOURCE_ROOT; };
+		E6AB599F12AF5983009EA891 /* Tower.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Tower.h; path = ../TowerSaintIphone/Tower.h; sourceTree = SOURCE_ROOT; };
+		E6AB59A012AF5983009EA891 /* Tower.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Tower.m; path = ../TowerSaintIphone/Tower.m; sourceTree = SOURCE_ROOT; };
+		E6AB59A112AF5983009EA891 /* Road.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Road.h; path = ../TowerSaintIphone/Road.h; sourceTree = SOURCE_ROOT; };
+		E6AB59A212AF5983009EA891 /* Road.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Road.m; path = ../TowerSaintIphone/Road.m; sourceTree = SOURCE_ROOT; };
+		E6AB59A312AF5983009EA891 /* Portal.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Portal.h; path = ../TowerSaintIphone/Portal.h; sourceTree = SOURCE_ROOT; };
+		E6AB59A412AF5983009EA891 /* Portal.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Portal.m; path = ../TowerSaintIphone/Portal.m; sourceTree = SOURCE_ROOT; };
+		E6AB59A512AF5983009EA891 /* User.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = User.h; path = ../TowerSaintIphone/User.h; sourceTree = SOURCE_ROOT; };
+		E6AB59A612AF5983009EA891 /* User.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = User.m; path = ../TowerSaintIphone/User.m; sourceTree = SOURCE_ROOT; };
+		E6AB59A712AF5983009EA891 /* Model.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Model.h; path = ../TowerSaintIphone/Model.h; sourceTree = SOURCE_ROOT; };
+		E6AB59A812AF5983009EA891 /* Bounds.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Bounds.h; path = ../TowerSaintIphone/Bounds.h; sourceTree = SOURCE_ROOT; };
+		E6AB59A912AF5983009EA891 /* Bounds.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Bounds.m; path = ../TowerSaintIphone/Bounds.m; sourceTree = SOURCE_ROOT; };
+		E6AB59AA12AF5983009EA891 /* ImageId.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ImageId.h; path = ../TowerSaintIphone/ImageId.h; sourceTree = SOURCE_ROOT; };
+		E6AB59AB12AF5983009EA891 /* ImageId.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ImageId.m; path = ../TowerSaintIphone/ImageId.m; sourceTree = SOURCE_ROOT; };
+		E6AB59B512AF599C009EA891 /* CoreLocationController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CoreLocationController.h; path = ../TowerSaintIphone/CoreLocationController.h; sourceTree = SOURCE_ROOT; };
+		E6AB59B612AF599C009EA891 /* CoreLocationController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = CoreLocationController.m; path = ../TowerSaintIphone/CoreLocationController.m; sourceTree = SOURCE_ROOT; };
+		E6AB59BC12AF5C32009EA891 /* GameImages.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = GameImages.plist; path = ../TowerSaintIphone/GameImages.plist; sourceTree = SOURCE_ROOT; };
+		E6AB59BF12AF5C3C009EA891 /* Crown.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = Crown.png; path = ../TowerSaintIphone/Crown.png; sourceTree = SOURCE_ROOT; };
+		E6AB59C012AF5C3C009EA891 /* EastRoad.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = EastRoad.png; path = ../TowerSaintIphone/EastRoad.png; sourceTree = SOURCE_ROOT; };
+		E6AB59C112AF5C3C009EA891 /* EastWestRoad.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = EastWestRoad.png; path = ../TowerSaintIphone/EastWestRoad.png; sourceTree = SOURCE_ROOT; };
+		E6AB59C212AF5C3C009EA891 /* NorthEastRoad.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = NorthEastRoad.png; path = ../TowerSaintIphone/NorthEastRoad.png; sourceTree = SOURCE_ROOT; };
+		E6AB59C312AF5C3C009EA891 /* NorthEastWestRoad.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = NorthEastWestRoad.png; path = ../TowerSaintIphone/NorthEastWestRoad.png; sourceTree = SOURCE_ROOT; };
+		E6AB59C412AF5C3C009EA891 /* NorthRoad.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = NorthRoad.png; path = ../TowerSaintIphone/NorthRoad.png; sourceTree = SOURCE_ROOT; };
+		E6AB59C512AF5C3C009EA891 /* NorthSouthEastRoad.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = NorthSouthEastRoad.png; path = ../TowerSaintIphone/NorthSouthEastRoad.png; sourceTree = SOURCE_ROOT; };
+		E6AB59C612AF5C3C009EA891 /* NorthSouthEastWestRoad.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = NorthSouthEastWestRoad.png; path = ../TowerSaintIphone/NorthSouthEastWestRoad.png; sourceTree = SOURCE_ROOT; };
+		E6AB59C712AF5C3C009EA891 /* NorthSouthRoad.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = NorthSouthRoad.png; path = ../TowerSaintIphone/NorthSouthRoad.png; sourceTree = SOURCE_ROOT; };
+		E6AB59C812AF5C3C009EA891 /* NorthSouthWestRoad.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = NorthSouthWestRoad.png; path = ../TowerSaintIphone/NorthSouthWestRoad.png; sourceTree = SOURCE_ROOT; };
+		E6AB59C912AF5C3C009EA891 /* NorthWestRoad.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = NorthWestRoad.png; path = ../TowerSaintIphone/NorthWestRoad.png; sourceTree = SOURCE_ROOT; };
+		E6AB59CA12AF5C3C009EA891 /* Portal.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = Portal.png; path = ../TowerSaintIphone/Portal.png; sourceTree = SOURCE_ROOT; };
+		E6AB59CB12AF5C3C009EA891 /* SouthEastRoad.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = SouthEastRoad.png; path = ../TowerSaintIphone/SouthEastRoad.png; sourceTree = SOURCE_ROOT; };
+		E6AB59CC12AF5C3C009EA891 /* SouthEastWestRoad.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = SouthEastWestRoad.png; path = ../TowerSaintIphone/SouthEastWestRoad.png; sourceTree = SOURCE_ROOT; };
+		E6AB59CD12AF5C3C009EA891 /* SouthRoad.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = SouthRoad.png; path = ../TowerSaintIphone/SouthRoad.png; sourceTree = SOURCE_ROOT; };
+		E6AB59CE12AF5C3C009EA891 /* SouthWestRoad.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = SouthWestRoad.png; path = ../TowerSaintIphone/SouthWestRoad.png; sourceTree = SOURCE_ROOT; };
+		E6AB59CF12AF5C3C009EA891 /* Tower_Level0.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = Tower_Level0.png; path = ../TowerSaintIphone/Tower_Level0.png; sourceTree = SOURCE_ROOT; };
+		E6AB59D012AF5C3C009EA891 /* Tower_Level1.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = Tower_Level1.png; path = ../TowerSaintIphone/Tower_Level1.png; sourceTree = SOURCE_ROOT; };
+		E6AB59D112AF5C3C009EA891 /* Tower_Level2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = Tower_Level2.png; path = ../TowerSaintIphone/Tower_Level2.png; sourceTree = SOURCE_ROOT; };
+		E6AB59D212AF5C3C009EA891 /* TowerSaint.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = TowerSaint.png; path = ../TowerSaintIphone/TowerSaint.png; sourceTree = SOURCE_ROOT; };
+		E6AB59D312AF5C3C009EA891 /* WestRoad.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = WestRoad.png; path = ../TowerSaintIphone/WestRoad.png; sourceTree = SOURCE_ROOT; };
+		E6AB59F912AF5D46009EA891 /* CoreUser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CoreUser.h; sourceTree = "<group>"; };
+		E6AB59FA12AF5D46009EA891 /* CoreUser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CoreUser.m; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		1D60588F0D05DD3D006BFB54 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				1D60589F0D05DD5A006BFB54 /* Foundation.framework in Frameworks */,
+				1DF5F4E00D08C38300B7A737 /* UIKit.framework in Frameworks */,
+				288765A50DF7441C002DB57D /* CoreGraphics.framework in Frameworks */,
+				E65C6A3E12ADE3DC0043CED5 /* MapKit.framework in Frameworks */,
+				E65C6A4212ADE3EB0043CED5 /* CoreLocation.framework in Frameworks */,
+				E65C6B8212ADE9F20043CED5 /* CoreData.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		080E96DDFE201D6D7F000001 /* Classes */ = {
+			isa = PBXGroup;
+			children = (
+				1D3623240D0F684500981E51 /* TowerSaintPhoneAppDelegate.h */,
+				1D3623250D0F684500981E51 /* TowerSaintPhoneAppDelegate.m */,
+				28D7ACF60DDB3853001CB0EB /* TowerSaintPhoneViewController.h */,
+				28D7ACF70DDB3853001CB0EB /* TowerSaintPhoneViewController.m */,
+				E65C6A3512ADE30A0043CED5 /* FacebookViewController.h */,
+				E65C6A3612ADE30A0043CED5 /* FacebookViewController.m */,
+				E65C6A3712ADE30A0043CED5 /* FacebookViewController.xib */,
+				E65C6BB012ADFAD90043CED5 /* MainViewController.h */,
+				E65C6BB112ADFAD90043CED5 /* MainViewController.m */,
+				E65C6BB212ADFAD90043CED5 /* MainViewController.xib */,
+			);
+			path = Classes;
+			sourceTree = "<group>";
+		};
+		19C28FACFE9D520D11CA2CBB /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				1D6058910D05DD3D006BFB54 /* TowerSaintPhone.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		29B97314FDCFA39411CA2CEA /* CustomTemplate */ = {
+			isa = PBXGroup;
+			children = (
+				E6885DE012BEEA0B00D87081 /* GameObjects */,
+				E6AB59B412AF599C009EA891 /* Location */,
+				E6AB599E12AF5983009EA891 /* Models */,
+				E6AB599912AF5983009EA891 /* Connection */,
+				E6AB588712AF4EE5009EA891 /* FBConnect */,
+				080E96DDFE201D6D7F000001 /* Classes */,
+				29B97315FDCFA39411CA2CEA /* Other Sources */,
+				29B97317FDCFA39411CA2CEA /* Resources */,
+				29B97323FDCFA39411CA2CEA /* Frameworks */,
+				19C28FACFE9D520D11CA2CBB /* Products */,
+			);
+			name = CustomTemplate;
+			sourceTree = "<group>";
+		};
+		29B97315FDCFA39411CA2CEA /* Other Sources */ = {
+			isa = PBXGroup;
+			children = (
+				32CA4F630368D1EE00C91783 /* TowerSaintPhone_Prefix.pch */,
+				29B97316FDCFA39411CA2CEA /* main.m */,
+			);
+			name = "Other Sources";
+			sourceTree = "<group>";
+		};
+		29B97317FDCFA39411CA2CEA /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				E6AB59BE12AF5C3C009EA891 /* Images */,
+				E6AB59F912AF5D46009EA891 /* CoreUser.h */,
+				E6AB59FA12AF5D46009EA891 /* CoreUser.m */,
+				E6AB59BC12AF5C32009EA891 /* GameImages.plist */,
+				2899E5210DE3E06400AC0155 /* TowerSaintPhoneViewController.xib */,
+				28AD733E0D9D9553002E5188 /* MainWindow.xib */,
+				8D1107310486CEB800E47090 /* TowerSaintPhone-Info.plist */,
+				E65C6B7F12ADE99B0043CED5 /* TowerSaint.xcdatamodel */,
+			);
+			name = Resources;
+			sourceTree = "<group>";
+		};
+		29B97323FDCFA39411CA2CEA /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				1DF5F4DF0D08C38300B7A737 /* UIKit.framework */,
+				1D30AB110D05D00D00671497 /* Foundation.framework */,
+				288765A40DF7441C002DB57D /* CoreGraphics.framework */,
+				E65C6A3D12ADE3DC0043CED5 /* MapKit.framework */,
+				E65C6A4112ADE3EB0043CED5 /* CoreLocation.framework */,
+				E65C6B8112ADE9F20043CED5 /* CoreData.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		E6885DE012BEEA0B00D87081 /* GameObjects */ = {
+			isa = PBXGroup;
+			children = (
+				E6AB59AA12AF5983009EA891 /* ImageId.h */,
+				E6AB59AB12AF5983009EA891 /* ImageId.m */,
+				E66B7CC912B9901900DCBC9D /* ModelAnnotation.h */,
+				E66B7CCA12B9901900DCBC9D /* ModelAnnotation.m */,
+				E6885DE112BEEA2A00D87081 /* Constants.h */,
+				E6885DE212BEEA2A00D87081 /* Constants.m */,
+			);
+			name = GameObjects;
+			sourceTree = "<group>";
+		};
+		E6AB588712AF4EE5009EA891 /* FBConnect */ = {
+			isa = PBXGroup;
+			children = (
+				E6AB588812AF4EE5009EA891 /* FBDialog.bundle */,
+				E6AB588912AF4EE5009EA891 /* JSON */,
+				E6AB589712AF4EE5009EA891 /* FBConnect.h */,
+				E6AB589812AF4EE5009EA891 /* FBRequest.h */,
+				E6AB589912AF4EE5009EA891 /* FBRequest.m */,
+				E6AB589A12AF4EE5009EA891 /* Facebook.m */,
+				E6AB589B12AF4EE5009EA891 /* Facebook.h */,
+				E6AB589C12AF4EE5009EA891 /* FBLoginDialog.h */,
+				E6AB589D12AF4EE5009EA891 /* FBLoginDialog.m */,
+				E6AB589E12AF4EE5009EA891 /* FBDialog.h */,
+				E6AB589F12AF4EE5009EA891 /* FBDialog.m */,
+			);
+			name = FBConnect;
+			sourceTree = "<group>";
+		};
+		E6AB588912AF4EE5009EA891 /* JSON */ = {
+			isa = PBXGroup;
+			children = (
+				E6AB588A12AF4EE5009EA891 /* JSON.h */,
+				E6AB588B12AF4EE5009EA891 /* NSObject+SBJSON.h */,
+				E6AB588C12AF4EE5009EA891 /* NSObject+SBJSON.m */,
+				E6AB588D12AF4EE5009EA891 /* NSString+SBJSON.h */,
+				E6AB588E12AF4EE5009EA891 /* NSString+SBJSON.m */,
+				E6AB588F12AF4EE5009EA891 /* SBJSON.h */,
+				E6AB589012AF4EE5009EA891 /* SBJSON.m */,
+				E6AB589112AF4EE5009EA891 /* SBJsonBase.h */,
+				E6AB589212AF4EE5009EA891 /* SBJsonBase.m */,
+				E6AB589312AF4EE5009EA891 /* SBJsonParser.h */,
+				E6AB589412AF4EE5009EA891 /* SBJsonParser.m */,
+				E6AB589512AF4EE5009EA891 /* SBJsonWriter.h */,
+				E6AB589612AF4EE5009EA891 /* SBJsonWriter.m */,
+			);
+			name = JSON;
+			path = "../facebook-ios-sdk/src/JSON";
+			sourceTree = SOURCE_ROOT;
+		};
+		E6AB599912AF5983009EA891 /* Connection */ = {
+			isa = PBXGroup;
+			children = (
+				E6AB599A12AF5983009EA891 /* ModelConnectionAndParse.h */,
+				E6AB599B12AF5983009EA891 /* ModelConnectionAndParse.m */,
+				E6AB599C12AF5983009EA891 /* URLRequestManager.h */,
+				E6AB599D12AF5983009EA891 /* URLRequestManager.m */,
+			);
+			name = Connection;
+			sourceTree = "<group>";
+		};
+		E6AB599E12AF5983009EA891 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				E6AB599F12AF5983009EA891 /* Tower.h */,
+				E6AB59A012AF5983009EA891 /* Tower.m */,
+				E6AB59A112AF5983009EA891 /* Road.h */,
+				E6AB59A212AF5983009EA891 /* Road.m */,
+				E6AB59A312AF5983009EA891 /* Portal.h */,
+				E6AB59A412AF5983009EA891 /* Portal.m */,
+				E6AB59A512AF5983009EA891 /* User.h */,
+				E6AB59A612AF5983009EA891 /* User.m */,
+				E6AB59A712AF5983009EA891 /* Model.h */,
+				E6AB59A812AF5983009EA891 /* Bounds.h */,
+				E6AB59A912AF5983009EA891 /* Bounds.m */,
+			);
+			name = Models;
+			sourceTree = "<group>";
+		};
+		E6AB59B412AF599C009EA891 /* Location */ = {
+			isa = PBXGroup;
+			children = (
+				E6AB59B512AF599C009EA891 /* CoreLocationController.h */,
+				E6AB59B612AF599C009EA891 /* CoreLocationController.m */,
+			);
+			name = Location;
+			sourceTree = "<group>";
+		};
+		E6AB59BE12AF5C3C009EA891 /* Images */ = {
+			isa = PBXGroup;
+			children = (
+				E6AB59BF12AF5C3C009EA891 /* Crown.png */,
+				E6AB59C012AF5C3C009EA891 /* EastRoad.png */,
+				E6AB59C112AF5C3C009EA891 /* EastWestRoad.png */,
+				E6AB59C212AF5C3C009EA891 /* NorthEastRoad.png */,
+				E6AB59C312AF5C3C009EA891 /* NorthEastWestRoad.png */,
+				E6AB59C412AF5C3C009EA891 /* NorthRoad.png */,
+				E6AB59C512AF5C3C009EA891 /* NorthSouthEastRoad.png */,
+				E6AB59C612AF5C3C009EA891 /* NorthSouthEastWestRoad.png */,
+				E6AB59C712AF5C3C009EA891 /* NorthSouthRoad.png */,
+				E6AB59C812AF5C3C009EA891 /* NorthSouthWestRoad.png */,
+				E6AB59C912AF5C3C009EA891 /* NorthWestRoad.png */,
+				E6AB59CA12AF5C3C009EA891 /* Portal.png */,
+				E6AB59CB12AF5C3C009EA891 /* SouthEastRoad.png */,
+				E6AB59CC12AF5C3C009EA891 /* SouthEastWestRoad.png */,
+				E6AB59CD12AF5C3C009EA891 /* SouthRoad.png */,
+				E6AB59CE12AF5C3C009EA891 /* SouthWestRoad.png */,
+				E6AB59CF12AF5C3C009EA891 /* Tower_Level0.png */,
+				E6AB59D012AF5C3C009EA891 /* Tower_Level1.png */,
+				E6AB59D112AF5C3C009EA891 /* Tower_Level2.png */,
+				E6AB59D212AF5C3C009EA891 /* TowerSaint.png */,
+				E6AB59D312AF5C3C009EA891 /* WestRoad.png */,
+			);
+			name = Images;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		1D6058900D05DD3D006BFB54 /* TowerSaintPhone */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 1D6058960D05DD3E006BFB54 /* Build configuration list for PBXNativeTarget "TowerSaintPhone" */;
+			buildPhases = (
+				1D60588D0D05DD3D006BFB54 /* Resources */,
+				1D60588E0D05DD3D006BFB54 /* Sources */,
+				1D60588F0D05DD3D006BFB54 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = TowerSaintPhone;
+			productName = TowerSaintPhone;
+			productReference = 1D6058910D05DD3D006BFB54 /* TowerSaintPhone.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		29B97313FDCFA39411CA2CEA /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				ORGANIZATIONNAME = TowerSaint;
+			};
+			buildConfigurationList = C01FCF4E08A954540054247B /* Build configuration list for PBXProject "TowerSaintPhone" */;
+			compatibilityVersion = "Xcode 3.1";
+			developmentRegion = English;
+			hasScannedForEncodings = 1;
+			knownRegions = (
+				English,
+				Japanese,
+				French,
+				German,
+			);
+			mainGroup = 29B97314FDCFA39411CA2CEA /* CustomTemplate */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				1D6058900D05DD3D006BFB54 /* TowerSaintPhone */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		1D60588D0D05DD3D006BFB54 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				28AD733F0D9D9553002E5188 /* MainWindow.xib in Resources */,
+				2899E5220DE3E06400AC0155 /* TowerSaintPhoneViewController.xib in Resources */,
+				E65C6A3912ADE30A0043CED5 /* FacebookViewController.xib in Resources */,
+				E65C6BB412ADFAD90043CED5 /* MainViewController.xib in Resources */,
+				E6AB58A012AF4EE5009EA891 /* FBDialog.bundle in Resources */,
+				E6AB59BD12AF5C32009EA891 /* GameImages.plist in Resources */,
+				E6AB59D412AF5C3C009EA891 /* Crown.png in Resources */,
+				E6AB59D512AF5C3C009EA891 /* EastRoad.png in Resources */,
+				E6AB59D612AF5C3C009EA891 /* EastWestRoad.png in Resources */,
+				E6AB59D712AF5C3C009EA891 /* NorthEastRoad.png in Resources */,
+				E6AB59D812AF5C3C009EA891 /* NorthEastWestRoad.png in Resources */,
+				E6AB59D912AF5C3C009EA891 /* NorthRoad.png in Resources */,
+				E6AB59DA12AF5C3C009EA891 /* NorthSouthEastRoad.png in Resources */,
+				E6AB59DB12AF5C3C009EA891 /* NorthSouthEastWestRoad.png in Resources */,
+				E6AB59DC12AF5C3C009EA891 /* NorthSouthRoad.png in Resources */,
+				E6AB59DD12AF5C3C009EA891 /* NorthSouthWestRoad.png in Resources */,
+				E6AB59DE12AF5C3C009EA891 /* NorthWestRoad.png in Resources */,
+				E6AB59DF12AF5C3C009EA891 /* Portal.png in Resources */,
+				E6AB59E012AF5C3C009EA891 /* SouthEastRoad.png in Resources */,
+				E6AB59E112AF5C3C009EA891 /* SouthEastWestRoad.png in Resources */,
+				E6AB59E212AF5C3C009EA891 /* SouthRoad.png in Resources */,
+				E6AB59E312AF5C3C009EA891 /* SouthWestRoad.png in Resources */,
+				E6AB59E412AF5C3C009EA891 /* Tower_Level0.png in Resources */,
+				E6AB59E512AF5C3C009EA891 /* Tower_Level1.png in Resources */,
+				E6AB59E612AF5C3C009EA891 /* Tower_Level2.png in Resources */,
+				E6AB59E712AF5C3C009EA891 /* TowerSaint.png in Resources */,
+				E6AB59E812AF5C3C009EA891 /* WestRoad.png in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		1D60588E0D05DD3D006BFB54 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				1D60589B0D05DD56006BFB54 /* main.m in Sources */,
+				1D3623260D0F684500981E51 /* TowerSaintPhoneAppDelegate.m in Sources */,
+				28D7ACF80DDB3853001CB0EB /* TowerSaintPhoneViewController.m in Sources */,
+				E65C6A3812ADE30A0043CED5 /* FacebookViewController.m in Sources */,
+				E65C6B8012ADE99B0043CED5 /* TowerSaint.xcdatamodel in Sources */,
+				E65C6BB312ADFAD90043CED5 /* MainViewController.m in Sources */,
+				E6AB58A112AF4EE5009EA891 /* NSObject+SBJSON.m in Sources */,
+				E6AB58A212AF4EE5009EA891 /* NSString+SBJSON.m in Sources */,
+				E6AB58A312AF4EE5009EA891 /* SBJSON.m in Sources */,
+				E6AB58A412AF4EE5009EA891 /* SBJsonBase.m in Sources */,
+				E6AB58A512AF4EE5009EA891 /* SBJsonParser.m in Sources */,
+				E6AB58A612AF4EE5009EA891 /* SBJsonWriter.m in Sources */,
+				E6AB58A712AF4EE5009EA891 /* FBRequest.m in Sources */,
+				E6AB58A812AF4EE5009EA891 /* Facebook.m in Sources */,
+				E6AB58A912AF4EE5009EA891 /* FBLoginDialog.m in Sources */,
+				E6AB58AA12AF4EE5009EA891 /* FBDialog.m in Sources */,
+				E6AB59AC12AF5983009EA891 /* ModelConnectionAndParse.m in Sources */,
+				E6AB59AD12AF5983009EA891 /* URLRequestManager.m in Sources */,
+				E6AB59AE12AF5983009EA891 /* Tower.m in Sources */,
+				E6AB59AF12AF5983009EA891 /* Road.m in Sources */,
+				E6AB59B012AF5983009EA891 /* Portal.m in Sources */,
+				E6AB59B112AF5983009EA891 /* User.m in Sources */,
+				E6AB59B212AF5983009EA891 /* Bounds.m in Sources */,
+				E6AB59B312AF5983009EA891 /* ImageId.m in Sources */,
+				E6AB59B712AF599C009EA891 /* CoreLocationController.m in Sources */,
+				E6AB59FB12AF5D46009EA891 /* CoreUser.m in Sources */,
+				E66B7CCB12B9901900DCBC9D /* ModelAnnotation.m in Sources */,
+				E6885DE312BEEA2A00D87081 /* Constants.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		1D6058940D05DD3E006BFB54 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				COPY_PHASE_STRIP = NO;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = TowerSaintPhone_Prefix.pch;
+				INFOPLIST_FILE = "TowerSaintPhone-Info.plist";
+				PRODUCT_NAME = TowerSaintPhone;
+			};
+			name = Debug;
+		};
+		1D6058950D05DD3E006BFB54 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				COPY_PHASE_STRIP = YES;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = TowerSaintPhone_Prefix.pch;
+				INFOPLIST_FILE = "TowerSaintPhone-Info.plist";
+				PRODUCT_NAME = TowerSaintPhone;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		C01FCF4F08A954540054247B /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				GCC_C_LANGUAGE_STANDARD = c99;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				PREBINDING = NO;
+				SDKROOT = iphoneos;
+			};
+			name = Debug;
+		};
+		C01FCF5008A954540054247B /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				GCC_C_LANGUAGE_STANDARD = c99;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				OTHER_CFLAGS = "-DNS_BLOCK_ASSERTIONS=1";
+				PREBINDING = NO;
+				SDKROOT = iphoneos;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		1D6058960D05DD3E006BFB54 /* Build configuration list for PBXNativeTarget "TowerSaintPhone" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				1D6058940D05DD3E006BFB54 /* Debug */,
+				1D6058950D05DD3E006BFB54 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		C01FCF4E08A954540054247B /* Build configuration list for PBXProject "TowerSaintPhone" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				C01FCF4F08A954540054247B /* Debug */,
+				C01FCF5008A954540054247B /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 29B97313FDCFA39411CA2CEA /* Project object */;
+}
