@@ -1,4 +1,6 @@
-# Copyright (c) 2007-2009 The PyAMF Project.
+# -*- coding: utf-8 -*-
+#
+# Copyright (c) The PyAMF Project.
 # See LICENSE.txt for details.
 
 """
@@ -43,13 +45,13 @@ class AcknowlegdementGeneratorTestCase(unittest.TestCase):
         self.assertTrue(ack.clientId is not None)
         self.assertTrue(ack.timestamp is not None)
 
-        self.assertEquals(ack.correlationId, '123123')
+        self.assertEqual(ack.correlationId, '123123')
 
 
 class RequestProcessorTestCase(unittest.TestCase):
     def test_create(self):
         rp = amf3.RequestProcessor('xyz')
-        self.assertEquals(rp.gateway, 'xyz')
+        self.assertEqual(rp.gateway, 'xyz')
 
     def test_ping(self):
         message = messaging.CommandMessage(operation=5)
@@ -60,9 +62,9 @@ class RequestProcessorTestCase(unittest.TestCase):
         ack = response.body
 
         self.assertTrue(isinstance(response, remoting.Response))
-        self.assertEquals(response.status, remoting.STATUS_OK)
+        self.assertEqual(response.status, remoting.STATUS_OK)
         self.assertTrue(isinstance(ack, messaging.AcknowledgeMessage))
-        self.assertEquals(ack.body, True)
+        self.assertEqual(ack.body, True)
 
     def test_request(self):
         def echo(x):
@@ -77,13 +79,13 @@ class RequestProcessorTestCase(unittest.TestCase):
         ack = response.body
 
         self.assertTrue(isinstance(response, remoting.Response))
-        self.assertEquals(response.status, remoting.STATUS_OK)
+        self.assertEqual(response.status, remoting.STATUS_OK)
         self.assertTrue(isinstance(ack, messaging.AcknowledgeMessage))
-        self.assertEquals(ack.body, 'spam.eggs')
+        self.assertEqual(ack.body, 'spam.eggs')
 
     def test_error(self):
         def echo(x):
-            raise TypeError
+            raise TypeError('foo')
 
         gw = gateway.BaseGateway({'echo': echo})
         rp = amf3.RequestProcessor(gw)
@@ -95,13 +97,14 @@ class RequestProcessorTestCase(unittest.TestCase):
 
         self.assertFalse(gw.debug)
         self.assertTrue(isinstance(response, remoting.Response))
-        self.assertEquals(response.status, remoting.STATUS_ERROR)
+        self.assertEqual(response.status, remoting.STATUS_ERROR)
         self.assertTrue(isinstance(ack, messaging.ErrorMessage))
-        self.assertEquals(ack.faultCode, 'TypeError')
+        self.assertEqual(ack.faultCode, 'TypeError')
+        self.assertEqual(ack.faultString, 'foo')
 
     def test_error_debug(self):
         def echo(x):
-            raise TypeError
+            raise TypeError('foo')
 
         gw = gateway.BaseGateway({'echo': echo}, debug=True)
         rp = amf3.RequestProcessor(gw)
@@ -113,9 +116,9 @@ class RequestProcessorTestCase(unittest.TestCase):
 
         self.assertTrue(gw.debug)
         self.assertTrue(isinstance(response, remoting.Response))
-        self.assertEquals(response.status, remoting.STATUS_ERROR)
+        self.assertEqual(response.status, remoting.STATUS_ERROR)
         self.assertTrue(isinstance(ack, messaging.ErrorMessage))
-        self.assertEquals(ack.faultCode, 'TypeError')
+        self.assertEqual(ack.faultCode, 'TypeError')
         self.assertNotEquals(ack.extendedData, None)
 
     def test_too_many_args(self):
@@ -131,9 +134,9 @@ class RequestProcessorTestCase(unittest.TestCase):
         ack = response.body
 
         self.assertTrue(isinstance(response, remoting.Response))
-        self.assertEquals(response.status, remoting.STATUS_ERROR)
+        self.assertEqual(response.status, remoting.STATUS_ERROR)
         self.assertTrue(isinstance(ack, messaging.ErrorMessage))
-        self.assertEquals(ack.faultCode, 'TypeError')
+        self.assertEqual(ack.faultCode, 'TypeError')
 
     def test_preprocess(self):
         def echo(x):
@@ -144,7 +147,7 @@ class RequestProcessorTestCase(unittest.TestCase):
         def preproc(sr, *args):
             self.called = True
 
-            self.assertEquals(args, ('spam.eggs',))
+            self.assertEqual(args, ('spam.eggs',))
             self.assertTrue(isinstance(sr, gateway.ServiceRequest))
 
         gw = gateway.BaseGateway({'echo': echo}, preprocessor=preproc)
@@ -156,9 +159,9 @@ class RequestProcessorTestCase(unittest.TestCase):
         ack = response.body
 
         self.assertTrue(isinstance(response, remoting.Response))
-        self.assertEquals(response.status, remoting.STATUS_OK)
+        self.assertEqual(response.status, remoting.STATUS_OK)
         self.assertTrue(isinstance(ack, messaging.AcknowledgeMessage))
-        self.assertEquals(ack.body, 'spam.eggs')
+        self.assertEqual(ack.body, 'spam.eggs')
         self.assertTrue(self.called)
 
     def test_fail_preprocess(self):
@@ -177,7 +180,7 @@ class RequestProcessorTestCase(unittest.TestCase):
         ack = response.body
 
         self.assertTrue(isinstance(response, remoting.Response))
-        self.assertEquals(response.status, remoting.STATUS_ERROR)
+        self.assertEqual(response.status, remoting.STATUS_ERROR)
         self.assertTrue(isinstance(ack, messaging.ErrorMessage))
 
     def test_destination(self):
@@ -193,9 +196,9 @@ class RequestProcessorTestCase(unittest.TestCase):
         ack = response.body
 
         self.assertTrue(isinstance(response, remoting.Response))
-        self.assertEquals(response.status, remoting.STATUS_OK)
+        self.assertEqual(response.status, remoting.STATUS_OK)
         self.assertTrue(isinstance(ack, messaging.AcknowledgeMessage))
-        self.assertEquals(ack.body, None)
+        self.assertEqual(ack.body, None)
 
     def test_disconnect(self):
         message = messaging.CommandMessage(operation=12)
@@ -206,7 +209,7 @@ class RequestProcessorTestCase(unittest.TestCase):
         ack = response.body
 
         self.assertTrue(isinstance(response, remoting.Response))
-        self.assertEquals(response.status, remoting.STATUS_OK)
+        self.assertEqual(response.status, remoting.STATUS_OK)
         self.assertTrue(isinstance(ack, messaging.AcknowledgeMessage))
 
     def test_async(self):
@@ -218,18 +221,27 @@ class RequestProcessorTestCase(unittest.TestCase):
         ack = response.body
 
         self.assertTrue(isinstance(response, remoting.Response))
-        self.assertEquals(response.status, remoting.STATUS_OK)
+        self.assertEqual(response.status, remoting.STATUS_OK)
         self.assertTrue(isinstance(ack, messaging.AcknowledgeMessage))
 
+    def test_error_unicode_message(self):
+        """
+        See #727
+        """
+        def echo(x):
+            raise TypeError(u'ƒøø')
 
-def suite():
-    suite = unittest.TestSuite()
+        gw = gateway.BaseGateway({'echo': echo})
+        rp = amf3.RequestProcessor(gw)
+        message = messaging.RemotingMessage(body=['spam.eggs'], operation='echo')
+        request = remoting.Request('null', body=[message])
 
-    suite.addTest(unittest.makeSuite(RandomIdGeneratorTestCase))
-    suite.addTest(unittest.makeSuite(AcknowlegdementGeneratorTestCase))
-    suite.addTest(unittest.makeSuite(RequestProcessorTestCase))
+        response = rp(request)
+        ack = response.body
 
-    return suite
-
-if __name__ == '__main__':
-    unittest.main(defaultTest='suite')
+        self.assertFalse(gw.debug)
+        self.assertTrue(isinstance(response, remoting.Response))
+        self.assertEqual(response.status, remoting.STATUS_ERROR)
+        self.assertTrue(isinstance(ack, messaging.ErrorMessage))
+        self.assertEqual(ack.faultCode, 'TypeError')
+        self.assertEqual(ack.faultString, u'ƒøø')

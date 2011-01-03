@@ -11,6 +11,7 @@ package managers
 	import managers.states.TowerSaintServiceState;
 	
 	import models.Bounds;
+	import models.Location;
 	import models.SuperObject;
 	import models.User;
 	
@@ -19,9 +20,15 @@ package managers
 	import mx.rpc.AbstractOperation;
 	import mx.rpc.events.ResultEvent;
 	import mx.rpc.remoting.RemoteObject;
+	import mx.utils.ObjectUtil;
+	
+	import spark.components.Application;
+	import spark.components.Button;
 	
 	public class UserObjectManager
 	{
+		public var app:Application; 													/* A reference to the application that runs the user object manager */
+		
 		// The map
 		public var map:Map;
 		
@@ -36,14 +43,14 @@ package managers
 		
 		// The list of bounds
 		public var listOfBounds:ArrayCollection;
-	
+		
 		// Networking variables
 		public var listOfOpenConnections:ArrayCollection;
 		
 		/*
-			Constructor - Takes in the map(view), and state constants
+		Constructor - Takes in the map(view), and state constants
 		*/
-		public function UserObjectManager(m:Map, uU:User, sS:TowerSaintServiceState, p:PhotoAssets, fPM:FocusPanelManager)
+		public function UserObjectManager(m:Map, uU:User, sS:TowerSaintServiceState, p:PhotoAssets, fPM:FocusPanelManager, a:Application)
 		{
 			// The state variables
 			this.map = m;
@@ -51,16 +58,19 @@ package managers
 			this.serverState = sS;
 			this.photo = p;
 			this.focusPanelManager = fPM;
+			this.app = a;
 			
 			// The containers
 			this.listOfObjects = new ArrayCollection();
 			this.listOfBounds = new ArrayCollection();
 			this.listOfOpenConnections = new ArrayCollection();
+			
 		}
+
 		
 		/* 
-			Function asynchoously gets all objects within visible bounds of the map.
-			The objects recived are drawn on the map
+		Function asynchoously gets all objects within visible bounds of the map.
+		The objects recived are drawn on the map
 		*/
 		public function getAllObjectsWithinBounds(bounds:LatLngBounds) : void {
 			if(!hasBounds(bounds)){
@@ -68,7 +78,7 @@ package managers
 				this.listOfBounds.addItem(bounds);
 				//Alert.show(this.listOfBounds.toString());
 				// Get all of the services
-				var a:Array = this.serverState.getAllConstants();
+				var a:Array = this.serverState.getAllDrawableConstants();
 				
 				// Get the bounds
 				var b:Bounds = new Bounds();
@@ -83,8 +93,8 @@ package managers
 		}
 		
 		/* 
-			Function asynchronously gets all objects withing influence range of the visible
-			bounds of the map. The objects are used to calculate the empire boundaries.
+		Function asynchronously gets all objects withing influence range of the visible
+		bounds of the map. The objects are used to calculate the empire boundaries.
 		*/
 		public function getAllObjectsWithinInfluenceOfBounds(bounds:LatLngBounds) : void {
 			if(!hasBounds(bounds)){
@@ -93,8 +103,8 @@ package managers
 		}
 		
 		/* 
-			Private function used to diminish the laod on the server by only get data in
-			latlngbounds that is not part of the arrayCollection of bounds
+		Private function used to diminish the laod on the server by only get data in
+		latlngbounds that is not part of the arrayCollection of bounds
 		*/
 		private function hasBounds(bounds:LatLngBounds) :Boolean {
 			for(var i:int = 0; i < this.listOfBounds.length; i++){
@@ -107,8 +117,8 @@ package managers
 		}
 		
 		/*
-			Function interfaces with the backend by calling the remote objects 
-			getObjectWithinBound method
+		Function interfaces with the backend by calling the remote objects 
+		getObjectWithinBound method
 		*/
 		private function getObjectWithinBound(serviceString:String, bounds:Bounds) : void {
 			var servicesDictionary:Dictionary = this.serverState.getServices();
@@ -127,7 +137,7 @@ package managers
 		Remove the first instance of the abstract operation, that has an open
 		connection with the server.
 		*/
-	
+		
 		private function removeFirstOperationFromOpenConnection(op:mx.rpc.AbstractOperation) : void{
 			for(var i:int = 0; i <this.listOfOpenConnections.length; i++){
 				var cOp:AbstractOperation = this.listOfOpenConnections[i] as AbstractOperation;
@@ -136,6 +146,22 @@ package managers
 					return;
 				}
 			}	
+		}
+		
+		/* 
+		Checks if the a position for the capital of a new empire is the minimum distance from
+		all other towers
+		*/
+		public function satisfiesMinimumDistance(pos:LatLng, f:Function) : void {
+			var l:Location = Location.googleToAMFLocation(pos);
+			
+			var servicesDictionary:Dictionary = this.serverState.getServices();
+			var _service:RemoteObject = servicesDictionary["towersaint"] as RemoteObject;
+			
+			// The abstract call
+			var operation:AbstractOperation = _service.getOperation("satisfiesMinimumDistance");
+			operation.addEventListener(ResultEvent.RESULT, f);	
+			operation.send(l);
 		}
 		
 		
@@ -148,13 +174,13 @@ package managers
 		
 		
 		/* 
-			Draw all of the objects one gets from the server
+		Draw all of the objects one gets from the server
 		*/
 		private function onGetAllObjects(event:ResultEvent) : void {
 			var tArray:ArrayCollection = event.result as ArrayCollection;
 			for(var i:Number = 0; i < tArray.length; i++){
 				var s:SuperObject = tArray.getItemAt(i) as SuperObject;
-				s.draw(false, this.map, this.photo, this.focusPanelManager);
+			//	s.draw(false, this.map, this.photo, this.focusPanelManager);
 			}
 			
 			// Save the list of objects
@@ -164,7 +190,7 @@ package managers
 			var op:AbstractOperation = event.target as AbstractOperation;
 			removeFirstOperationFromOpenConnection(op);
 			
-		
+			
 			// Check if all the open connections are closed
 			if(!hasOpenConnections()){
 				
@@ -176,10 +202,10 @@ package managers
 		}
 		
 		/*
-			Function draws the empire boundaries around super objects. First it must calculate
-			the boundary of all the object pieces. Then, it must check for intersections.
-			After finding the interesections, the relative power of an empire at that position 
-			is calculated to determine to whom belongs the  lattice point.
+		Function draws the empire boundaries around super objects. First it must calculate
+		the boundary of all the object pieces. Then, it must check for intersections.
+		After finding the interesections, the relative power of an empire at that position 
+		is calculated to determine to whom belongs the  lattice point.
 		*/
 		
 		public function drawEmpireBoundaries():void {
@@ -190,8 +216,8 @@ package managers
 		}
 		
 		/*
-			The user object stores all of the objects from the server. This function acts a filter
-			and returns only the objects that are currently being displayed by the map
+		The user object stores all of the objects from the server. This function acts a filter
+		and returns only the objects that are currently being displayed by the map
 		*/
 		
 		public function getObjectWithinBounds():ArrayCollection{
@@ -208,7 +234,7 @@ package managers
 		}
 		
 		/* 
-			Updates all objects belonging to the user
+		Updates all objects belonging to the user
 		*/
 		
 		public function updateTowerSaintService():void
@@ -216,7 +242,7 @@ package managers
 			var modified_objects:Array = getAllModifiedObjects();
 			
 			var servicesDictionary:Dictionary = this.serverState.getServices();
-			var _service:RemoteObject = servicesDictionary["update"] as RemoteObject;
+			var _service:RemoteObject = servicesDictionary["towersaint"] as RemoteObject;
 			
 			// The abstract call
 			var operation:AbstractOperation = _service.getOperation("saveUserObjects");
@@ -224,19 +250,33 @@ package managers
 			operation.send(modified_objects);
 		}
 		
-		public function saveUser() : void
+		public function saveUser(u:User) : void
 		{
-			var servicesDictionary:Dictionary = this.serverState.getServices();
-			var _service:RemoteObject = servicesDictionary["update"] as RemoteObject;
+			// Save the user
+			this.user = u;
 			
-			var operation:AbstractOperation = _service.getOperation("saveUser");
+			// Create the service
+			var servicesDictionary:Dictionary = this.serverState.getServices();
+			var _service:RemoteObject = servicesDictionary["towersaint"] as RemoteObject;
+			
+			// If this.user is a new user, the service will create the user on the server.
+			// If not, then 
+			var operation:AbstractOperation = _service.getOperation("getCurrentUser");
 			operation.addEventListener(ResultEvent.RESULT, onSaveUser);
 			operation.send(this.user);
 		}
 		
 		protected function onSaveUser(event:ResultEvent) : void
 		{
-			
+			var u:User = event.result as User;
+			// If it returns the same user, then the user is new, and we should start the initManager
+			if(!ObjectUtil.compare(this.user, u)){
+				// Change the state
+				this.app.currentState = "initUser";
+			}else{
+				var bounds:LatLngBounds = this.map.getLatLngBounds();
+ 				this.getAllObjectsWithinBounds(bounds);
+			}
 		}
 		
 		protected function onSaveUserObjects(event:ResultEvent) : void
@@ -245,7 +285,7 @@ package managers
 		}
 		
 		/*
-			Function return all objects that have been modified in an array
+		Function return all objects that have been modified in an array
 		*/
 		public function getAllModifiedObjects():Array {
 			var a:Array = new Array();

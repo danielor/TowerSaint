@@ -8,6 +8,7 @@ import pyamf, random, string, logging
 from pyamf import amf3
 from pyamf.flex import ArrayCollection, ObjectProxy
 from models import User, Road, Tower, Portal, Location, Bounds, Constants
+from geo.geomodel import GeoModel
 
 def drange(start, stop, step):
     """Get the range"""
@@ -49,11 +50,6 @@ def createRandomString(length = 10):
     """Create the random string"""
     return "".join([random.choice(string.letters) for _ in range(length)])
 
-def createRandomUser():
-    """Factory function for random user"""
-    u = createUser(random.random(), random.randint(0, 1000), createRandomString(), random.randint(0, 1) == 0,
-             random.randint(0, 1000), random.randint(0, 1000), random.randint(0, 1000))
-    return u
 
 def createListOfPairs(seq):
     """Create a list of consecutive pairs"""
@@ -64,29 +60,6 @@ def createListOfPairs(seq):
     except StopIteration:
         return
 
-# Factory functions to create the objects
-def createPortal(hitPoints, level, user, firstL, secondL):
-    """
-    hitPoints - the number of hit points associated with the portal
-    level - the level associated with the portal
-    user - the user who owns the portal
-    """
-    p = Portal()
-    p.hitPoints = hitPoints
-    p.level = level
-    p.user = user
-    p.startLocationLatitude = firstL.latitude
-    p.startLocationLongitude = firstL.longitude
-    p.startLocationLatitudeIndex = firstL.latIndex
-    p.startLocationLongitudeIndex = firstL.lonIndex
-    
-    # The end location
-    p.endLocationLatitude = secondL.latitude
-    p.endLocationLongitude = secondL.longitude
-    p.endLocationLatitudeIndex = secondL.latIndex
-    p.endLocationLongitudeIndex = secondL.lonIndex
-    return p
-    
 def createLocation(latIndex, lonIndex, latitude, longitude):
     l = Location()
     l.latIndex = latIndex
@@ -94,61 +67,6 @@ def createLocation(latIndex, lonIndex, latitude, longitude):
     l.latitude = latitude
     l.longitude = longitude
     return l
-        
-def createRoad(hitPoints, level, user, l):
-    r = Road()
-    r.hitPoints = hitPoints
-    r.level = level
-    r.user = user
-    r.latIndex = l.latIndex
-    r.lonIndex = l.lonIndex
-    r.latitude = l.latitude
-    r.longitude = l.longitude
-    return r
-
-def createBounds(southwestLocation, northeastLocation):
-    b = Bounds()
-    b.southwestLocation = southwestLocation
-    b.northeastLocation = northeastLocation
-    return b
-
-def createUser(FacebookID, Experience, Empire, isEmperor, completeManaProduction,
-                 completeStoneProduction, completeWoodProduction):
-    u = User()
-    u.FacebookID = FacebookID
-    u.Experience = Experience
-    u.Empire = Empire
-    u.isEmperor = isEmperor
-    u.completeManaProduction = completeManaProduction
-    u.completeStoneProduction = completeStoneProduction
-    u.completeWoodProduction = completeWoodProduction
-    return u
-
-def createTower(Experience, Speed, Power, Armor, Range, Accuracy,
-                 HitPoints, isIsolated, isCapital, hasRuler, user,
-                 manaProduction, stoneProduction, woodProduction, level, l):
-    t = Tower()
-    t.Experience = Experience
-    t.Speed = Speed
-    t.Power = Power
-    t.Armor = Armor
-    t.Range = Range
-    t.Accuracy = Accuracy
-    t.HitPoints = HitPoints
-    t.isIsolated = isIsolated
-    t.isCapital = isCapital
-    t.hasRuler = hasRuler
-    t.user = user
-    t.manaProduction = manaProduction
-    t.stoneProduction = stoneProduction
-    t.woodProduction = woodProduction
-    t.Level = level
-    t.latIndex = l.latIndex
-    t.lonIndex = l.lonIndex
-    t.latitude = l.latitude
-    t.longitude = l.longitude
-    return t
-        
 
         
 # The services for the AMF objects
@@ -159,7 +77,6 @@ class TowerService(object):
         
     def getObjectInBounds(self, latlng):
         """Get all tower objects within the bounds"""
-
         # Return the array collection
         return ArrayCollection(self._createListOfTowers(latlng, self.numberOfObjectsPerBound))
     
@@ -175,9 +92,9 @@ class TowerService(object):
         # From the list of locations 
         for _ in range(howMany):
             tower = Tower.createRandomObjectInBounds(b)
-            tower.put()
             # Get the proxy
             listOfTowers.append(tower)
+            
         return listOfTowers
     
     def getObjectInFunctionalBounds(self, bounds):
@@ -217,7 +134,6 @@ class PortalService(object):
     
     def getObjectInBounds(self, latlng):
         """Get all tower objects within the bounds"""
-        
         # Create the objects
         b = Bounds.createBoundsFromAMFData(latlng)
         
@@ -268,24 +184,70 @@ class RoadService(object):
         Get *all* objects that influence the visible screen. Objects outside of the
         map bounds can influence the drawing of the map bounds. The objects created randomly
         off the screen should be cached, so as to be consistent when the user pans. 
+
         """
-        
+
     
-class UpdateManager(object):
+class TowerSaintManager(object):
     def __init__(self):
-        pass
+        self.numberOfObjectsPerBound = 5
+        # Delete all objects in the database
+        #self.deleteAllObjects()
+    
+    def getObjectInBounds(self, latlng):
+        """Get the object within the latlng bounds of {latlng}"""
+        # Create the objects
+        b = Bounds.createBoundsFromAMFData(latlng)
+        # The list of road
+        listOfObjects = []
+        for obj in [Road, Portal, Tower]:
+            for _ in range(self.numberOfObjectsPerBound):
+                
+                # Create the road
+                o = obj.createRandomObjectInBounds(b)
+                
+                # The proxy
+                listOfObjects.append(o)
+        
+        return ArrayCollection(listOfObjects)
+        
     def saveUserObjects(self, objects):
         for piece in objects:
             piece.put()
-    def saveUser(self, user):
-        user.put()
-    
+            
+    def getCurrentUser(self, user):
+        """Save the users"""
+        # Get the user with id. Makes sure that only one user is created
+        # with the associated id.
+        u = User.all().filter('FacebookID =', user.FacebookID).get()
+        if u:
+            return u
+        else:
+            user.put()
+            return user
+        
+    def satisfiesMinimumDistance(self, latlng):
+        """If the tower satisfies the minimum distance from other towers, then it is true"""
+        logging.error(latlng)
+        pt = db.GeoPt(latlng['latitude'], latlng['longitude'])
+        distance = Constants.minInfluence() * Constants.latIndex() * Constants.latToMiles()
+        
+        # Find if their is a tower distance away from the pt. If there is even one object, this
+        # function will return  a value, and make satisfiesMinimumDistance false.
+        value = Tower.proximity_fetch(Tower.all(), pt, max_results = 1, max_distance = distance)
+        return value is None
+        
+    def deleteAllObjects(self):
+        """Remove all objects in the database"""
+        for cls in [Bounds, User, Road, Portal, Tower, Location]:
+            query = cls.all()
+            for obj in query.fetch(1000):           # For intial testing it would be rare for their to be more than 1000
+                obj.delete()
 
 def register_classes(AMF_NAMESPACE = 'models'):
     """Register the amf classes in a namespace"""
     # set this so returned objects and arrays are bindable
     amf3.use_proxies_default = True
-
     # register domain objects that will be used with PyAMF
     pyamf.register_class(User, '%s.User' % AMF_NAMESPACE)
     pyamf.register_class(Location, '%s.Location' % AMF_NAMESPACE)

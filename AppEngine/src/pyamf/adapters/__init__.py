@@ -1,4 +1,4 @@
-# Copyright (c) 2007-2009 The PyAMF Project.
+# Copyright (c) The PyAMF Project.
 # See LICENSE.txt for details.
 
 """
@@ -14,6 +14,9 @@ import glob
 from pyamf.util import imports
 
 
+adapters_registered = False
+
+
 class PackageImporter(object):
     """
     Package importer used for lazy module loading.
@@ -23,8 +26,6 @@ class PackageImporter(object):
 
     def __call__(self, mod):
         __import__('%s.%s' % ('pyamf.adapters', self.name))
-
-adapters_registered = False
 
 
 def register_adapters():
@@ -59,18 +60,32 @@ def register_adapter(mod, func):
     module already exists then the callable will be executed immediately.
     You can register the same module multiple times, the callables will be
     executed in the order they were registered. The root module must exist
-    (i.e. be importable) otherwise an C{ImportError} will be thrown.
+    (i.e. be importable) otherwise an `ImportError` will be thrown.
 
     @param mod: The fully qualified module string, as used in the imports
         statement. E.g. 'foo.bar.baz'. The string must map to a module
         otherwise the callable will not fire.
-    @type mod: C{str}
     @param func: The function to call when C{mod} is imported. This function
         must take one arg, the newly imported C{module} object.
     @type func: callable
     @raise TypeError: C{func} must be callable
     """
-    if not callable(func):
+    if not hasattr(func, '__call__'):
         raise TypeError('func must be callable')
 
-    imports.when_imported(str(mod), func)
+    imports.when_imported(mod, func)
+
+
+def get_adapter(mod):
+    """
+    """
+    base_name = '_' + mod.replace('.', '_')
+
+    full_import = '%s.%s' % (__name__, base_name)
+
+    ret = __import__(full_import)
+
+    for attr in full_import.split('.')[1:]:
+        ret = getattr(ret, attr)
+
+    return ret

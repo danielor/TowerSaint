@@ -19,19 +19,17 @@ package managers
 	{
 		// The display objects of the focus panel
 		public var focusImage:Image;
-		public var controlButton:Button;
 		public var bodyText:RichEditableText;
 		public var titleText:RichEditableText;
 		
 		// The photo assets
 		public var _photo:PhotoAssets;
 		
-		public function FocusPanelManager(fI:Image, cB:Button, bT:RichEditableText, tT:RichEditableText, 
+		public function FocusPanelManager(fI:Image, bT:RichEditableText, tT:RichEditableText, 
 										  p:PhotoAssets)
 		{
 			// The panel
 			this.focusImage = fI;
-			this.controlButton = cB;
 			this.bodyText = bT;
 			this.titleText = tT;
 			
@@ -44,7 +42,7 @@ package managers
 			var marker:TowerSaintMarker = event.currentTarget as TowerSaintMarker;
 
 			// Display the model in the focusPanelManager
-			displayModel(marker.model);
+			displayModel(marker.getModel());
 		}
 		
 		public function displayModel(m:SuperObject) : void {

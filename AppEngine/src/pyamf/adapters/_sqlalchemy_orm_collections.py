@@ -1,10 +1,10 @@
-# Copyright (c) 2007-2009 The PyAMF Project.
+# Copyright (c) The PyAMF Project.
 # See LICENSE for details.
 
 """
 SQLAlchemy adapter module.
 
-@see: U{SQLAlchemy homepage (external)<http://www.sqlalchemy.org>}
+@see: U{SQLAlchemy homepage<http://www.sqlalchemy.org>}
 
 @since: 0.4
 """

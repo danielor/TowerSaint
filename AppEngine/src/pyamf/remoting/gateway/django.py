@@ -1,4 +1,4 @@
-# Copyright (c) 2007-2009 The PyAMF Project.
+# Copyright (c) The PyAMF Project.
 # See LICENSE.txt for details.
 
 """
@@ -7,8 +7,7 @@ Gateway for the Django framework.
 This gateway allows you to expose functions in Django to AMF clients and
 servers.
 
-@see: U{Django homepage (external)<http://djangoproject.com>}
-
+@see: U{Django homepage<http://djangoproject.com>}
 @since: 0.1.0
 """
 
@@ -42,8 +41,9 @@ class DjangoGateway(gateway.BaseGateway):
     @ivar expose_request: The standard Django view always has the request
         object as the first parameter. To disable this functionality, set this
         to C{False}.
-    @type expose_request: C{bool}
     """
+
+    csrf_exempt = True
 
     def __init__(self, *args, **kwargs):
         kwargs['expose_request'] = kwargs.get('expose_request', True)
@@ -68,13 +68,13 @@ class DjangoGateway(gateway.BaseGateway):
         Processes the AMF request, returning an AMF response.
 
         @param http_request: The underlying HTTP Request.
-        @type http_request: C{HTTPRequest<django.core.http.HTTPRequest>}
+        @type http_request: U{HTTPRequest<http://docs.djangoproject.com
+            /en/dev/ref/request-response/#httprequest-objects>}
         @param request: The AMF Request.
         @type request: L{Envelope<pyamf.remoting.Envelope>}
         @rtype: L{Envelope<pyamf.remoting.Envelope>}
-        @return: The AMF Response.
         """
-        response = remoting.Envelope(request.amfVersion, request.clientType)
+        response = remoting.Envelope(request.amfVersion)
 
         for name, message in request:
             http_request.amf_request = message
@@ -87,11 +87,6 @@ class DjangoGateway(gateway.BaseGateway):
     def __call__(self, http_request):
         """
         Processes and dispatches the request.
-
-        @param http_request: The C{HTTPRequest} object.
-        @type http_request: C{HTTPRequest}
-        @return: The response to the request.
-        @rtype: C{HTTPResponse}
         """
         if http_request.method != 'POST':
             return http.HttpResponseNotAllowed(['POST'])
@@ -105,37 +100,39 @@ class DjangoGateway(gateway.BaseGateway):
                 strict=self.strict, logger=self.logger,
                 timezone_offset=timezone_offset)
         except (pyamf.DecodeError, IOError):
-            fe = gateway.format_exception()
-
             if self.logger:
-                self.logger.exception(fe)
+                self.logger.exception('Error decoding AMF request')
 
-            response = "400 Bad Request\n\nThe request body was unable to " \
-                "be successfully decoded."
+            response = ("400 Bad Request\n\nThe request body was unable to "
+                "be successfully decoded.")
 
             if self.debug:
-                response += "\n\nTraceback:\n\n%s" % fe
+                response += "\n\nTraceback:\n\n%s" % gateway.format_exception()
 
-            return http.HttpResponseBadRequest(mimetype='text/plain', content=response)
+            # support for Django 0.96
+            http_response = http.HttpResponse(mimetype='text/plain',
+                content=response)
+
+            http_response.status_code = 400
+
+            return http_response
         except (KeyboardInterrupt, SystemExit):
             raise
         except:
-            fe = gateway.format_exception()
-
             if self.logger:
-                self.logger.exception(fe)
+                self.logger.exception('Unexpected error decoding AMF request')
 
             response = ('500 Internal Server Error\n\n'
                 'An unexpected error occurred.')
 
             if self.debug:
-                response += "\n\nTraceback:\n\n%s" % fe
+                response += "\n\nTraceback:\n\n%s" % gateway.format_exception()
 
             return http.HttpResponseServerError(mimetype='text/plain',
                 content=response)
 
         if self.logger:
-            self.logger.info("AMF Request: %r" % request)
+            self.logger.debug("AMF Request: %r" % request)
 
         # Process the request
         try:
@@ -143,40 +140,37 @@ class DjangoGateway(gateway.BaseGateway):
         except (KeyboardInterrupt, SystemExit):
             raise
         except:
-            fe = gateway.format_exception()
-
             if self.logger:
-                self.logger.exception(fe)
+                self.logger.exception('Error processing AMF request')
 
-            response = "500 Internal Server Error\n\nThe request was " \
-                "unable to be successfully processed."
+            response = ("500 Internal Server Error\n\nThe request was "
+                "unable to be successfully processed.")
 
             if self.debug:
-                response += "\n\nTraceback:\n\n%s" % fe
+                response += "\n\nTraceback:\n\n%s" % gateway.format_exception()
 
             return http.HttpResponseServerError(mimetype='text/plain',
                 content=response)
 
         if self.logger:
-            self.logger.info("AMF Response: %r" % response)
+            self.logger.debug("AMF Response: %r" % response)
 
         # Encode the response
         try:
             stream = remoting.encode(response, strict=self.strict,
                 logger=self.logger, timezone_offset=timezone_offset)
         except:
-            fe = gateway.format_exception()
-
             if self.logger:
-                self.logger.exception(fe)
+                self.logger.exception('Error encoding AMF request')
 
             response = ("500 Internal Server Error\n\nThe request was "
                 "unable to be encoded.")
 
             if self.debug:
-                response += "\n\nTraceback:\n\n%s" % fe
+                response += "\n\nTraceback:\n\n%s" % gateway.format_exception()
 
-            return http.HttpResponseServerError(mimetype='text/plain', content=response)
+            return http.HttpResponseServerError(
+                mimetype='text/plain', content=response)
 
         buf = stream.getvalue()
 

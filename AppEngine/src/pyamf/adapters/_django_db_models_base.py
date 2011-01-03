@@ -1,11 +1,10 @@
-# Copyright (c) 2007-2009 The PyAMF Project.
+# Copyright (c) The PyAMF Project.
 # See LICENSE.txt for details.
 
 """
 C{django.db.models} adapter module.
 
 @see: U{Django Project<http://www.djangoproject.com>}
-
 @since: 0.4.1
 """
 
@@ -16,7 +15,6 @@ from django.db.models.fields import related, files
 import datetime
 
 import pyamf
-from pyamf.util import imports
 
 
 class DjangoReferenceCollection(dict):
@@ -37,12 +35,12 @@ class DjangoReferenceCollection(dict):
         """
         Return an instance based on klass/key.
 
-        If an instance cannot be found then L{KeyError} is raised.
+        If an instance cannot be found then C{KeyError} is raised.
 
         @param klass: The class of the instance.
         @param key: The primary_key of the instance.
         @return: The instance linked to the C{klass}/C{key}.
-        @rtype: Instance of L{klass}.
+        @rtype: Instance of C{klass}.
         """
         d = self._getClass(klass)
 
@@ -62,8 +60,6 @@ class DjangoReferenceCollection(dict):
 
 
 class DjangoClassAlias(pyamf.ClassAlias):
-    """
-    """
 
     def getCustomProperties(self):
         self.fields = {}
@@ -72,20 +68,21 @@ class DjangoClassAlias(pyamf.ClassAlias):
 
         self.meta = self.klass._meta
 
-        for x in self.meta.local_fields:
+        for name in self.meta.get_all_field_names():
+            x = self.meta.get_field_by_name(name)[0]
+
             if isinstance(x, files.FileField):
-                self.readonly_attrs.update([x.name])
+                self.readonly_attrs.update([name])
 
-            if not isinstance(x, related.ForeignKey):
-                self.fields[x.name] = x
+            if isinstance(x, related.RelatedObject):
+                continue
+
+            if isinstance(x, related.ManyToManyField):
+                self.relations[name] = x
+            elif not isinstance(x, related.ForeignKey):
+                self.fields[name] = x
             else:
-                self.relations[x.name] = x
-
-            self.columns.append(x.attname)
-
-        for k, v in self.klass.__dict__.iteritems():
-            if isinstance(v, related.ReverseManyRelatedObjectsDescriptor):
-                self.fields[k] = v.field
+                self.relations[name] = x
 
         parent_fields = []
 
@@ -97,9 +94,10 @@ class DjangoClassAlias(pyamf.ClassAlias):
 
         props = self.fields.keys()
 
-        self.static_attrs.update(props)
         self.encodable_properties.update(props)
         self.decodable_properties.update(props)
+
+        self.exclude_attrs.update(['_state'])
 
     def _compile_base_class(self, klass):
         if klass is Model:
@@ -150,44 +148,45 @@ class DjangoClassAlias(pyamf.ClassAlias):
         return value
 
     def getEncodableAttributes(self, obj, **kwargs):
-        sa, da = pyamf.ClassAlias.getEncodableAttributes(self, obj, **kwargs)
+        attrs = pyamf.ClassAlias.getEncodableAttributes(self, obj, **kwargs)
+
+        if not attrs:
+            attrs = {}
 
         for name, prop in self.fields.iteritems():
-            if name not in sa:
+            if name not in attrs.keys():
                 continue
 
-            if isinstance(prop, related.ManyToManyField):
-                sa[name] = [x for x in getattr(obj, name).all()]
-            else:
-                sa[name] = self._encodeValue(prop, getattr(obj, name))
+            attrs[name] = self._encodeValue(prop, getattr(obj, name))
 
-        if not da:
-            da = {}
-
-        keys = da.keys()
+        keys = attrs.keys()
 
         for key in keys:
             if key.startswith('_'):
-                del da[key]
-            elif key in self.columns:
-                del da[key]
+                del attrs[key]
 
         for name, relation in self.relations.iteritems():
             if '_%s_cache' % name in obj.__dict__:
-                da[name] = getattr(obj, name)
+                attrs[name] = getattr(obj, name)
+
+            if isinstance(relation, related.ManyToManyField):
+                attrs[name] = [x for x in getattr(obj, name).all()]
             else:
-                da[name] = pyamf.Undefined
+                del attrs[relation.attname]
 
-        if not da:
-            da = None
-
-        return sa, da
+        return attrs
 
     def getDecodableAttributes(self, obj, attrs, **kwargs):
         attrs = pyamf.ClassAlias.getDecodableAttributes(self, obj, attrs, **kwargs)
 
         for n in self.decodable_properties:
-            f = self.fields[n]
+            if n in self.relations:
+                continue
+
+            try:
+                f = self.fields[n]
+            except KeyError:
+                continue
 
             attrs[f.attname] = self._decodeValue(f, attrs[n])
 
@@ -197,11 +196,28 @@ class DjangoClassAlias(pyamf.ClassAlias):
         #
         # django also forces the use only one attribute as primary key, so
         # our obj._meta.pk.attname check is sufficient)
-        try:
-            setattr(obj, obj._meta.pk.attname, attrs[obj._meta.pk.attname])
-            del attrs[obj._meta.pk.attname]
-        except KeyError:
-            pass
+        pk_attr = obj._meta.pk.attname
+        pk = attrs.pop(pk_attr, None)
+
+        if pk:
+            if pk is fields.NOT_PROVIDED:
+                attrs[pk_attr] = pk
+            else:
+                # load the object from the database
+                try:
+                    loaded_instance = self.klass.objects.filter(pk=pk)[0]
+                    obj.__dict__ = loaded_instance.__dict__
+                except IndexError:
+                    pass
+
+        if not getattr(obj, pk_attr):
+            for name, relation in self.relations.iteritems():
+                if isinstance(relation, related.ManyToManyField):
+                    try:
+                        if len(attrs[name]) == 0:
+                            del attrs[name]
+                    except KeyError:
+                        pass
 
         return attrs
 
@@ -211,22 +227,24 @@ def getDjangoObjects(context):
     Returns a reference to the C{django_objects} on the context. If it doesn't
     exist then it is created.
 
-    @param context: The context to load the C{django_objects} index from.
-    @type context: Instance of L{pyamf.BaseContext}
-    @return: The C{django_objects} index reference.
     @rtype: Instance of L{DjangoReferenceCollection}
     @since: 0.5
     """
-    if not hasattr(context, 'django_objects'):
-        context.django_objects = DjangoReferenceCollection()
+    c = context.extra
+    k = 'django_objects'
 
-    return context.django_objects
+    try:
+        return c[k]
+    except KeyError:
+        c[k] = DjangoReferenceCollection()
+
+    return c[k]
 
 
-def writeDjangoObject(self, obj, *args, **kwargs):
+def writeDjangoObject(obj, encoder=None):
     """
     The Django ORM creates new instances of objects for each db request.
-    This is a problem for PyAMF as it uses the id(obj) of the object to do
+    This is a problem for PyAMF as it uses the C{id(obj)} of the object to do
     reference checking.
 
     We could just ignore the problem, but the objects are conceptually the
@@ -239,17 +257,15 @@ def writeDjangoObject(self, obj, *args, **kwargs):
 
     @since: 0.5
     """
-    if not isinstance(obj, Model):
-        self.writeNonDjangoObject(obj, *args, **kwargs)
+    s = obj.pk
+
+    if s is None:
+        encoder.writeObject(obj)
 
         return
 
-    context = self.context
+    django_objects = getDjangoObjects(encoder.context)
     kls = obj.__class__
-
-    s = obj.pk
-
-    django_objects = getDjangoObjects(context)
 
     try:
         referenced_object = django_objects.getClassKey(kls, s)
@@ -257,26 +273,9 @@ def writeDjangoObject(self, obj, *args, **kwargs):
         referenced_object = obj
         django_objects.addClassKey(kls, s, obj)
 
-    self.writeNonDjangoObject(referenced_object, *args, **kwargs)
-
-
-def install_django_reference_model_hook(mod):
-    """
-    Called when L{pyamf.amf0} or L{pyamf.amf3} are imported. Attaches the
-    L{writeDjangoObject} method to the C{Encoder} class in that module.
-
-    @param mod: The module imported.
-    @since: 0.4.1
-    """
-    if not hasattr(mod.Encoder, 'writeNonDjangoObject'):
-        mod.Encoder.writeNonDjangoObject = mod.Encoder.writeObject
-        mod.Encoder.writeObject = writeDjangoObject
+    encoder.writeObject(referenced_object)
 
 
 # initialise the module here: hook into pyamf
-
 pyamf.register_alias_type(DjangoClassAlias, Model)
-
-# hook the L{writeDjangobject} method to the Encoder class on import
-imports.when_imported('pyamf.amf0', install_django_reference_model_hook)
-imports.when_imported('pyamf.amf3', install_django_reference_model_hook)
+pyamf.add_type(Model, writeDjangoObject)

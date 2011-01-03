@@ -1,4 +1,4 @@
-# Copyright (c) 2007-2009 The PyAMF Project.
+# Copyright (c) The PyAMF Project.
 # See LICENSE.txt for details.
 
 """
@@ -21,7 +21,7 @@ except ImportError:
     impl = 'Python'
 
 SERVER_NAME = 'PyAMF/%s %s/%s' % (
-    '.'.join(map(lambda x: str(x), pyamf.__version__)), impl,
+    pyamf.version, impl,
     '.'.join(map(lambda x: str(x), sys.version_info[0:3]))
 )
 
@@ -260,10 +260,11 @@ class BaseGateway(object):
     @ivar logger: A logging instance.
     @ivar strict: Defines whether the gateway should use strict en/decoding.
     @type strict: C{bool}
-    @ivar timezone_offset: A L{datetime.timedelta} between UTC and the
-        timezone to be encoded. Most dates should be handled as UTC to avoid
-        confusion but for older legacy systems this is not an option. Supplying
-        an int as this will be interpretted in seconds.
+    @ivar timezone_offset: A U{datetime.datetime.timedelta<http://
+        docs.python.org/library/datetime.html#datetime.timedelta} between UTC
+        and the timezone to be encoded. Most dates should be handled as UTC to
+        avoid confusion but for older legacy systems this is not an option.
+        Supplying an int as this will be interpretted in seconds.
     @ivar debug: Provides debugging information when an error occurs. Use only
         in non production settings.
     @type debug: C{bool}
@@ -343,30 +344,17 @@ class BaseGateway(object):
         """
         Removes a service from the gateway.
 
-        @param service: The service to remove from the gateway.
+        @param service: Either the name or t of the service to remove from the
+                        gateway, or .
         @type service: C{callable} or a class instance
         @raise NameError: Service not found.
         """
-        if service not in self.services:
-            raise NameError("Service %s not found" % str(service))
-
         for name, wrapper in self.services.iteritems():
-            if isinstance(service, basestring) and service == name:
+            if service in (name, wrapper.service):
                 del self.services[name]
-
-                return
-            elif isinstance(service, ServiceWrapper) and wrapper == service:
-                del self.services[name]
-
-                return
-            elif isinstance(service, (type, types.ClassType,
-                types.FunctionType)) and wrapper.service == service:
-                del self.services[name]
-
                 return
 
-        # shouldn't ever get here
-        raise RuntimeError("Something went wrong ...")
+        raise NameError("Service %r not found" % (service,))
 
     def getServiceRequest(self, request, target):
         """
@@ -401,7 +389,7 @@ class BaseGateway(object):
         @param request: The AMF message.
         @type request: L{Request<remoting.Request>}
         """
-        if request.target == 'null':
+        if request.target == 'null' or not request.target:
             from pyamf.remoting import amf3
 
             return amf3.RequestProcessor(self)
@@ -600,7 +588,7 @@ def preprocess(func, c, expose_request=False):
 def format_exception():
     import traceback
 
-    f = util.StringIO()
+    f = util.BufferedByteStream()
 
     traceback.print_exc(file=f)
 

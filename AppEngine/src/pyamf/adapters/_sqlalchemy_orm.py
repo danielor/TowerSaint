@@ -1,10 +1,10 @@
-# Copyright (c) 2007-2009 The PyAMF Project.
+# Copyright (c) The PyAMF Project.
 # See LICENSE for details.
 
 """
 SQLAlchemy adapter module.
 
-@see: U{SQLAlchemy homepage (external)<http://www.sqlalchemy.org>}
+@see: U{SQLAlchemy homepage<http://www.sqlalchemy.org>}
 
 @since: 0.4
 """
@@ -24,6 +24,9 @@ try:
     class_mapper(dict)
 except Exception, e:
     UnmappedInstanceError = e.__class__
+
+
+class_checkers = []
 
 
 class SaMappedClassAlias(pyamf.ClassAlias):
@@ -52,31 +55,32 @@ class SaMappedClassAlias(pyamf.ClassAlias):
 
         self.encodable_properties.update(self.properties)
         self.decodable_properties.update(self.properties)
-        self.static_attrs.update(self.properties)
+
+        self.exclude_sa_key = self.KEY_ATTR in self.exclude_attrs
+        self.exclude_sa_lazy = self.LAZY_ATTR in self.exclude_attrs
 
     def getEncodableAttributes(self, obj, **kwargs):
         """
         Returns a C{tuple} containing a dict of static and dynamic attributes
         for C{obj}.
         """
-        sa, da = pyamf.ClassAlias.getEncodableAttributes(self, obj, **kwargs)
+        attrs = pyamf.ClassAlias.getEncodableAttributes(self, obj, **kwargs)
 
-        if not da:
-            da = {}
+        if not self.exclude_sa_key:
+            # primary_key_from_instance actually changes obj.__dict__ if
+            # primary key properties do not already exist in obj.__dict__
+            attrs[self.KEY_ATTR] = self.mapper.primary_key_from_instance(obj)
 
-        lazy_attrs = []
+        if not self.exclude_sa_lazy:
+            lazy_attrs = []
 
-        # primary_key_from_instance actually changes obj.__dict__ if
-        # primary key properties do not already exist in obj.__dict__
-        da[self.KEY_ATTR] = self.mapper.primary_key_from_instance(obj)
+            for attr in self.properties:
+                if attr not in obj.__dict__:
+                    lazy_attrs.append(attr)
 
-        for attr in self.properties:
-            if attr not in obj.__dict__:
-                lazy_attrs.append(attr)
+            attrs[self.LAZY_ATTR] = lazy_attrs
 
-        da[self.LAZY_ATTR] = lazy_attrs
-
-        return sa, da
+        return attrs
 
     def getDecodableAttributes(self, obj, attrs, **kwargs):
         """
@@ -126,6 +130,11 @@ class SaMappedClassAlias(pyamf.ClassAlias):
 
         return attrs
 
+    def createInstance(self, *args, **kwargs):
+        self.compile()
+
+        return self.mapper.class_manager.new_instance()
+
 
 def is_class_sa_mapped(klass):
     """
@@ -133,6 +142,10 @@ def is_class_sa_mapped(klass):
     """
     if not isinstance(klass, type):
         klass = type(klass)
+
+    for c in class_checkers:
+        if c(klass):
+            return False
 
     try:
         class_mapper(klass)

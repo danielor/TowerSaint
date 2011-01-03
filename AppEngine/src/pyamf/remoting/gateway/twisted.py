@@ -1,4 +1,4 @@
-# Copyright (c) 2007-2009 The PyAMF Project.
+# Copyright (c) The PyAMF Project.
 # See LICENSE.txt for details.
 
 """
@@ -7,8 +7,7 @@ Twisted server implementation.
 This gateway allows you to expose functions in Twisted to AMF clients and
 servers.
 
-@see: U{Twisted homepage (external)<http://twistedmatrix.com>}
-
+@see: U{Twisted homepage<http://twistedmatrix.com>}
 @since: 0.1.0
 """
 
@@ -119,7 +118,6 @@ class AMF3RequestProcessor(amf3.RequestProcessor):
 
     def _processRemotingMessage(self, amf_request, ro_request, **kwargs):
         ro_response = amf3.generate_acknowledgement(ro_request)
-        amf_response = remoting.Response(ro_response, status=remoting.STATUS_OK)
 
         try:
             service_name = ro_request.operation
@@ -141,7 +139,7 @@ class AMF3RequestProcessor(amf3.RequestProcessor):
 
             if self.gateway.logger:
                 self.gateway.logger.error(errMesg)
-                self.gateway.logger.info(failure.getTraceback())
+                self.gateway.logger.error(failure.getTraceback())
 
             ro_response = self.buildErrorResponse(ro_request, (failure.type,
                                                   failure.value, failure.tb))
@@ -186,7 +184,7 @@ class AMF3RequestProcessor(amf3.RequestProcessor):
 
             if self.gateway.logger:
                 self.gateway.logger.error(errMesg)
-                self.gateway.logger.info(failure.getTraceback())
+                self.gateway.logger.error(failure.getTraceback())
 
             deferred_response.callback(self.buildErrorResponse(ro_request,
                 (failure.type, failure.value, failure.tb)))
@@ -252,7 +250,7 @@ class TwistedGateway(gateway.BaseGateway, resource.Resource):
 
             if self.logger:
                 self.logger.error(errMesg)
-                self.logger.info(failure.getTraceback())
+                self.logger.error(failure.getTraceback())
 
             body = "400 Bad Request\n\nThe request body was unable to " \
                 "be successfully decoded."
@@ -295,7 +293,7 @@ class TwistedGateway(gateway.BaseGateway, resource.Resource):
 
             if self.logger:
                 self.logger.error(errMesg)
-                self.logger.info(failure.getTraceback())
+                self.logger.error(failure.getTraceback())
 
             body = "500 Internal Server Error\n\nThere was an error encoding " \
                 "the response."
@@ -333,8 +331,7 @@ class TwistedGateway(gateway.BaseGateway, resource.Resource):
         @param amf_request: The AMF Request.
         @type amf_request: L{Envelope<pyamf.remoting.Envelope>}
         """
-        response = remoting.Envelope(amf_request.amfVersion,
-            amf_request.clientType)
+        response = remoting.Envelope(amf_request.amfVersion)
         dl = []
 
         def cb(body, name):
@@ -361,7 +358,7 @@ class TwistedGateway(gateway.BaseGateway, resource.Resource):
 
             if self.logger:
                 self.logger.error(errMesg)
-                self.logger.info(failure.getTraceback())
+                self.logger.error(failure.getTraceback())
 
             body = "500 Internal Server Error\n\nThe request was unable to " \
                 "be successfully processed."

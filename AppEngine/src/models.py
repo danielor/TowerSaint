@@ -1,12 +1,18 @@
 '''
 Created on Sep 16, 2010
 
+Note 1:
+It should be noted that the order of the __readamf__, and __writeamf__ functions
+are important. The flex, and gae must be consistent.
+
 @author: danielo
 '''
 from google.appengine.ext import db
 import logging, random, string
 from math import fabs
 from xml.etree import cElementTree as cTree
+from geo.geomodel import GeoModel
+from geo.geotypes import Box
 
 def createRandomString(length = 10):
     """Create the random string"""
@@ -33,12 +39,45 @@ class Constants(object):
         """The maximum influence(in lattice points) any object can have"""
         return 10
     
+    @classmethod
+    def minInfluence(cls):
+        """The minimum influence(in lattice points) any object can have"""
+        return 3
+    
+    @classmethod
+    def latToMiles(cls):
+        """Converts a latitude constant to miles"""
+        return 69
+    
     
 
 class User(db.Model):
     """The user of the game"""
-    FacebookID = db.FloatProperty()
-    Experience = db.IntegerProperty
+#    class __amf__:
+#        external = True
+#        amf3 = True
+#        
+#    def __writeamf__(self, output):
+#        """Encoding of the information"""
+#        output.writeInt(self.FacebookID)
+#        output.writeInt(self.Experience)
+#        output.writeUTF(self.Empire)
+#        output.writeInt(self.completeManaProduction)
+#        output.writeInt(self.completeStoneProduction)
+#        output.writeInt(self.completeWoodProduction)
+#        
+#    def __readamf__(self, input):
+#        """Decoding of the information"""
+#        self.FacebookID = input.readInt()
+#        self.Experience = input.readInt()
+#        self.Empire = input.readUTF()
+#        self.isEmperor = input.readBoolean()
+#        self.completeManaProduction = input.readInt()
+#        self.completeStoneProduction = input.readInt()
+#        self.completeWoodProduction = input.readInt()
+        
+    FacebookID = db.IntegerProperty()
+    Experience = db.IntegerProperty()
     Empire = db.StringProperty()
     isEmperor = db.BooleanProperty()
     completeManaProduction = db.IntegerProperty()
@@ -62,7 +101,20 @@ class User(db.Model):
     def createRandomUser(self):
         """Create a random user"""
         u = User()
-        u.FacebookID = random.random()
+        u.FacebookID = random.randint(0, 1000)
+        u.Experience = random.randint(0, 1000)
+        u.Empire = createRandomString()
+        u.isEmperor = random.randint(0, 1) == 0
+        u.completeManaProduction = random.randint(0, 1000)
+        u.completeStoneProduction = random.randint(0, 1000)
+        u.completeWoodProduction = random.randint(0, 1000)
+        u.put()
+        return u
+    
+    @classmethod
+    def createRandomUserWithID(cls, id):
+        u = User()
+        u.FacebookID = id
         u.Experience = random.randint(0, 1000)
         u.Empire = createRandomString()
         u.isEmperor = random.randint(0, 1) == 0
@@ -94,7 +146,7 @@ class BoundsPlugin(object):
         Function expects a @class-model.Bounds objects as the argument
         """
         # Check for the type
-        if not isinstance(cls, Bounds):
+        if not isinstance(bounds, Bounds):
             logging.error("ERROR : getObjectInBounds requires a model.Bounds object as an argument")
             return []
         
@@ -102,25 +154,15 @@ class BoundsPlugin(object):
         sWL = bounds.southwestLocation
         nEL = bounds.northeastLocation
         
-        # The result list
-        rList = []
+        # Create the box for filtering 
+        box = Box(nEL.latitude, nEL.longitude, sWL.latitude, sWL.longitude)
         
-        # Create a filter object of the class object. Keys only are set to true to make it 
-        # the filtering much faster.
-        query = cls.all(keys_only = True)
-        for lIndex in cls.getLocationIndex():
-            
-            # The box bounds in filter form
-            query.filter("%s > %d" % (lIndex[0], sWL.latIndex))
-            query.filter("%s < %d" % (lIndex[0], nEL.latIndex))
-            query.filter("%s > %d" % (lIndex[1], sWL.lonIndex))
-            query.filter("%s < %d" % (lIndex[1], nEL.lonIndex))
-            
-            # Extend the list of results
-            rList.extend([cls.get(key) for key in query.fetch(1000)])
+        # Find all cls objects in the bounding_box
+        rList = cls.bounding_box_fetch(cls.all(), box, max_results = 1000)
         
         return rList
     
+    @classmethod
     def getLocationIndex(self):
         """
         Return a list of location index pairs
@@ -140,12 +182,34 @@ class BoundsPlugin(object):
         """
         raise NotImplementedError("FilterPlugin.createRandomObject needs to be implemented in inherited class")
 
-class Road(db.Model, BoundsPlugin):
+class Road(GeoModel, BoundsPlugin):
     """The road object integrates with AMF"""
+#    class __amf__:
+#        external = True
+#        amf3 = True
+#
+#    def __writeamf__(self, output):
+#        """Encoding of the information"""
+#        output.writeInt(self.hitPoints)
+#        output.writeInt(self.level)
+#        output.writeObject(self.user)
+#        output.writeInt(self.lonIndex)
+#        output.writeInt(self.latIndex)
+#        output.writeFloat(self.latitude)
+#        output.writeFloat(self.longitude)
+#        
+#    def __readamf__(self, input):
+#        """Decoding of the information"""
+#        self.hitPoints = input.readInt()
+#        self.level = input.readInt()
+#        self.user = input.readObject()
+#        self.lonIndex = input.readInt()
+#        self.latIndex = input.readInt()
+#        self.latitude = input.readFloat()
+#        self.longitude = input.readFloat()
     # Descriptive
     hitPoints = db.IntegerProperty()
     level = db.IntegerProperty()
-    
     
     # A Reference to the user
     user = db.ReferenceProperty(User)
@@ -155,7 +219,9 @@ class Road(db.Model, BoundsPlugin):
     latIndex = db.IntegerProperty()
     latitude = db.FloatProperty() 
     longitude = db.FloatProperty()
-
+    
+   
+    @classmethod
     def getLocationIndex(self):
         """Get the lat/lon indices"""
         return [("latIndex", "lonIndex")]
@@ -179,6 +245,8 @@ class Road(db.Model, BoundsPlugin):
         self.longitude = location.longitude
         self.latIndex = int(self.latitude / Constants.latIndex())
         self.lonIndex = int(self.longitude / Constants.lonIndex())
+        self.location = db.GeoPt(self.latitude, self.longitude)
+        self.update_location()
         
     @classmethod
     def createRandomObject(cls):
@@ -191,8 +259,56 @@ class Road(db.Model, BoundsPlugin):
         r.user = User.createRandomUser()
         return r
     
-class Tower(db.Model, BoundsPlugin):
+class Tower(GeoModel, BoundsPlugin):
     """The tower object integrates with AMF"""
+#    class __amf__:
+#        external = True
+#        amf3 = True
+#        
+#    def __writeamf__(self, output):
+#        """Encoding of the information"""
+#        output.writeInt(self.Experience)
+#        output.writeInt(self.Speed)
+#        output.writeInt(self.Power)
+#        output.writeInt(self.Armor)
+#        output.writeInt(self.Range)
+#        output.writeFloat(self.Accuracy)
+#        output.writeInt(self.HitPoints)
+#        output.writeBoolean(self.isIsolated)
+#        output.writeBoolean(self.isCapital)
+#        output.writeBoolean(self.hasRuler)
+#        output.writeObject(self.user)
+#        output.writeInt(self.manaProduction)
+#        output.writeInt(self.stoneProduction)
+#        output.writeInt(self.woodProduction)
+#        output.writeInt(self.Level)
+#        output.writeInt(self.latIndex)
+#        output.writeInt(self.lonIndex)
+#        output.writeFloat(self.latitude)
+#        output.writeFloat(self.longitude)
+#        
+#    def __readamf__(self, input):
+#        """Decoding of the information"""
+#        self.Experience = input.readInt()
+#        self.Speed = input.readInt()
+#        self.Power = input.readInt()
+#        self.Armor = input.readInt()
+#        self.Range = input.readInt()
+#        self.Accuracy = input.readFloat()
+#        self.HitPoints = input.readInt()
+#        self.isIsolated = input.readBoolean()
+#        self.isCapital = input.readBoolean()
+#        self.hasRuler = input.readBoolean()
+#        self.user = input.readObject()
+#        self.manaProduction = input.readInt()
+#        self.stoneProduction = input.readInt()
+#        self.woodProduction = input.readInt()
+#        self.Level = input.readInt()
+#        self.latIndex = input.readInt()
+#        self.lonIndex = input.readInt()
+#        self.latitude = input.readFloat()
+#        self.longitude = input.readFloat()
+        
     # Description of the objects
     Experience = db.IntegerProperty()
     Speed = db.IntegerProperty()
@@ -220,6 +336,7 @@ class Tower(db.Model, BoundsPlugin):
     latitude = db.FloatProperty() 
     longitude = db.FloatProperty()
     
+    @classmethod
     def getLocationIndex(self):
         """Get the lat/lon indices"""
         return [("latIndex", "lonIndex")]
@@ -259,6 +376,8 @@ class Tower(db.Model, BoundsPlugin):
         self.longitude = location.longitude
         self.latIndex = int(self.latitude / Constants.latIndex())
         self.lonIndex = int(self.longitude / Constants.lonIndex())
+        self.location = db.GeoPt(self.latitude, self.longitude)
+        self.update_location()
         
     @classmethod
     def createRandomObject(cls):
@@ -283,8 +402,39 @@ class Tower(db.Model, BoundsPlugin):
         t.manaProduction = random.randint(0, 1000)
         return t
 
-class Portal(db.Model, BoundsPlugin):
+class Portal(GeoModel, BoundsPlugin):
     """The portal objects integrates with AMF"""
+#    class __amf__:
+#        external = True
+#        amf3 = True
+#        
+#    def __writeamf__(self, output):
+#        """Encoding of the information"""
+#        output.writeInt(self.hitPoints)
+#        output.writeInt(self.level)
+#        output.writeObject(self.user)
+#        output.writeFloat(self.startLocationLatitude)
+#        output.writeFloat(self.startLocationLongitude)
+#        output.writeInt(self.startLocationLatitudeIndex)
+#        output.writeInt(self.startLocationLongitudeIndex)
+#        output.writeFloat(self.endLocationLatitude)
+#        output.writeFloat(self.endLocationLongitude)
+#        output.writeInt(self.endLocationLatitudeIndex)
+#        output.writeInt(self.endLocationLongitudeIndex)
+#    
+#    def __readamf__(self, input):
+#        """Decoding of the information"""
+#        self.hitPoints = input.readInt()
+#        self.level = input.readInt()
+#        self.user = input.readObject()
+#        self.startLocationLatitude = input.readFloat()
+#        self.startLocationLongitude = input.readFloat()
+#        self.startLocationLatitudeIndex = input.readInt()
+#        self.startLocationLongitudeIndex = input.readInt()
+#        self.endLocationLatitude = input.readFloat()
+#        self.endLocationLongitude = input.readFloat()
+#        self.endLocationLatitudeIndex = input.readInt()
+#        self.endLocationLongitudeIndex = input.readInt()
     # Descriptive
     hitPoints = db.IntegerProperty()
     level = db.IntegerProperty()
@@ -314,13 +464,24 @@ class Portal(db.Model, BoundsPlugin):
             self.startLocationLongitude = location.longitude
             self.startLocationLatitudeIndex = int(self.startLocationLatitude / Constants.latIndex())
             self.startLocationLongitudeIndex = int(self.startLocationLongitude / Constants.lonIndex())
+            self.endLocationLatitude = 0.0
+            self.endLocationLongitude = 0.0
+            self.endLocationLatitudeIndex = 0
+            self.endLocationLongitudeIndex = 0
+            self.location = db.GeoPt(self.startLocationLatitude, self.startLocationLongitude)
+            self.update_location()
         else:
             self.endLocationLatitude = location.latitude
             self.endLocationLongitude = location.longitude
             self.endLocationLatitudeIndex = int(self.endLocationLatitude / Constants.latIndex())
             self.endLocationLongitudeIndex = int(self.endLocationLongitude / Constants.lonIndex())
-
-    
+            self.startLocationLatitude = 0.0
+            self.startLocationLongitude = 0.0
+            self.startLocationLatitudeIndex = 0
+            self.startLocationLongitudeIndex = 0
+            self.location = db.GeoPt(self.endLocationLatitude, self.endLocationLongitude)
+            self.update_location()
+    @classmethod
     def getLocationIndex(self):
         """Get the lat/lon indices"""
         return [("startLocationLatitudeIndex", "startLocationLongitudeIndex"),
@@ -352,6 +513,25 @@ class Portal(db.Model, BoundsPlugin):
         return p
 class Location(db.Model):
     """The location object integrates with AMF"""
+#    class __amf__:
+#        external = True
+#        amf3 = True
+#        
+#    def __writeamf__(self, output):
+#        """Encoding of the information"""
+#        output.writeInt(self.latIndex)
+#        output.writeInt(self.lonIndex)
+#        output.writeFloat(self.latitude)
+#        output.writeFloat(self.longitude)
+#    
+#    def __readamf__(self, input):
+#        """Decoding of the information"""
+#        self.latIndex = input.readInt()
+#        self.lonIndex = input.readInt()
+#        self.latitude = input.readFloat()
+#        self.longitude = input.readFloat()
+    
+    
     # The index represesents the lattice site on the map
     latIndex = db.IntegerProperty()
     lonIndex = db.IntegerProperty()
@@ -366,6 +546,21 @@ class Location(db.Model):
 
 class Bounds(db.Model):
     """The bound object integrates with AMF"""
+#    class __amf__:
+#        external = True
+#        amf3 = True
+#        
+#    def __writeamf__(self, output):
+#        """Encoding of the information"""
+#        output.writeObject(self.southwestLocation)
+#        output.writeObject(self.northeastLocation)
+#    
+#    def __readamf__(self, input):
+#        """Decoding of the information"""
+#        logging.error("Here")
+#        self.southwestLocation = input.readObject()
+#        self.northeastLocation = input.readObject()
+    
     southwestLocation = db.ReferenceProperty(Location, collection_name ="southwestCollection")
     northeastLocation = db.ReferenceProperty(Location, collection_name = "northeastCollection")
     
@@ -404,6 +599,21 @@ class Bounds(db.Model):
                                    latitude = minLat, longitude = minLon)
         fBoundNorthEast =  Location(latIndex = int(maxLat / Constants.latIndex()), lonIndex = int(maxLon / Constants.lonIndex()), 
                                     latitude = maxLat, longitude = maxLon)
+        fBoundSouthWest.put()
+        fBoundNorthEast.put()
+        
+        # Return a Bounds objects
+        return Bounds(southwestLocation = fBoundSouthWest, northeastLocation = fBoundNorthEast)
+    
+    @classmethod
+    def createBoundsFromSimpleData(cls, SWLat, SWLon, NELat, NELon):
+        """
+        Convert the simple data into a bounds object
+        """
+        fBoundSouthWest = Location(latIndex = int(SWLat / Constants.latIndex()), lonIndex = int(SWLon / Constants.lonIndex()), 
+                                   latitude = SWLat, longitude = SWLon)
+        fBoundNorthEast =  Location(latIndex = int(NELat / Constants.latIndex()), lonIndex = int(NELon / Constants.lonIndex()), 
+                                    latitude = NELat, longitude = NELon)
         fBoundSouthWest.put()
         fBoundNorthEast.put()
         

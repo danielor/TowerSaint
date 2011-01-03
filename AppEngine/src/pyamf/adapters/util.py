@@ -1,4 +1,4 @@
-# Copyright (c) 2007-2009 The PyAMF Project.
+# Copyright (c) The PyAMF Project.
 # See LICENSE.txt for details.
 
 """
@@ -15,44 +15,36 @@ if not hasattr(__builtin__, 'set'):
 
 def to_list(obj, encoder):
     """
-    Converts an arbitrary object C{obj} to a list.
-
-    @rtype: L{list}
+    Converts an arbitrary object C{obj} to a C{list}.
     """
     return list(obj)
 
 
 def to_dict(obj, encoder):
     """
-    Converts an arbitrary object C{obj} to a dict.
-
-    @rtype: L{dict}
+    Converts an arbitrary object C{obj} to a C{dict}.
     """
     return dict(obj)
 
 
 def to_set(obj, encoder):
     """
-    Converts an arbitrary object C{obj} to a set.
-
-    @rtype: L{set}
+    Converts an arbitrary object C{obj} to a C{set}.
     """
     return set(obj)
 
 
 def to_tuple(x, encoder):
     """
-    Converts an arbitrary object C{obj} to a tuple.
-
-    @rtype: L{tuple}
+    Converts an arbitrary object C{obj} to a C{tuple}.
     """
     return tuple(x)
+
 
 def to_string(x, encoder):
     """
     Converts an arbitrary object C{obj} to a string.
 
-    @rtype: L{tuple}
     @since: 0.5
     """
     return str(x)

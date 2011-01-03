@@ -1,28 +1,55 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:fb="http://www.facebook.com/2008/fbml">
-	<head>
-	 	<!-- Include support librarys first -->
-		<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/swfobject/2.2/swfobject.js"></script>
-		<script type="text/javascript" src="http://connect.facebook.net/en_US/all.js"></script>
-		
-		<!-- Include FBJSBridge to allow for SWF to Facebook communication. -->
-		<script type="text/javascript" src="http://towersaint.appspot.com/facebook/static/FBJSBridge.js"></script>
-		
-		<script type="text/javascript">
-			function embedPlayer() {
-				var flashvars = {};
-				embedSWF("http://towersaint.appspot.com/facebook/static/TowerSaint.swf", "flashContent", "800", "800", "10.0");
-			}
-			//Redirect for authorization for application loaded in an iFrame on Facebook.com 
-			function redirect(id,perms,uri) {
-				var params = window.location.toString().slice(window.location.toString().indexOf('?'));
-				top.location = 'https://graph.facebook.com/oauth/authorize?client_id='+id+'&scope='+perms+'&redirect_uri='+uri+params;				 
-			}
-			embedPlayer();
-		</script>
+	 <head>
+              <title> Towersaint Application </title>
+              
+                <!-- Include support librarys first -->
+                <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/swfobject/2.2/swfobject.js"></script>
+                <script type="text/javascript" src="http://connect.facebook.net/en_US/all.js"></script>
+                <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
 
-  </head>
-  <body>
+			
+                <script type="text/javascript">
+
+
+                        var APP_ID = "142447749129831";
+                        var REDIRECT_URI = "http://apps.facebook.com/towersaint/";
+
+                        var PERMS = "email,publish_stream,offline_access,read_stream"; //comma separated list of extended permissions
+
+                        function init() {
+                        		createDiv();
+                                FB.init({appId:APP_ID, status: true, cookie: true});
+                                FB.getLoginStatus(handleLoginStatus);
+                        }
+
+                        function handleLoginStatus(response) {
+                                if (response.session) { //Show the SWF
+                                        swfobject.embedSWF("http://towersaint.appspot.com/static/TowerSaint.swf", "flashContent", "800", "600", "9.0", null, null, null, {name:"flashContent"});
+                                		swfobject.registerObject("flashContent");
+                                 } else { //ask the user to login
+
+                                        var params = window.location.toString().slice(window.location.toString().indexOf('?'));
+                                        top.location = 'https://graph.facebook.com/oauth/authorize?client_id='+APP_ID+'&amp;scope='+PERMS+'&amp;redirect_uri=' + REDIRECT_URI + params;
+
+                                  }
+                        }
+                        
+                        //  If the fb-root div has not been created, create it.
+                        function createDiv() {
+                        	var root = document.getElementById('fb-root');
+        					if (!root) {
+        						var divTag = document.createElement("div");
+        						divTag.id = "fb-root";
+        						document.body.appendChild(divTag);
+        					}
+                        }
+						$(document).ready(function(){
+							 init();
+						});
+                </script>
+        </head>
+   <body>
     <div id="fb-root"></div>
     <div id="flashContent">
         	<h1>You need at least Flash Player 10.0 to view this page.</h1>

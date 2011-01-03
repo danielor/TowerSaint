@@ -1,4 +1,4 @@
-# Copyright (c) 2007-2009 The PyAMF Project.
+# Copyright (c) The PyAMF Project.
 # See LICENSE.txt for details.
 
 """
@@ -130,6 +130,6 @@ def build_fault(cls, e, tb, include_traceback=False):
     details = None
 
     if include_traceback:
-        details = str(traceback.format_exception(cls, e, tb)).replace("\\n", '')
+        details = traceback.format_exception(cls, e, tb)
 
-    return remoting.ErrorFault(code=code, description=str(e), details=details)
+    return remoting.ErrorFault(code=code, description=unicode(e), details=details)

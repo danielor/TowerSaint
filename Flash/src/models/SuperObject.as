@@ -16,9 +16,22 @@ package models
 
 	public interface SuperObject
 	{
-		function draw(drag:Boolean, map:Map, photo:PhotoAssets, fpm:FocusPanelManager) : void;
+		// Draw the object on the map
+		function draw(drag:Boolean, map:Map, photo:PhotoAssets, fpm:FocusPanelManager, withBoundary:Boolean) : void;
+		
+		// Display information associated with object in text
 		function display() : TextFlow;
+		
+		// Remove the marker from the map
+		function eraseFromMap(map:Map) : void;
+		
+		// Set focus on the object
+		function setFocusOnObject(error:Boolean) : void;
+		
+		// Set the position of the object on the map
 		function setPosition(pos:LatLng) : void;
+		
+		// Get the position of the object
 		function getPosition(b:LatLngBounds):LatLng;
 		
 		// Interface to the isModified flag, which is true when an object has been create.

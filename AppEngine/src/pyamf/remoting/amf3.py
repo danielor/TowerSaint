@@ -1,4 +1,4 @@
-# Copyright (c) 2007-2009 The PyAMF Project.
+# Copyright (c) The PyAMF Project.
 # See LICENSE.txt for details.
 
 """
@@ -15,7 +15,7 @@ import time
 import uuid
 import sys
 
-import pyamf
+import pyamf.python
 from pyamf import remoting
 from pyamf.flex import messaging
 
@@ -62,20 +62,35 @@ def generate_error(request, cls, e, tb, include_traceback=False):
     else:
         code = cls.__name__
 
-    detail = ''
+    details = None
     rootCause = None
 
     if include_traceback:
-        detail = []
+        details = traceback.format_exception(cls, e, tb)
         rootCause = e
 
-        for x in traceback.format_exception(cls, e, tb):
-            detail.append(x.replace("\\n", ''))
+    faultDetail = None
+    faultString = None
 
-    return messaging.ErrorMessage(messageId=generate_random_id(),
-        clientId=generate_random_id(), timestamp=calendar.timegm(time.gmtime()),
-        correlationId = request.messageId, faultCode=code, faultString=str(e),
-        faultDetail=str(detail), extendedData=detail, rootCause=rootCause)
+    if hasattr(e, 'message'):
+        faultString = unicode(e.message)
+    elif hasattr(e, 'args') and e.args:
+        if isinstance(e.args[0], pyamf.python.str_types):
+            faultString = unicode(e.args[0])
+
+    if details:
+        faultDetail = unicode(details)
+
+    return messaging.ErrorMessage(
+        messageId=generate_random_id(),
+        clientId=generate_random_id(),
+        timestamp=calendar.timegm(time.gmtime()),
+        correlationId=request.messageId,
+        faultCode=code,
+        faultString=faultString,
+        faultDetail=faultDetail,
+        extendedData=details,
+        rootCause=rootCause)
 
 
 class RequestProcessor(object):

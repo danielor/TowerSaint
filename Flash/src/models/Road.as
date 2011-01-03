@@ -8,6 +8,14 @@ package models
 	import com.google.maps.MapMouseEvent;
 	import com.google.maps.overlays.Marker;
 	import com.google.maps.overlays.MarkerOptions;
+	import com.google.maps.overlays.Polygon;
+	import com.google.maps.overlays.PolygonOptions;
+	import com.google.maps.styles.FillStyle;
+	import com.google.maps.styles.StrokeStyle;
+	
+	import flash.utils.IDataInput;
+	import flash.utils.IDataOutput;
+	import flash.utils.IExternalizable;
 	
 	import flashx.textLayout.elements.ParagraphElement;
 	import flashx.textLayout.elements.SpanElement;
@@ -21,7 +29,7 @@ package models
 
 	[Bindable]
 	[RemoteClass(alias="models.Road")]
-	public class Road implements SuperObject
+	public class Road  implements SuperObject
 	{
 		// Information
 		public var hitPoints:Number;
@@ -38,14 +46,37 @@ package models
 		
 		// State variables
 		private var isModified:Boolean;
-	
+		private var hasFocus:Boolean;											/* True if the current object has user focus */
+		private var roadMarker:TowerSaintMarker;								/* The marker to be drawn on the map */
+		private var focusPolygon:Polygon;	
+		
 		
 		public function Road()
 		{
 			super();
 		}
 		
-		public function draw(drag:Boolean, map:Map, photo:PhotoAssets, fpm:FocusPanelManager) : void{
+		// IExternalizable interface		
+		public function writeExternal(output:IDataOutput) : void {
+			output.writeInt(this.hitPoints);
+			output.writeInt(this.level);
+			output.writeObject(this.user);
+			output.writeInt(this.lonIndex);
+			output.writeInt(this.latIndex);
+			output.writeFloat(this.latitude);
+			output.writeFloat(this.longitude);
+		}
+		public function readExternal(input:IDataInput) : void {
+			this.hitPoints = input.readInt();
+			this.level = input.readInt();
+			this.user = input.readObject();
+			this.lonIndex = input.readInt();
+			this.latIndex = input.readInt();
+			this.latitude = input.readFloat();
+			this.longitude = input.readFloat();
+		}
+		
+		public function draw(drag:Boolean, map:Map, photo:PhotoAssets, fpm:FocusPanelManager, withBoundary:Boolean) : void{
 			
 			// Add a ground overlay
 			var roadIcon:BitmapAsset = getRoadFromNeighbors(photo);
@@ -62,9 +93,64 @@ package models
 			markerOptions.draggable = drag;
 			
 			// Create the marker
-			var marker:TowerSaintMarker = new TowerSaintMarker(this, gposition, markerOptions);
-			marker.addEventListener(MapMouseEvent.CLICK, fpm.onMarkerClick);
-			map.addOverlay(marker);
+			roadMarker = new TowerSaintMarker(this, gposition, markerOptions, map);
+			roadMarker.addEventListener(MapMouseEvent.CLICK, fpm.onMarkerClick);
+			map.addOverlay(roadMarker);
+		}
+		
+		// Erase the marker
+		public function eraseFromMap(map:Map) : void {
+			map.removeOverlay(roadMarker);
+		}
+		
+		public function setFocusOnObject(error:Boolean) : void{
+			createFocusPolygonAtPosition(error);
+			hasFocus = true;
+		}
+		
+		private function createFocusPolygonAtPosition(color:Boolean):void {
+			// The position on the map, and the map
+			var pos:LatLng = roadMarker.getLatLng();
+			var m:Map = roadMarker.getMap();
+			
+			// Get the color
+			var pColor:Number;
+			if(color){
+				pColor = 0xFF0000;
+			}else{
+				pColor = 0x0000FF;
+			}
+			
+			// Get the game constants
+			var latOffset:Number = GameConstants.getLatOffset();
+			var lonOffset:Number = GameConstants.getLonOffset();
+			
+			// Create the polygon
+			var lat:Number = pos.lat();
+			var lon:Number = pos.lng();
+			var polygon:Polygon = new Polygon([
+				new LatLng(lat - latOffset, lon - lonOffset),
+				new LatLng(lat - latOffset, lon + lonOffset),
+				new LatLng(lat + latOffset, lon + lonOffset),
+				new LatLng(lat + latOffset, lon - lonOffset),
+				new LatLng(lat - lonOffset, lon - lonOffset)
+			], 
+				new  PolygonOptions({ 
+					strokeStyle: new StrokeStyle({
+						color: 0x0000ff,
+						thickness: 10,
+						alpha: 0.7}), 
+					fillStyle: new FillStyle({
+						color: 0x0000ff,
+						alpha: 0.7})
+				}));
+			
+			// Keep a reference to the focus polygon.
+			this.focusPolygon = polygon;
+			
+			// Add the polygon to the map
+			m.addOverlay(this.focusPolygon);
+			
 		}
 
 		

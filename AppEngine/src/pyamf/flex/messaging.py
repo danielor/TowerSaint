@@ -1,4 +1,4 @@
-# Copyright (c) 2007-2009 The PyAMF Project.
+# Copyright (c) The PyAMF Project.
 # See LICENSE.txt for details.
 
 """
@@ -22,7 +22,9 @@ __all__ = [
     'RemotingMessage',
     'CommandMessage',
     'AcknowledgeMessage',
-    'ErrorMessage'
+    'ErrorMessage',
+    'AbstractMessage',
+    'AsyncMessage'
 ]
 
 NAMESPACE = 'flex.messaging.messages'
@@ -39,8 +41,8 @@ class AbstractMessage(object):
     message instance. The data property contains the instance specific data
     that needs to be delivered and processed by the decoder.
 
-    @see: U{AbstractMessage on Livedocs (external)
-    <http://livedocs.adobe.com/flex/201/langref/mx/messaging/messages/AbstractMessage.html>}
+    @see: U{AbstractMessage on Livedocs<http://
+        livedocs.adobe.com/flex/201/langref/mx/messaging/messages/AbstractMessage.html>}
 
     @ivar body: Specific data that needs to be delivered to the remote
         destination.
@@ -64,7 +66,6 @@ class AbstractMessage(object):
         amf3 = True
         static = ('body', 'clientId', 'destination', 'headers', 'messageId',
             'timestamp', 'timeToLive')
-        dynamic = False
 
     #: Each message pushed from the server will contain this header identifying
     #: the client that will receive the message.
@@ -92,6 +93,13 @@ class AbstractMessage(object):
         SMALL_UUID_FLAGS,
         ['clientId', 'messageId']
     ))
+
+    def __new__(cls, *args, **kwargs):
+        obj = object.__new__(cls)
+
+        obj.__init__(*args, **kwargs)
+
+        return obj
 
     def __init__(self, *args, **kwargs):
         self.body = kwargs.get('body', None)
@@ -206,8 +214,8 @@ class AsyncMessage(AbstractMessage):
     """
     I am the base class for all asynchronous Flex messages.
 
-    @see: U{AsyncMessage on Livedocs (external)
-    <http://livedocs.adobe.com/flex/201/langref/mx/messaging/messages/AsyncMessage.html>}
+    @see: U{AsyncMessage on Livedocs<http://
+        livedocs.adobe.com/flex/201/langref/mx/messaging/messages/AsyncMessage.html>}
 
     @ivar correlationId: Correlation id of the message.
     @type correlationId: C{str}
@@ -269,8 +277,8 @@ class AcknowledgeMessage(AsyncMessage):
     Every message sent within the messaging system must receive an
     acknowledgement.
 
-    @see: U{AcknowledgeMessage on Livedocs (external)
-    <http://livedocs.adobe.com/flex/201/langref/mx/messaging/messages/AcknowledgeMessage.html>}
+    @see: U{AcknowledgeMessage on Livedocs<http://
+        livedocs.adobe.com/flex/201/langref/mx/messaging/messages/AcknowledgeMessage.html>}
     """
 
     #: Used to indicate that the acknowledgement is for a message that
@@ -306,8 +314,8 @@ class CommandMessage(AsyncMessage):
     Provides a mechanism for sending commands related to publish/subscribe
     messaging, ping, and cluster operations.
 
-    @see: U{CommandMessage on Livedocs (external)
-    <http://livedocs.adobe.com/flex/201/langref/mx/messaging/messages/CommandMessage.html>}
+    @see: U{CommandMessage on Livedocs<http://
+        livedocs.adobe.com/flex/201/langref/mx/messaging/messages/CommandMessage.html>}
 
     @ivar operation: The command
     @type operation: C{int}
@@ -358,10 +366,6 @@ class CommandMessage(AsyncMessage):
         AsyncMessage.__init__(self, *args, **kwargs)
 
         self.operation = kwargs.get('operation', None)
-        #: Remote destination belonging to a specific service, based upon
-        #: whether this message type matches the message type the service
-        #: handles.
-        self.messageRefType = kwargs.get('messageRefType', None)
 
     def __readamf__(self, input):
         AsyncMessage.__readamf__(self, input)
@@ -405,8 +409,8 @@ class ErrorMessage(AcknowledgeMessage):
 
     This class is used to report errors within the messaging system.
 
-    @see: U{ErrorMessage on Livedocs (external)
-    <http://livedocs.adobe.com/flex/201/langref/mx/messaging/messages/ErrorMessage.html>}
+    @see: U{ErrorMessage on Livedocs<http://
+        livedocs.adobe.com/flex/201/langref/mx/messaging/messages/ErrorMessage.html>}
     """
 
     #: If a message may not have been delivered, the faultCode will contain
@@ -450,8 +454,8 @@ class RemotingMessage(AbstractMessage):
     """
     I am used to send RPC requests to a remote endpoint.
 
-    @see: U{RemotingMessage on Livedocs (external)
-    <http://livedocs.adobe.com/flex/201/langref/mx/messaging/messages/RemotingMessage.html>}
+    @see: U{RemotingMessage on Livedocs<http://
+        livedocs.adobe.com/flex/201/langref/mx/messaging/messages/RemotingMessage.html>}
     """
 
     class __amf__:

@@ -1,4 +1,4 @@
-# Copyright (c) 2007-2009 The PyAMF Project.
+# Copyright (c) The PyAMF Project.
 # See LICENSE.txt for details.
 
 """
@@ -9,14 +9,18 @@ PyAMF SQLAlchemy adapter tests.
 
 import unittest
 
-import sqlalchemy
-from sqlalchemy import MetaData, Table, Column, Integer, String, ForeignKey, \
-    create_engine
-from sqlalchemy.orm import mapper, relation, sessionmaker, clear_mappers
+try:
+    import sqlalchemy
+    from sqlalchemy import MetaData, Table, Column, Integer, String, ForeignKey, \
+        create_engine
+    from sqlalchemy.orm import mapper, relation, sessionmaker, clear_mappers
+
+    from pyamf.adapters import _sqlalchemy_orm as adapter
+except ImportError:
+    sqlalchemy = None
 
 import pyamf.flex
 from pyamf.tests.util import Spam
-from pyamf.adapters import _sqlalchemy_orm as adapter
 
 
 class BaseObject(object):
@@ -49,6 +53,9 @@ class BaseTestCase(unittest.TestCase):
     """
 
     def setUp(self):
+        if not sqlalchemy:
+            self.skipTest("'sqlalchemy' is not available")
+
         # Create DB and map objects
         self.metadata = MetaData()
         self.engine = create_engine('sqlite:///:memory:', echo=False)
@@ -130,9 +137,9 @@ class BaseTestCase(unittest.TestCase):
 
 class SATestCase(BaseTestCase):
     def _test_obj(self, encoded, decoded):
-        self.assertEquals(User, decoded.__class__)
-        self.assertEquals(encoded.name, decoded.name)
-        self.assertEquals(encoded.addresses[0].email_address, decoded.addresses[0].email_address)
+        self.assertEqual(User, decoded.__class__)
+        self.assertEqual(encoded.name, decoded.name)
+        self.assertEqual(encoded.addresses[0].email_address, decoded.addresses[0].email_address)
 
     def test_encode_decode_transient(self):
         user = self._build_obj()
@@ -172,7 +179,7 @@ class SATestCase(BaseTestCase):
         encoder.writeElement(users)
         encoded = encoder.stream.getvalue()
         decoded = pyamf.get_decoder(pyamf.AMF3, encoded).readElement()
-        self.assertEquals([].__class__, decoded.__class__)
+        self.assertEqual([].__class__, decoded.__class__)
 
         for i in range(0, max):
             self._test_obj(users[i], decoded[i])
@@ -217,7 +224,7 @@ class SATestCase(BaseTestCase):
         decoded = pyamf.get_decoder(pyamf.AMF3, encoded).readElement()
 
         for i in range(0, max):
-            self.assertEquals(id(decoded[0]), id(decoded[i]))
+            self.assertEqual(id(decoded[0]), id(decoded[i]))
 
 
 class BaseClassAliasTestCase(BaseTestCase):
@@ -229,7 +236,7 @@ class BaseClassAliasTestCase(BaseTestCase):
 
 class ClassAliasTestCase(BaseClassAliasTestCase):
     def test_type(self):
-        self.assertEquals(self.alias.__class__, adapter.SaMappedClassAlias)
+        self.assertEqual(self.alias.__class__, adapter.SaMappedClassAlias)
 
     def test_get_mapper(self):
         self.assertFalse(hasattr(self.alias, 'mapper'))
@@ -238,36 +245,40 @@ class ClassAliasTestCase(BaseClassAliasTestCase):
         mapper = adapter.class_mapper(User)
 
         self.assertTrue(hasattr(self.alias, 'mapper'))
-        self.assertEquals(id(mapper), id(self.alias.mapper))
+        self.assertEqual(id(mapper), id(self.alias.mapper))
+
+        self.assertEqual(self.alias.static_attrs, [])
 
     def test_get_attrs(self):
         u = self._build_obj()
-        static, dynamic = self.alias.getEncodableAttributes(u)
+        attrs = self.alias.getEncodableAttributes(u)
 
-        self.assertEquals(static.keys(), [
+        self.assertEqual(sorted(attrs.keys()), [
+            'addresses',
+            'another_lazy_loaded',
             'id',
             'lazy_loaded',
-            'addresses',
             'name',
-            'another_lazy_loaded'
+            'sa_key',
+            'sa_lazy'
         ])
-        self.assertEquals(dynamic, {'sa_key': [None], 'sa_lazy': []})
+
+        self.assertEqual(attrs['sa_key'], [None])
+        self.assertEqual(attrs['sa_lazy'], [])
 
     def test_get_attributes(self):
         u = self._build_obj()
 
         self.assertFalse(u in self.session)
-        self.assertEquals([None], self.mappers['user'].primary_key_from_instance(u))
-        static, dynamic = self.alias.getEncodableAttributes(u)
+        self.assertEqual([None], self.mappers['user'].primary_key_from_instance(u))
+        attrs = self.alias.getEncodableAttributes(u)
 
-        self.assertEquals(static, {
+        self.assertEqual(attrs, {
             'addresses': u.addresses,
             'lazy_loaded': u.lazy_loaded,
             'another_lazy_loaded': [],
             'id': None,
-            'name': 'test_user'
-        })
-        self.assertEquals(dynamic, {
+            'name': 'test_user',
             'sa_lazy': [],
             'sa_key': [None]
         })
@@ -295,17 +306,16 @@ class ClassAliasTestCase(BaseClassAliasTestCase):
 
         obj = Person()
 
-        sa, da = alias.getEncodableAttributes(obj)
-        self.assertEquals(sa, {
+        attrs = alias.getEncodableAttributes(obj)
+        self.assertEqual(attrs, {
             'id': None,
-            'name': None})
-        self.assertEquals(da, {
+            'name': None,
             'sa_key': [None],
             'sa_lazy': [],
             'rw': 'bar',
             'ro': 'gak'})
 
-        self.assertEquals(obj.ro, 'gak')
+        self.assertEqual(obj.ro, 'gak')
         alias.applyAttributes(obj, {
             'sa_key': [None],
             'sa_lazy': [],
@@ -313,7 +323,7 @@ class ClassAliasTestCase(BaseClassAliasTestCase):
             'name': None,
             'rw': 'bar',
             'ro': 'baz'})
-        self.assertEquals(obj.ro, 'gak')
+        self.assertEqual(obj.ro, 'gak')
 
 
 class ApplyAttributesTestCase(BaseClassAliasTestCase):
@@ -337,11 +347,11 @@ class ApplyAttributesTestCase(BaseClassAliasTestCase):
         if sqlalchemy.__version__.startswith('0.4'):
             self.assertTrue('_state' in d)
             del d['_state']
-        elif sqlalchemy.__version__.startswith('0.5'):
+        else:
             self.assertTrue('_sa_instance_state' in d)
             del d['_sa_instance_state']
 
-        self.assertEquals(d, {
+        self.assertEqual(d, {
             'lazy_loaded': [],
             'addresses': [],
             'name': 'test_user',
@@ -387,25 +397,19 @@ class AdapterTestCase(BaseTestCase):
         self.assertFalse(adapter.is_class_sa_mapped(Spam))
 
 
-def suite():
-    suite = unittest.TestSuite()
+class ExcludableAttrsTestCase(BaseTestCase):
+    """
+    Tests for #790
+    """
 
-    try:
-        import pysqlite2
-    except ImportError:
-        return suite
+    def test_core_attrs(self):
+        """
+        Ensure that sa_key and sa_lazy can be excluded
+        """
+        a = adapter.SaMappedClassAlias(Address, exclude_attrs=['sa_lazy', 'sa_key'])
+        u = Address()
 
-    classes = [
-        SATestCase,
-        AdapterTestCase,
-        ClassAliasTestCase,
-        ApplyAttributesTestCase
-    ]
+        attrs = a.getEncodableAttributes(u)
 
-    for x in classes:
-        suite.addTest(unittest.makeSuite(x))
-
-    return suite
-
-if __name__ == '__main__':
-    unittest.main(defaultTest='suite')
+        self.assertFalse('sa_key' in attrs)
+        self.assertFalse('sa_lazy' in attrs)

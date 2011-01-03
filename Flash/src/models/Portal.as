@@ -8,6 +8,14 @@ package models
 	import com.google.maps.MapMouseEvent;
 	import com.google.maps.overlays.Marker;
 	import com.google.maps.overlays.MarkerOptions;
+	import com.google.maps.overlays.Polygon;
+	import com.google.maps.overlays.PolygonOptions;
+	import com.google.maps.styles.FillStyle;
+	import com.google.maps.styles.StrokeStyle;
+	
+	import flash.utils.IDataInput;
+	import flash.utils.IDataOutput;
+	import flash.utils.IExternalizable;
 	
 	import flashx.textLayout.elements.ParagraphElement;
 	import flashx.textLayout.elements.SpanElement;
@@ -21,11 +29,11 @@ package models
 
 	[Bindable]
 	[RemoteClass(alias="models.Portal")]
-	public class Portal implements SuperObject
+	public class Portal  implements SuperObject
 	{
 		// Information
-		public var hitPoints:Number;
-		public var level:Number;
+		public var hitPoints:int;
+		public var level:int;
 		
 		// Who owns it?
 		public var user:User;
@@ -35,26 +43,57 @@ package models
 		// The Start location.
 		public var startLocationLatitude:Number;
 		public var startLocationLongitude:Number;
-		public var startLocationLatitudeIndex:Number;
-		public var startLocationLongitudeIndex:Number;
+		public var startLocationLatitudeIndex:int;
+		public var startLocationLongitudeIndex:int;
 		
 		// The End location
 		public var endLocationLatitude:Number;
 		public var endLocationLongitude:Number;
-		public var endLocationLatitudeIndex:Number;
-		public var endLocationLongitudeIndex:Number;
+		public var endLocationLatitudeIndex:int;
+		public var endLocationLongitudeIndex:int;
+	
 		
 		// State variables
 		private var isModified:Boolean;
+		private var hasFocus:Boolean;											/* True if the current object has user focus */
+		private var portalMarker:TowerSaintMarker;								/* The marker to be drawn on the map */
+		private var focusPolygon:Polygon;	
 		
 		public function Portal()
 		{
 			super();
 		}
 		
+		// IExternalizable interface		
+		public function writeExternal(output:IDataOutput) : void {
+			output.writeInt(this.hitPoints);
+			output.writeInt(this.level);
+			output.writeObject(this.user);
+			output.writeFloat(this.startLocationLatitude);
+			output.writeFloat(this.startLocationLongitude);
+			output.writeInt(this.startLocationLatitudeIndex);
+			output.writeInt(this.startLocationLongitudeIndex);
+			output.writeFloat(this.endLocationLatitude);
+			output.writeFloat(this.endLocationLongitude);
+			output.writeInt(this.endLocationLatitudeIndex);
+			output.writeInt(this.endLocationLongitudeIndex);
+		}
+		public function readExternal(input:IDataInput) : void {
+			this.hitPoints = input.readInt();
+			this.level = input.readInt();
+			this.user = input.readObject();
+			this.startLocationLatitude = input.readFloat();
+			this.startLocationLongitude = input.readFloat();
+			this.startLocationLatitudeIndex = input.readInt();
+			this.startLocationLongitudeIndex = input.readInt();
+			this.endLocationLatitude = input.readFloat();
+			this.endLocationLongitude = input.readFloat();
+			this.endLocationLatitudeIndex = input.readInt();
+			this.endLocationLongitudeIndex = input.readInt();
+		}
 
 		
-		public function draw(drag:Boolean, map:Map, photo:PhotoAssets, fpm:FocusPanelManager) : void {
+		public function draw(drag:Boolean, map:Map, photo:PhotoAssets, fpm:FocusPanelManager, withBoundary:Boolean) : void {
 			// Extract the position associated with remoteObject(Tower)			
 			var firstPosition:LatLng = new LatLng(endLocationLatitude, endLocationLongitude);
 			var secondPosition:LatLng = new LatLng(startLocationLatitude, startLocationLongitude);
@@ -82,9 +121,64 @@ package models
 			markerOptions.draggable = drag;
 			
 			// Create the marker
-			var marker:TowerSaintMarker = new TowerSaintMarker(this, pos, markerOptions);
-			marker.addEventListener(MapMouseEvent.CLICK, fpm.onMarkerClick);
-			map.addOverlay(marker);
+			portalMarker = new TowerSaintMarker(this, pos, markerOptions, map);
+			portalMarker.addEventListener(MapMouseEvent.CLICK, fpm.onMarkerClick);
+			map.addOverlay(portalMarker);
+			
+		}
+		
+		// Erase the marker
+		public function eraseFromMap(map:Map) : void {
+			map.removeOverlay(portalMarker);
+		}
+		
+		public function setFocusOnObject(error:Boolean) : void{
+			createFocusPolygonAtPosition(error);
+			hasFocus = true;
+		}
+		
+		private function createFocusPolygonAtPosition(color:Boolean):void {
+			// The position on the map, and the map
+			var pos:LatLng = portalMarker.getLatLng();
+			var m:Map = portalMarker.getMap();
+			
+			// Get the color
+			var pColor:Number;
+			if(color){
+				pColor = 0xFF0000;
+			}else{
+				pColor = 0x0000FF;
+			}
+			
+			// Get the game constants
+			var latOffset:Number = GameConstants.getLatOffset();
+			var lonOffset:Number = GameConstants.getLonOffset();
+			
+			// Create the polygon
+			var lat:Number = pos.lat();
+			var lon:Number = pos.lng();
+			var polygon:Polygon = new Polygon([
+				new LatLng(lat - latOffset, lon - lonOffset),
+				new LatLng(lat - latOffset, lon + lonOffset),
+				new LatLng(lat + latOffset, lon + lonOffset),
+				new LatLng(lat + latOffset, lon - lonOffset),
+				new LatLng(lat - lonOffset, lon - lonOffset)
+			], 
+				new  PolygonOptions({ 
+					strokeStyle: new StrokeStyle({
+						color: 0x0000ff,
+						thickness: 10,
+						alpha: 0.7}), 
+					fillStyle: new FillStyle({
+						color: 0x0000ff,
+						alpha: 0.7})
+				}));
+			
+			// Keep a reference to the focus polygon.
+			this.focusPolygon = polygon;
+			
+			// Add the polygon to the map
+			m.addOverlay(this.focusPolygon);
 			
 		}
 		

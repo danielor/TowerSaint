@@ -1,6 +1,4 @@
-# -*- coding: utf-8 -*-
-#
-# Copyright (c) 2007-2009 The PyAMF Project.
+# Copyright (c) The PyAMF Project.
 # See LICENSE.txt for details.
 
 """
@@ -11,12 +9,9 @@ cookie-like data entity used by the Adobe Flash Player and Gnash. The players
 allow web content to read and write LSO data to the computer's local drive on
 a per-domain basis.
 
-@see: U{Local Shared Object on WikiPedia (external)
-<http://en.wikipedia.org/wiki/Local_Shared_Object>}
-@see: U{Local Shared Object envelope (external)
-<http://osflash.org/documentation/amf/envelopes/sharedobject>}
-
-@since: 0.1.0
+@see: U{Local Shared Object on WikiPedia
+    <http://en.wikipedia.org/wiki/Local_Shared_Object>}
+@since: 0.1
 """
 
 import pyamf
@@ -32,20 +27,11 @@ PADDING_BYTE = '\x00'
 
 def decode(stream, strict=True):
     """
-    Decodes a SOL stream. C{strict} mode ensures that the sol stream is as spec
+    Decodes a SOL stream. L{strict} mode ensures that the sol stream is as spec
     compatible as possible.
 
-    @param strict: Ensure that the SOL stream is as spec compatible as possible.
-    @type strict: C{bool}
     @return: A C{tuple} containing the C{root_name} and a C{dict} of name,
         value pairs.
-    @rtype: C{tuple}
-
-    @raise DecodeError: Unknown SOL version in header.
-    @raise DecodeError: Inconsistent stream header length.
-    @raise DecodeError: Invalid signature.
-    @raise DecodeError: Invalid padding read.
-    @raise DecodeError: Missing padding byte.
     """
     if not isinstance(stream, util.BufferedByteStream):
         stream = util.BufferedByteStream(stream)
@@ -101,21 +87,19 @@ def encode(name, values, strict=True, encoding=pyamf.AMF0):
     Produces a SharedObject encoded stream based on the name and values.
 
     @param name: The root name of the SharedObject.
-    @type name: C{basestring}
-    @param values: A C{dict} of name value pairs to be encoded in the stream.
-    @type values: C{dict}
+    @param values: A `dict` of name value pairs to be encoded in the stream.
     @param strict: Ensure that the SOL stream is as spec compatible as possible.
-    @type strict: C{bool}
     @return: A SharedObject encoded stream.
-    @rtype: L{BufferedByteStream<pyamf.util.BufferedByteStream>}
+    @rtype: L{BufferedByteStream<pyamf.util.BufferedByteStream>}, a file like
+        object.
     """
     encoder = pyamf.get_encoder(encoding)
-    encoder.stream = stream = util.BufferedByteStream()
+    stream = encoder.stream
 
     # write the header
     stream.write(HEADER_VERSION)
 
-    if strict is True:
+    if strict:
         length_pos = stream.tell()
 
     stream.write_ulong(0)
@@ -124,18 +108,17 @@ def encode(name, values, strict=True, encoding=pyamf.AMF0):
     stream.write(HEADER_SIGNATURE)
 
     # write the root name
-    if not isinstance(name, unicode):
-        name = unicode(name)
+    name = name.encode('utf-8')
 
     stream.write_ushort(len(name))
-    stream.write_utf8_string(name)
+    stream.write(name)
 
     # write the padding
     stream.write(PADDING_BYTE * 3)
     stream.write_uchar(encoding)
 
     for n, v in values.iteritems():
-        encoder.writeString(n, writeType=False)
+        encoder.serialiseString(n)
         encoder.writeElement(v)
 
         # write the padding
@@ -155,9 +138,7 @@ def load(name_or_file):
     Loads a sol file and returns a L{SOL} object.
 
     @param name_or_file: Name of file, or file-object.
-    @type name_or_file: C{str} or C{StringIO}
-
-    @raise ValueError: Readable stream expected.
+    @type name_or_file: C{string}
     """
     f = name_or_file
     opened = False
@@ -184,14 +165,8 @@ def save(sol, name_or_file, encoding=pyamf.AMF0):
     """
     Writes a L{SOL} object to C{name_or_file}.
 
-    @param sol:
-    @type sol:
-    @param name_or_file: Name of file, or file-object.
-    @type name_or_file: C{str} or C{StringIO}
+    @param name_or_file: Name of file or file-object to write to.
     @param encoding: AMF encoding type.
-    @type encoding: C{int}
-
-    @raise ValueError: Writable stream expected.
     """
     f = name_or_file
     opened = False

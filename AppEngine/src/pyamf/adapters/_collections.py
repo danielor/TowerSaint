@@ -1,8 +1,8 @@
-# Copyright (c) 2007-2009 The PyAMF Project.
+# Copyright (c) The PyAMF Project.
 # See LICENSE.txt for details.
 
 """
-collections adapter module.
+U{collections<http://docs.python.org/library/collections.html>} adapter module.
 
 @since: 0.5
 """
