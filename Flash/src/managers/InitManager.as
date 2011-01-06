@@ -144,6 +144,54 @@ package managers
 		}
 		
 		private function onBuildButton(event:MouseEvent) : void {
+			this.InitializeUserAlias();
+		}
+		
+		
+		private function InitializeUserAlias() : void {
+			// Create the popup
+			var ua:UserAlias = new UserAlias();
+			popup = ua;
+			
+			// Setup the popup manager
+			PopUpManager.addPopUp(ua, this.app, true);
+			PopUpManager.centerPopUp(ua);
+			
+			// Setup events on the popup
+			ua.aliasButton.addEventListener(MouseEvent.MOUSE_UP, onAliasButton);
+		}
+		
+		private function onAliasButton(event:MouseEvent) : void {
+			// Extract information from the alias
+			var ua:UserAlias = popup as UserAlias;
+			var s:String = ua.aliasText.text;
+			
+			// Call the function associated with setting the user alias
+			this.userObjectManager.setUserAlias(this.currentUser, s, onSetUserAlias);
+		}
+		
+		private function onSetUserAlias(event:ResultEvent) : void {
+			var b:Boolean = event.result as Boolean;
+			var ua:UserAlias = this.popup as UserAlias;
+			if(b){
+				PopUpManager.removePopUp(popup);
+				this.currentUser.alias = ua.aliasText.text;
+				this.end();
+			}else{
+				ua.title = "User Alias: Taken";
+			}
+		}
+		
+		private function end() : void {
+			// Make the tower user specific
+			this.currentCapital.user = null;
+			
+			// Save the capital
+			var a:Array = new Array();
+			a.push(this.currentCapital);
+			Alert.show(this.currentUser.toString());
+			this.userObjectManager.saveUserObjects(a, this.currentUser, ignoreResult);
+			
 			// Build the tower
 			this.mapEventHandler.RemoveEvents();
 			
@@ -154,6 +202,10 @@ package managers
 			
 			// Change the state
 			this.app.currentState = "inApp";
+		}
+		
+		private function ignoreResult(event:ResultEvent) : void {
+			
 		}
 		
 		// The change of location should cause the new location popup to happen.

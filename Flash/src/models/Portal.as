@@ -119,7 +119,7 @@ package models
 			markerOptions.hasShadow = false;
 			markerOptions.radius = 5;
 			markerOptions.draggable = drag;
-			
+	
 			// Create the marker
 			portalMarker = new TowerSaintMarker(this, pos, markerOptions, map);
 			portalMarker.addEventListener(MapMouseEvent.CLICK, fpm.onMarkerClick);

@@ -164,6 +164,31 @@ package managers
 			operation.send(l);
 		}
 		
+		/* 
+		Adds a user alias associated with a new user
+		*/
+		public function setUserAlias(u:User, s:String, f:Function) : void {
+			var servicesDictionary:Dictionary = this.serverState.getServices();
+			var _service:RemoteObject = servicesDictionary["towersaint"] as RemoteObject;
+			
+			// The abstract call
+			var operation:AbstractOperation = _service.getOperation("setUserAlias");
+			operation.addEventListener(ResultEvent.RESULT, f);	
+			operation.send(u, s);
+		}
+		
+		/* 
+		Function saves updated objects
+		*/
+		public function saveUserObjects(arr:Array, u:User, f:Function) : void {
+			var servicesDictionary:Dictionary = this.serverState.getServices();
+			var _service:RemoteObject = servicesDictionary["towersaint"] as RemoteObject;
+			
+			// The abstract call
+			var operation:AbstractOperation = _service.getOperation("saveUserObjects");
+			operation.addEventListener(ResultEvent.RESULT, f);	
+			operation.send(arr, u);
+		}
 		
 		/* 
 		Returns true if there are any open connections
@@ -215,6 +240,8 @@ package managers
 			
 		}
 		
+
+		
 		/*
 		The user object stores all of the objects from the server. This function acts a filter
 		and returns only the objects that are currently being displayed by the map
@@ -250,7 +277,7 @@ package managers
 			operation.send(modified_objects);
 		}
 		
-		public function saveUser(u:User) : void
+		public function saveUser(u:User, f:Function) : void
 		{
 			// Save the user
 			this.user = u;
@@ -262,26 +289,31 @@ package managers
 			// If this.user is a new user, the service will create the user on the server.
 			// If not, then 
 			var operation:AbstractOperation = _service.getOperation("getCurrentUser");
-			operation.addEventListener(ResultEvent.RESULT, onSaveUser);
+			operation.addEventListener(ResultEvent.RESULT, f);
 			operation.send(this.user);
 		}
 		
-		protected function onSaveUser(event:ResultEvent) : void
-		{
-			var u:User = event.result as User;
-			// If it returns the same user, then the user is new, and we should start the initManager
-			if(!ObjectUtil.compare(this.user, u)){
-				// Change the state
-				this.app.currentState = "initUser";
-			}else{
-				var bounds:LatLngBounds = this.map.getLatLngBounds();
- 				this.getAllObjectsWithinBounds(bounds);
-			}
+		public function GetUserObjects(u:User, f:Function) : void {
+			var servicesDictionary:Dictionary = this.serverState.getServices();
+			var _service:RemoteObject = servicesDictionary["towersaint"] as RemoteObject;
+			
+			// If this.user is a new user, the service will create the user on the server.
+			// If not, then 
+			var operation:AbstractOperation = _service.getOperation("getUserObjects");
+			operation.addEventListener(ResultEvent.RESULT, f);
+			operation.send(u);
 		}
 		
-		protected function onSaveUserObjects(event:ResultEvent) : void
-		{
+		
+		public function initGame(u:User, f:Function) : void {
+			var servicesDictionary:Dictionary = this.serverState.getServices();
+			var _service:RemoteObject = servicesDictionary["towersaint"] as RemoteObject;
 			
+			// If this.user is a new user, the service will create the user on the server.
+			// If not, then 
+			var operation:AbstractOperation = _service.getOperation("getUserObjects");
+			operation.addEventListener(ResultEvent.RESULT, f);
+			operation.send(u);
 		}
 		
 		/*

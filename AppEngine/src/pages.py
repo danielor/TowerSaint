@@ -3,11 +3,32 @@ Created on November 13, 2010
 
 @author: danielo
 '''
-import logging
+import logging, datetime
 from google.appengine.ext import webapp
 from google.appengine.api import memcache
 from models import Bounds, User, Road, Portal, Tower,Constants, Location
 
+
+class UserStatePage(webapp.RequestHandler):
+    """Cron job removes inactive users. Since the game is constantly sending
+    for server information, the only way a user can be logged out is if he closes
+    the window with the TowerSaint.swf. This cron job cleans up the user state"""
+    def get(self):
+        """The cron job calls this function"""
+        userList = User.all().filter('isLoggedIn =', True)
+        now = datetime.datetime.now()
+        
+        # If it is within 5 minutes
+        for u in userList:
+            # Get the delta
+            lastActive = u.lastActive
+            delta = now - lastActive
+            
+            # More than 5 minutes. You could be Anatartica~!!!
+            if delta.seconds > 300:
+                u.isLoggedIn = False
+                u.put()
+            
 
 class UserPage(webapp.RequestHandler):
     def __init__(self):
@@ -73,7 +94,7 @@ class BoundsPage(webapp.RequestHandler):
             query = cls.all()
             for obj in query.fetch(1000):           # For intial testing it would be rare for their to be more than 1000
                 obj.delete()
-                
+
     def loadRandomDataInBounds(self, bounds, numberOfRandomObjects = 5):
         """Load random data in the bounds of the data"""
         for _ in range(numberOfRandomObjects):

@@ -1,0 +1,5 @@
+
+cron:
+-description : Handle the user state
+ url : /user_state
+ schedule : every 5 minutes

@@ -40,6 +40,8 @@ package models
 			this.completeManaProduction = 0;
 			this.completeStoneProduction = 0;
 			this.completeWoodProduction = 0;
+			this.level = 0;
+			this.alias = "danielo2";
 		}
 		
 		public function toString():String {
@@ -50,6 +52,8 @@ package models
 			s = s + this.isEmperor.toString() + ":";
 			s = s + this.completeManaProduction.toString() + ":";
 			s = s + this.completeStoneProduction.toString() + ":";
+			s = s + this.level.toString() + ":";
+			s = s + this.alias.toString() + ":";
 			s = s + this.completeWoodProduction.toString() + "\n";
 			return s;
 		}

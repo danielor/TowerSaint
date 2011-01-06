@@ -25,6 +25,9 @@ package models
 	import managers.EventManager;
 	import managers.FocusPanelManager;
 	
+	import messaging.ChannelJavascriptBridge;
+	import messaging.events.ChannelAttackEvent;
+	
 	import models.map.TowerSaintMarker;
 	
 	import mx.controls.Alert;
@@ -194,6 +197,8 @@ package models
 			if(withBoundary){
 				this.generateBoundaryPolygon(map);
 			}
+			var e:ChannelAttackEvent;
+			var r:ChannelJavascriptBridge;
 		}
 		
 		// Generate the boundary around the objects

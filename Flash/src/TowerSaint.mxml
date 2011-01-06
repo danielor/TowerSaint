@@ -64,6 +64,7 @@
 			import mx.rpc.events.ResultEvent;
 			import mx.rpc.remoting.RemoteObject;
 			import mx.utils.ObjectProxy;
+			import mx.utils.ObjectUtil;
 			
 			
 			// The facebook data
@@ -124,8 +125,6 @@
 				}
 			}
 			
-
-			
 			protected function initFacebook():void {
 				Facebook.init("142447749129831", handleInit);
 				Facebook.setCanvasAutoResize(true);
@@ -161,7 +160,7 @@
 				this._user = new User();
 				this._user.initializeUserWithId(f_id);
 				if(!isDesktop){
-					this._userObjectManager.saveUser(this._user);
+					this._userObjectManager.saveUser(this._user, onSaveUser);
 				}
 
 				
@@ -202,8 +201,7 @@
 				
 				// Calculate the bounds of the map
 				if(!initializedInAppManagers){
-					//var bounds:LatLngBounds = this.map.getLatLngBounds();
-					//mapDimension = new LatLng(bounds.getNorth() - bounds.getSouth(), bounds.getWest() - bounds.getEast());
+				
 					
 					// Initialize the object manager, and make the game user specific.
 					this._focusPanelManager = new FocusPanelManager(focusImage, bodyText, titleText, _photo);
@@ -211,28 +209,31 @@
 					this._userObjectManager = new UserObjectManager(this.map, this._user, this._serverState, this._photo, this._focusPanelManager, this);
 	
 	   				if(isDesktop){
-						this._userObjectManager.saveUser(this._user);
+						this._userObjectManager.saveUser(this._user, onSaveUser);
 					}
+					
 					initializedInAppManagers = true;
-					
-					// Get all objects within the bounds of the server.	
-					//this._userObjectManager.getAllObjectsWithinBounds(bounds);				
-					
-					// Set an event listener upon the complete loading of the information
-					/*
-					this.map.addEventListener(MapEvent.TILES_LOADED, onTilesLoaded);
-					this.map.addEventListener(MapMouseEvent.CLICK, onMapMouseClick);
-					this.map.addEventListener(MapMouseEvent.DRAG_START, onMapDragStart);
-					this.map.addEventListener(MapMouseEvent.DRAG_END, onMapDragEnd);
-					this.map.addEventListener(MapMoveEvent.MOVE_END, onMapMoveEnd);
-					*/
 				}
 			}
 			
-			
-			
-			
-			
+			// Depending on the resuls from the server start the initialization manager or the game
+			// manager
+			protected function onSaveUser(event:ResultEvent) : void{
+				var u:User = event.result as User;
+				// If it returns the same user, then the user is new, and we should start the initManager
+				if(!ObjectUtil.compare(this._user, u)){
+					// Change the state
+					currentState = "initUser";
+				}else{
+					this._user = u;
+					this._gameManager = new GameManager(this._user, this.map, this._photo, this._focusPanelManager, this,
+						this.sendButton, this.chatList, this.userList, this.userObjectList, this.chatText, this._userObjectManager,
+						this.mySprite);
+					this._gameManager.run();
+				}
+				
+			}
+		
 			// Button handlers for the create amf objects
 			protected function onImageClick(event:MouseEvent) : void {
 				imageState.isClicked = true;
@@ -280,7 +281,7 @@
 	<s:Button includeIn="initUser" x="689" y="20" label="changeLocation" id="locationChanger"/>
 	<s:Button includeIn="initUser" x="10" y="21" label="Build" id="buildButton"/>
 	<s:VGroup includeIn="inApp" x="10" y="10" width="153" height="580">
-		<mx:Image width="153" height="66" id="logo"/>
+		<mx:Image width="153" height="66" id="logo"  source="@Embed(source='assets/pictures/TowerSaintLogo.gif')"/>
 		<s:List width="152" height="123" id="userList" itemRenderer="BuildListItemRenderer"></s:List>
 		<s:List width="150" id="chatList"></s:List>
 		<mx:TabNavigator width="153" height="262" width.inApp="154">

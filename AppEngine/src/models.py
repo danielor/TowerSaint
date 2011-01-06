@@ -11,8 +11,8 @@ from google.appengine.ext import db
 import logging, random, string
 from math import fabs
 from xml.etree import cElementTree as cTree
-from geo.geomodel import GeoModel
-from geo.geotypes import Box
+from geomodel.geomodel import GeoModel
+from geomodel.geotypes import Box
 
 def createRandomString(length = 10):
     """Create the random string"""
@@ -49,7 +49,15 @@ class Constants(object):
         """Converts a latitude constant to miles"""
         return 69
     
+    @classmethod
+    def levelFromExperience(cls, u):
+        """Get the level from the experience of a user"""
+        return u.Experience / 1000
     
+
+class GameChannel(db.Model):
+    """Tokens sent to the user to the user to run the relevant javascript clients"""
+    userManagerToken = db.TextProperty()
 
 class User(db.Model):
     """The user of the game"""
@@ -75,7 +83,7 @@ class User(db.Model):
 #        self.completeManaProduction = input.readInt()
 #        self.completeStoneProduction = input.readInt()
 #        self.completeWoodProduction = input.readInt()
-        
+    # AMF/XML information    
     FacebookID = db.IntegerProperty()
     Experience = db.IntegerProperty()
     Empire = db.StringProperty()
@@ -83,6 +91,11 @@ class User(db.Model):
     completeManaProduction = db.IntegerProperty()
     completeStoneProduction = db.IntegerProperty()
     completeWoodProduction = db.IntegerProperty()
+    alias = db.StringProperty()
+    
+    # State information
+    isLoggedIn = db.BooleanProperty()                       # True if the user is logged in
+    lastActive = db.DateTimeProperty()                      # The datetime that the user time was last active
     
     def toXML(self):
         """Return an xml representation of the google app engine model"""
@@ -94,8 +107,10 @@ class User(db.Model):
                     <isemperor>%s</isemperor>
                     <empire>%s</empire>
                     <experience>%s</experience>
+                    <alias>%s</alias>
                  </User>""" % (self.FacebookID, self.completeWoodProduction, self.completeStoneProduction,
-                               self.completeManaProduction, self.isEmperor, self.Empire, self.Experience)
+                               self.completeManaProduction, self.isEmperor, self.Empire, self.Experience,
+                               self.alias)
 
     @classmethod
     def createRandomUser(self):

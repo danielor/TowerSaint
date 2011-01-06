@@ -11,6 +11,7 @@ package managers
 	import away3dlite.materials.*;
 	import away3dlite.primitives.*;
 	
+	import com.facebook.graph.core.FacebookJSBridge;
 	import com.google.maps.LatLng;
 	import com.google.maps.LatLngBounds;
 	import com.google.maps.Map;
@@ -21,19 +22,33 @@ package managers
 	import flash.display.Bitmap;
 	import flash.display.BitmapData;
 	import flash.events.Event;
+	import flash.events.MouseEvent;
 	import flash.utils.Timer;
+	
+	import messaging.ChannelJavascriptBridge;
+	import messaging.events.ChannelAttackEvent;
+	import messaging.events.ChannelBuildEvent;
+	import messaging.events.ChannelJSON;
+	import messaging.events.ChannelMessageEvent;
+	import messaging.events.ChannelMoveEvent;
+	import messaging.events.ChannelUserLoginEvent;
+	import messaging.events.ChannelUserLogoutEvent;
 	
 	import models.SuperObject;
 	import models.Tower;
 	import models.User;
 	
 	import mx.collections.ArrayCollection;
+	import mx.controls.Alert;
 	import mx.core.BitmapAsset;
+	import mx.managers.PopUpManager;
+	import mx.rpc.events.ResultEvent;
 	
 	import spark.components.Application;
 	import spark.components.Button;
 	import spark.components.List;
 	import spark.components.TextInput;
+	import spark.components.TitleWindow;
 	import spark.core.SpriteVisualElement;
 
 	// The game manager runs the towersaint game.
@@ -54,7 +69,10 @@ package managers
 		private var listOfUserObjects:List;									/* List of user objects- Portals, and Tower */
 		private var chatTextInput:TextInput									/* The text input for the chat */
 		private var userObjectManager:UserObjectManager;					/* User object manager controls the collection of information from the server */
-	
+		private var channelBridge:ChannelJavascriptBridge;					/* The briged between GAE channel api and the actionscript */
+		// Popups
+		private var popup:TitleWindow;										/* A reference to any popup placed on top of the game manager */
+		
 		// Private variables associated with away3D objects
 		private var mySprite:SpriteVisualElement;							/* Visual element is used to render the scene */							
 		private var scene:Scene3D;											/* The scene where all of the 3D data will be drawn */
@@ -92,14 +110,24 @@ package managers
 			
 			// Initialize objects
 			this.listOfUserModels = new ArrayCollection();
+			
+			// Setup the game channels
+			var f:ChannelJavascriptBridge = new ChannelJavascriptBridge(this.app);
 		}
 		
 		// Run the game. Intialize active objects, events, and interfaces.
 		public function run() : void{
-			
-			
 			// Setup Map events
 			this.initializeMap();
+			
+			// Get all user objects
+			this.getUserObjects();
+			
+			// Setup up the game channels. The channels run the game
+			this.setupGameChannels();
+			
+			// Initialize the game
+			this.initGame();
 		}
 		
 		public function runFromInitManager(capital:Tower):void{
@@ -116,6 +144,12 @@ package managers
 			// Setup up the renderer of objects
 			this.listOfUserModels.addItem(capital);
 			this.listOfUserObjects.dataProvider = this.listOfUserModels;
+			
+			// Setup up the game channels. The channels run the game
+			this.setupGameChannels();
+			
+			// Initialize the game
+			this.initGame();
 		}
 		
 		// Setup function
@@ -132,9 +166,91 @@ package managers
 			this.mapEventManager.addEventListener(MapMoveEvent.MOVE_END, onMapMoveEnd);
 		}
 		
+		private function getUserObjects(): void {
+			this.userObjectManager.GetUserObjects(this.user, onGetUserObjects);
+		}
+		
+		private function onGetUserObjects(event:ResultEvent) : void {
+			this.listOfUserModels = event.result as ArrayCollection;
+			Alert.show(this.listOfUserModels.toString());
+			
+			// Get the first object, and draw it on the map. It should be the capital
+			var obj:SuperObject = this.listOfUserModels.getItemAt(0) as SuperObject;
+			var bounds:LatLngBounds = this.map.getLatLngBounds();
+			var pos:LatLng = obj.getPosition(this.map.getLatLngBounds());
+			this.map.setCenter(pos);
+			
+			// Draw all user objects on the map
+			this.drawUserObjectsInBounds(bounds);
+			
+			// Show all of the user objects
+			this.listOfUserObjects.dataProvider = this.listOfUserModels;
+		}
+		
+		// ==== CHANNEL INTERFACE =====
+		public function setupGameChannels() : void {
+			
+			// Setup the channel events
+			this.app.addEventListener(ChannelAttackEvent.CHANNEL_ATTACK, onChannelAttack);
+			this.app.addEventListener(ChannelBuildEvent.CHANNEL_BUILD, onChannelBuild);
+			this.app.addEventListener(ChannelMessageEvent.CHANNEL_MESSAGE, onChannelMessage);
+			this.app.addEventListener(ChannelMoveEvent.CHANNEL_MOVE, onChannelMove);
+			this.app.addEventListener(ChannelUserLoginEvent.CHANNEL_LOGIN, onChannelLogin);
+			this.app.addEventListener(ChannelUserLogoutEvent.CHANNEL_LOGOUT, onChannelLogout);
+			
+		}
+		
+		public function onChannelAttack(event:ChannelAttackEvent) : void {
+			
+		}
+		
+		public function onChannelBuild(event:ChannelBuildEvent) : void {
+			
+		}
+		
+		public function onChannelMessage(event:ChannelMessageEvent) : void {
+			
+		}
+		
+		public function onChannelMove(event:ChannelMoveEvent) : void {
+			
+		}
+		
+		public function onChannelLogin(event:ChannelUserLoginEvent) : void {
+			
+		}
+		
+		public function onChannelLogout(event:ChannelUserLogoutEvent) : void {
+			
+		}
+		
+		// ==== CHANNEL INTERFACE =====
+		
+		// ==== INIT GAME ===
+		private function initGame() : void {
+			this.userObjectManager.initGame(this.user, onInitGame);	
+		}
+		
+		private function onInitGame(event:ResultEvent) : void {
+			
+		}
+		// ==== INIT GAME ===
+		
+		/// MAP
 		// The drag events
 		private function onMapDragStart(event:MapMouseEvent) : void {
 			initialMapDragMouse = event.latLng;
+		}
+		
+		// Draw object with bounds
+		private function drawUserObjectsInBounds(bounds:LatLngBounds) : void {
+			for(var i:int = 0; i < this.listOfUserModels.length; i++){
+				var obj:SuperObject = this.listOfUserModels.getItemAt(i) as SuperObject;
+				var pos:LatLng = obj.getPosition(bounds);
+				if(bounds.containsLatLng(pos)){
+					obj.draw(true, this.map, this.photo, this.focusPanelManager, true);
+				}
+			}
 		}
 		
 		private function onMapDragEnd(event:MapMouseEvent) : void {
@@ -191,10 +307,6 @@ package managers
 				userMousePan = false;
 			}
 		}
-		
-		
-		
-		
 		
 		private function onMapMouseClick(event:MapMouseEvent) : void {
 			/*

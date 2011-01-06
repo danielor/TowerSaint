@@ -19,9 +19,9 @@ import logging, os
 from google.appengine.ext import webapp
 from google.appengine.ext.webapp.util import run_wsgi_app
 from google.appengine.ext.webapp import template
-from services import TowerService, PortalService, RoadService,TowerSaintManager
+from services import TowerSaintManager
 from services import register_classes
-from pages import BoundsPage, UserPage
+from pages import BoundsPage, UserPage, UserStatePage
 from pyamf.remoting.gateway.google import WebAppGateway
 
 
@@ -45,10 +45,6 @@ def main():
     debug_enabled = True
 
     services = {
-        'myservice.echo': echo,
-        'tower' : TowerService(),
-        'portal' : PortalService(),
-        'road' : RoadService(),
         'towersaint': TowerSaintManager()
     }
     
@@ -60,7 +56,8 @@ def main():
     gateway = WebAppGateway(services, logger=logging, debug=debug_enabled)
 
     application_paths = [('/', gateway),
-                         ('/helloworld', MainPage), 
+                         ('/helloworld', MainPage),
+                         ('/user_state', UserStatePage), 
                          ('/facebook/', FacebookCanvas),
                          (r'/bounds/(.*)/(.*)/(.*)/(.*)', BoundsPage), 
                          (r'/user/(.*)', UserPage)]
