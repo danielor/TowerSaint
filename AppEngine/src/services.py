@@ -51,10 +51,7 @@ class TowerSaintManager(object):
     def getAllActiveUsers(self):
         """Return all active users"""
         return ArrayCollection([{'alias': u.alias, 'level' : Constants.levelFromExperience(u)} for u in User.all().filter('isLoggedIn =', True).fetch(1000)])
-    
-    def initGame(self, user):
-        """Initialize the game for the user by instantiating all of the relevant sessions"""
-    
+        
     def setUserAlias(self, user, alias):
         """Set the alias associated with the user"""
         logging.error(user)
@@ -112,13 +109,13 @@ class TowerSaintManager(object):
         """Initialize the game channels for game, chat, and user upates""" 
         # Setup all the channels
         uM = UserManager()
-        state = uM.state
+        channelId = uM.channelId
         
         # Setup the channel
-        token = channel.create_channel(state.channelId + user.alias)
+        token = channel.create_channel(channelId + user.alias)
         
         # Return the channel associated with the 
-        return GameChannel(userManagerToken = token)
+        return GameChannel(token = token)
         
     def satisfiesMinimumDistance(self, latlng):
         """If the tower satisfies the minimum distance from other towers, then it is true"""

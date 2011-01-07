@@ -7,7 +7,7 @@ package models
 	public class GameChannel
 	{
 		// The tokens associated with the game channels
-		public var userManagerToken:String;	
+		public var token:String;	
 		public function GameChannel()
 		{
 			super();

@@ -14,6 +14,8 @@ package messaging
 	import messaging.events.ChannelUserLoginEvent;
 	import messaging.events.ChannelUserLogoutEvent;
 	
+	import models.GameChannel;
+	
 	import mx.controls.Alert;
 	
 	import spark.components.Application;
@@ -31,6 +33,11 @@ package messaging
 		
 			// The application
 			this.app = a;
+		}
+		
+		public function initGameChannel(gc:GameChannel) : void {
+			var token:String = gc.token;
+			ExternalInterface.call("CTA.openChannel", token);
 		}
 		
 		private function onChannelOpen() : void {

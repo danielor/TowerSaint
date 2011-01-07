@@ -34,6 +34,7 @@ package managers
 	import messaging.events.ChannelUserLoginEvent;
 	import messaging.events.ChannelUserLogoutEvent;
 	
+	import models.GameChannel;
 	import models.SuperObject;
 	import models.Tower;
 	import models.User;
@@ -70,6 +71,8 @@ package managers
 		private var chatTextInput:TextInput									/* The text input for the chat */
 		private var userObjectManager:UserObjectManager;					/* User object manager controls the collection of information from the server */
 		private var channelBridge:ChannelJavascriptBridge;					/* The briged between GAE channel api and the actionscript */
+		private var gameChannel:GameChannel;								/* The new game channel */
+		
 		// Popups
 		private var popup:TitleWindow;										/* A reference to any popup placed on top of the game manager */
 		
@@ -232,7 +235,8 @@ package managers
 		}
 		
 		private function onInitGame(event:ResultEvent) : void {
-			
+			this.gameChannel = event.result as GameChannel;
+			Alert.show(this.gameChannel.token.toString());
 		}
 		// ==== INIT GAME ===
 		

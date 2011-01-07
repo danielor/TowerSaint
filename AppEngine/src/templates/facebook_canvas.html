@@ -8,11 +8,11 @@
                 <script type="text/javascript" src="http://connect.facebook.net/en_US/all.js"></script>
                 <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
 				<script type="text/javascript" src="/_ah/channel/jsapi"></script>
-				<script type="text/javascript" src="http://towersaint.appspot.com/static/Channel.js"> </script>
+				<script type="text/javascript" src="http://localhost:8083/static/Channel.js"> </script>
 			
                 <script type="text/javascript">
-
-
+						var isDesktop = true;
+						
                         var APP_ID = "142447749129831";
                         var REDIRECT_URI = "http://apps.facebook.com/towersaint/";
 
@@ -36,6 +36,11 @@
                                   }
                         }
                         
+                        function desktopInit() {
+                        	swfobject.embedSWF("http://localhost:8083/static/TowerSaint.swf", "flashContent", "800", "600", "9.0", null, null, null, {name:"flashContent"});
+                    		swfobject.registerObject("flashContent");
+                        }
+                        
                         //  If the fb-root div has not been created, create it.
                         function createDiv() {
                         	var root = document.getElementById('fb-root');
@@ -46,7 +51,11 @@
         					}
                         }
 						$(document).ready(function(){
-							 init();
+							if(!isDesktop){
+							 	init();
+							}else{
+								desktopInit();
+							}
 						});
                 </script>
         </head>

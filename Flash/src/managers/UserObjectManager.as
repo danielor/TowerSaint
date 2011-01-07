@@ -263,7 +263,7 @@ package managers
 		/* 
 		Updates all objects belonging to the user
 		*/
-		
+		/*
 		public function updateTowerSaintService():void
 		{
 			var modified_objects:Array = getAllModifiedObjects();
@@ -276,6 +276,7 @@ package managers
 			operation.addEventListener(ResultEvent.RESULT, onSaveUserObjects);	
 			operation.send(modified_objects);
 		}
+		*/
 		
 		public function saveUser(u:User, f:Function) : void
 		{
@@ -311,7 +312,7 @@ package managers
 			
 			// If this.user is a new user, the service will create the user on the server.
 			// If not, then 
-			var operation:AbstractOperation = _service.getOperation("getUserObjects");
+			var operation:AbstractOperation = _service.getOperation("initGameChannels");
 			operation.addEventListener(ResultEvent.RESULT, f);
 			operation.send(u);
 		}

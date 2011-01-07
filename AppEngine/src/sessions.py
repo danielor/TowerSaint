@@ -11,6 +11,8 @@ from google.appengine.api import channel
 from google.appengine.ext import db
 from google.appengine.api import memcache
 
+def getChannelBaseString():
+    return "TowerSaint"
 
 class JsonProperty(db.TextProperty):
     """
@@ -40,7 +42,6 @@ class ChannelState(db.Model):
     """
     state = JsonProperty()                              # The data in the channel
     manager = db.TextProperty()                         # The manager associated with the state
-    channelId = db.TextProperty()                       # The channel id
 
 class UserManager(object):
     """
@@ -53,11 +54,14 @@ class UserManager(object):
     """
     def __init__(self):
         """Load all of the data from the channel state"""
+        # The channel id
+        self.channelId = getChannelBaseString()
+        
+        # Get the state
         client = memcache.Client()
         state = client.get("users")
-        
+         
         # The id associated with the manager
-        
         if state is not None:
             self.state = state
         else:
@@ -68,11 +72,12 @@ class UserManager(object):
             if state:
                 self.state = state
             else:
-                self.state = ChannelState(state={}, manager="users", channelId = "users")
+                self.state = ChannelState(state={}, manager="users")
             
             if not client.set("users", self.state):
                 logging.error("Memcache failed in UserManager")
     
+        # The Base string associated with the channel
     def getUserState(self):
         """Perform a gql query and return the state associated with the"""
         return ChannelState.all().filter("manager =", "UserManager")
@@ -80,7 +85,7 @@ class UserManager(object):
     def loginUser(self, user):
         """Add a user to the user list"""
         # Get the state and id
-        channelId = self.state.channelId    
+        channelId = self.channelId    
         self.state.state[user.alias] = user.level
     
         # The key value pair
@@ -99,7 +104,7 @@ class UserManager(object):
     def logoutUser(self, user):
         """Logout the user and broadcast to all other users"""
         # Get the state and id
-        channelId = self.state.channelId    
+        channelId = self.channelId    
         del self.state.state[user.alias]
     
         # The key value pair
@@ -117,7 +122,7 @@ class UserManager(object):
         
     def getAllUsers(self, user):
         """Upon initialization of the game get all current users of the game"""
-        channelId = self.state.channelId
+        channelId = self.channelId
         
         # The add message
         addMessage = {"ADD" : self.state}
