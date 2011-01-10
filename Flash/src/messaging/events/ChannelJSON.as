@@ -5,6 +5,7 @@ package messaging.events
 	public interface ChannelJSON
 	{
 		function fromJSON(s:String) : void;
-		function isType(s:String) : Boolean;
+		function isType(s:Object) : Boolean;
+		function getJSONObject() : Object;
 	}
 }

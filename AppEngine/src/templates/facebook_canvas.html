@@ -50,12 +50,17 @@
         						document.body.appendChild(divTag);
         					}
                         }
-						$(document).ready(function(){
-							if(!isDesktop){
-							 	init();
-							}else{
-								desktopInit();
-							}
+                        $(document).ready(function(){
+                        	if(!isDesktop){
+                        		init();
+                        	}else{
+                        		desktopInit();
+                        	}
+                        });
+						
+                        $(window).unload( function() {
+							swf = document.getElementById("flashContent");
+							swf.closeGame();
 						});
                 </script>
         </head>

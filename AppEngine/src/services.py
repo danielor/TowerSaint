@@ -54,8 +54,6 @@ class TowerSaintManager(object):
         
     def setUserAlias(self, user, alias):
         """Set the alias associated with the user"""
-        logging.error(user)
-        logging.error(alias)
         u = User.all().filter('FacebookID =', user.FacebookID).get()
         if not u:
             return False
@@ -113,10 +111,36 @@ class TowerSaintManager(object):
         
         # Setup the channel
         token = channel.create_channel(channelId + user.alias)
-        
+    
         # Return the channel associated with the 
-        return GameChannel(token = token)
+        ch = GameChannel()
+        ch.token = token
         
+        # Return arraycollection
+        return ObjectProxy({'token' : token})
+    
+    def loginUserToGame(self, user):
+        """The login user to the game with the game channels"""
+        # The user manager
+        um = UserManager()
+        
+        # Get the datastore user 
+        u = User.all().filter('FacebookID =', user.FacebookID).get()
+        
+        # Login the user. Send the login data to all of the users
+        # and the current login state for the user.
+        um.loginUser(u)
+        return True
+    
+    def closeGame(self, user):
+        """Close all of the game channels and tell the users that user is logged off"""
+        # Get the channels and close them
+        um = UserManager()
+        
+        # Get the datastore user 
+        u = User.all().filter('FacebookID =', user.FacebookID).get()
+        um.logoutUser(u)
+        return True
     def satisfiesMinimumDistance(self, latlng):
         """If the tower satisfies the minimum distance from other towers, then it is true"""
         pt = db.GeoPt(latlng['latitude'], latlng['longitude'])

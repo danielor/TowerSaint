@@ -107,6 +107,17 @@
 				if(!isDesktop){
 					initFacebook();
 				}	
+				
+				// Setup up the closing of the window
+				ExternalInterface.addCallback("closeGame", onCloseGame);
+			}
+			
+			public function onCloseGame() : void {
+				if(this._userObjectManager != null){
+					if(this._user != null){
+						this._userObjectManager.closeGame(this._user);	
+					}
+				}
 			}
 			
 			protected function onStateChange(s:StateChangeEvent) : void {
@@ -282,7 +293,7 @@
 	<s:Button includeIn="initUser" x="10" y="21" label="Build" id="buildButton"/>
 	<s:VGroup includeIn="inApp" x="10" y="10" width="153" height="580">
 		<mx:Image width="153" height="66" id="logo"  source="@Embed(source='assets/pictures/TowerSaintLogo.gif')"/>
-		<s:List width="152" height="123" id="userList" itemRenderer="BuildListItemRenderer"></s:List>
+		<s:List width="152" height="123" id="userList" itemRenderer="UserListRenderer"></s:List>
 		<s:List width="150" id="chatList"></s:List>
 		<mx:TabNavigator width="153" height="262" width.inApp="154">
 			<s:NavigatorContent label="Inspect" width="100%" height="100%">

@@ -6,6 +6,7 @@ package managers
 	import com.google.maps.LatLngBounds;
 	import com.google.maps.Map;
 	
+	import flash.events.Event;
 	import flash.utils.Dictionary;
 	
 	import managers.states.TowerSaintServiceState;
@@ -317,6 +318,38 @@ package managers
 			operation.send(u);
 		}
 		
+		/* 
+		Function logins user telling everyone over the channel api that we have logged in
+		*/
+		public function loginUserToGame(u:User, f:Function) : void {
+			var servicesDictionary:Dictionary = this.serverState.getServices();
+			var _service:RemoteObject = servicesDictionary["towersaint"] as RemoteObject;
+			
+			// If this.user is a new user, the service will create the user on the server.
+			// If not, then 
+			var operation:AbstractOperation = _service.getOperation("loginUserToGame");
+			operation.addEventListener(ResultEvent.RESULT, f);
+			operation.send(u);
+		}
+		
+		/* 
+		Function closes the game and all of the user channels
+		*/
+		public function closeGame(u:User) : void {
+			var servicesDictionary:Dictionary = this.serverState.getServices();
+			var _service:RemoteObject = servicesDictionary["towersaint"] as RemoteObject;
+			
+			// If this.user is a new user, the service will create the user on the server.
+			// If not, then 
+			var operation:AbstractOperation = _service.getOperation("closeGame");
+			operation.addEventListener(ResultEvent.RESULT, onNull);
+			operation.send(u);
+		}
+		
+		
+		private function onNull(e:Event):void {
+			
+		}
 		/*
 		Function return all objects that have been modified in an array
 		*/

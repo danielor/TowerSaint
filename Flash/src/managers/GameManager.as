@@ -115,7 +115,7 @@ package managers
 			this.listOfUserModels = new ArrayCollection();
 			
 			// Setup the game channels
-			var f:ChannelJavascriptBridge = new ChannelJavascriptBridge(this.app);
+			this.channelBridge = new ChannelJavascriptBridge(this.app);
 		}
 		
 		// Run the game. Intialize active objects, events, and interfaces.
@@ -175,13 +175,15 @@ package managers
 		
 		private function onGetUserObjects(event:ResultEvent) : void {
 			this.listOfUserModels = event.result as ArrayCollection;
-			Alert.show(this.listOfUserModels.toString());
 			
 			// Get the first object, and draw it on the map. It should be the capital
 			var obj:SuperObject = this.listOfUserModels.getItemAt(0) as SuperObject;
 			var bounds:LatLngBounds = this.map.getLatLngBounds();
 			var pos:LatLng = obj.getPosition(this.map.getLatLngBounds());
 			this.map.setCenter(pos);
+			
+			// Get the new bounds after recentering the position.
+			bounds = this.map.getLatLngBounds();
 			
 			// Draw all user objects on the map
 			this.drawUserObjectsInBounds(bounds);
@@ -220,7 +222,11 @@ package managers
 		}
 		
 		public function onChannelLogin(event:ChannelUserLoginEvent) : void {
+			Alert.show("onChannelLogin");
 			
+			// Set the user list to the data provider
+			var a:ArrayCollection = event.getJSONObject() as ArrayCollection;
+			this.userList.dataProvider = a;
 		}
 		
 		public function onChannelLogout(event:ChannelUserLogoutEvent) : void {
@@ -235,10 +241,28 @@ package managers
 		}
 		
 		private function onInitGame(event:ResultEvent) : void {
-			this.gameChannel = event.result as GameChannel;
-			Alert.show(this.gameChannel.token.toString());
+			// Get the token.
+			var token:String = event.result.token.toString();
+
+			// Create the game channel
+			this.gameChannel = new GameChannel();
+			this.gameChannel.token = token;
+
+			// Setup the javascript game channel
+			this.channelBridge.initGameChannel(this.gameChannel);
+			
+			// Login in the user
+			Alert.show("Inside");
+			this.userObjectManager.loginUserToGame(this.user, onNull);
+			
 		}
+			
 		// ==== INIT GAME ===
+		
+		// NULL result - nothing expected to be returned.
+		private function onNull(event:ResultEvent) : void {
+	
+		}
 		
 		/// MAP
 		// The drag events

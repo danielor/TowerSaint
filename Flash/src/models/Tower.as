@@ -158,6 +158,29 @@ package models
 			this.longitude = input.readFloat();
 		}
 		
+		public function toString() : String {
+			var s:String = "";
+			s = s + this.Experience.toString() + ":";
+			s = s + this.Speed.toString() + ":";
+			s = s + this.Power.toString() + ":";
+			s = s + this.Armor.toString() + ":";
+			s = s + this.Range.toString() + ":";
+			s = s + this.HitPoints.toString() + ":";
+			s = s + this.isIsolated.toString() + ":";
+			s = s + this.isCapital.toString() + ":";
+			s = s + this.hasRuler.toString() + "\n";
+			s = s + this.manaProduction.toString() + ":";
+			s = s + this.stoneProduction.toString() + ":";
+			s = s + this.woodProduction.toString() + ":";
+			s = s + this.Level.toString() + ":";
+			s = s + this.latIndex.toString() + ":";
+			s = s + this.lonIndex.toString() + ":";
+			s = s + this.latitude.toString() + ":";
+			s = s + this.longitude.toString() + ":";
+			return s;
+		}
+		
+		
 		public function draw(drag:Boolean, map:Map, _photo:PhotoAssets, fpm:FocusPanelManager, withBoundary:Boolean) : void {
 			// Add a test ground overlay
 			var towerIcon:BitmapAsset = _getImage(_photo);

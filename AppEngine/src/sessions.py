@@ -10,6 +10,7 @@ from django.utils import simplejson
 from google.appengine.api import channel
 from google.appengine.ext import db
 from google.appengine.api import memcache
+from models import Constants
 
 def getChannelBaseString():
     return "TowerSaint"
@@ -60,6 +61,8 @@ class UserManager(object):
         # Get the state
         client = memcache.Client()
         state = client.get("users")
+        if isinstance(state, db.Query):
+            state = state.get()
          
         # The id associated with the manager
         if state is not None:
@@ -67,6 +70,7 @@ class UserManager(object):
         else:
             # Get the user state
             state = self.getUserState()
+            logging.error(state)
             
             # Save the state upon cache failure
             if state:
@@ -80,17 +84,29 @@ class UserManager(object):
         # The Base string associated with the channel
     def getUserState(self):
         """Perform a gql query and return the state associated with the"""
-        return ChannelState.all().filter("manager =", "UserManager")
+        return ChannelState.all().filter("manager =", "users").get()
     
     def loginUser(self, user):
         """Add a user to the user list"""
         # Get the state and id
-        channelId = self.channelId    
-        self.state.state[user.alias] = user.level
+        channelId = self.channelId  
+        level = Constants.levelFromExperience(user)  
+        jsonState = self.state
+        jsonState.state[user.alias] = level
     
         # The key value pair
-        addMessage = {"ADD": {'alias' : user.alias, 'level' : user.level }}
-        channel.send_message(channelId + user.alias, addMessage)
+        addMessage = {"LOGIN": {'alias' : user.alias, 'level' : level }}
+        
+        # Login in the user on all of the channels
+        for alias, _ in jsonState.state.iteritems():
+            # Everyone except the user logging in
+            if user.alias != alias:
+                channel.send_message(channelId + alias, simplejson.dumps(addMessage))
+        
+        # Send the current state to the addMessage
+        allState = {'LOGIN' : [{'alias': alias, 'level':level} for alias, level in jsonState.state.iteritems()]}
+        message = simplejson.dumps(allState)
+        channel.send_message(channelId + user.alias,message)
         
         # Save the object
         self.state.put()
@@ -104,12 +120,19 @@ class UserManager(object):
     def logoutUser(self, user):
         """Logout the user and broadcast to all other users"""
         # Get the state and id
-        channelId = self.channelId    
+        channelId = self.channelId   
+        jsonState = self.state 
         del self.state.state[user.alias]
     
         # The key value pair
-        addMessage = {"REMOVE": {'alias' : user.alias, 'level' : user.level }}
-        channel.send_message(channelId + user.alias, addMessage)
+        addMessage = {"LOGOUT": {'alias' : user.alias, 'level' : user.level }}
+        
+        # Login in the user on all of the channels
+        for alias, _ in jsonState.state.iteritems():
+            # Everyone except the user logging in
+            if user.alias != alias:
+                channel.send_message(channelId + alias, simplejson.dumps(addMessage))
+        
         
         # Save the object
         self.state.put()

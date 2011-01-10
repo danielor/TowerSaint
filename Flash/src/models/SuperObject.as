@@ -18,6 +18,7 @@ package models
 	{
 		// Draw the object on the map
 		function draw(drag:Boolean, map:Map, photo:PhotoAssets, fpm:FocusPanelManager, withBoundary:Boolean) : void;
+		//function initializeIcon(photo:PhotoAssets):void;
 		
 		// Display information associated with object in text
 		function display() : TextFlow;

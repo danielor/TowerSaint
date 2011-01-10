@@ -21,8 +21,12 @@ package messaging.events
 			
 		}
 		
-		public function isType(t:String) : Boolean{
-			return JSON_TYPE == t;
+		public function getJSONObject() : Object {
+			return new Object();		
+		}
+		
+		public function isType(t:Object) : Boolean{
+			return t.hasOwnProperty(JSON_TYPE);
 		}
 	}
 }

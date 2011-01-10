@@ -57,7 +57,7 @@ class Constants(object):
 
 class GameChannel(db.Model):
     """Tokens sent to the user to the user to run the relevant javascript clients"""
-    token = db.TextProperty()
+    token = db.StringProperty()
 
 class User(db.Model):
     """The user of the game"""

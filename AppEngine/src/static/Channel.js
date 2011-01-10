@@ -34,7 +34,7 @@ var	CTA = {
 	},
 	onMessage : function(message) {
 		swf = CTA.getSWF();
-		swf.onChannelMessage(message);
+		swf.onChannelMessage(message.data);
 	},
 	onError : function(error) {
 		swf = CTA.getSWF();

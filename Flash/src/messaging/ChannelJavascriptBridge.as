@@ -40,11 +40,12 @@ package messaging
 			ExternalInterface.call("CTA.openChannel", token);
 		}
 		
-		private function onChannelOpen() : void {
+		public function onChannelOpen() : void {
 			
 		}
 		
-		private function onChannelMessage(message : String) : void {
+		public function onChannelMessage(message : String) : void {
+			
 			var resultObject:Object;
 			
 			// Parse the json
@@ -54,30 +55,34 @@ package messaging
 				}catch(e:JSONParseError){
 					Alert.show(e.text);
 				}
-			}
-			
-			// The type. What type of message is it?
-			var type:String = resultObject.type;
+			}			
 			
 			// Array of all the accepted types, which have an associated event
 			// which will be sent to the gameManager
 			var a:Array = [ChannelAttackEvent, ChannelBuildEvent, ChannelMessageEvent, ChannelMoveEvent, 
 				ChannelUserLoginEvent, ChannelUserLogoutEvent];
-			
+	
 			for(var i:int = 0; i < a.length; i++){
-				var json:ChannelJSON = a[i]();
-				if(json.isType(type)){
-					var e:Event = json as Event;
+				var obj:Object = new a[i]();
+				var json:ChannelJSON = obj as ChannelJSON;
+				if(json.isType(resultObject)){
+					
+					// Decode the json
+					json.fromJSON(message);
+					
+					// Send the message associated with the json
+					var e:Event = obj as Event;
 					this.app.dispatchEvent(e);
 				}
 			} 
+		
 		}
 		
-		private function onChannelError(error:String) : void {
+		public function onChannelError(error:String) : void {
 			Alert.show("Channel Error" + error);
 		}
 		
-		private function onChannelClose() : void {
+		public function onChannelClose() : void {
 
 		}
 	}
