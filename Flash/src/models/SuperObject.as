@@ -23,6 +23,9 @@ package models
 		// Display information associated with object in text
 		function display() : TextFlow;
 		
+		// Initialize the information for a new build object
+		function initialize(u:User) : void;
+		
 		// Remove the marker from the map
 		function eraseFromMap(map:Map) : void;
 		
@@ -47,5 +50,9 @@ package models
 		
 		// Get the influence
 		function getMaxInfluence():Number;
+		
+		// Boundary interface
+		function hasBoundary():Boolean;												/* Object for which this is true should implement the boundary super object interface */
+		function isOverLappingBoundsOfObject(pos:LatLng, map:Map, photo:PhotoAssets) : Boolean;		/* Check if the position is overlapping the image */
 	}
 }

@@ -32,7 +32,28 @@ class Constants(object):
     @classmethod
     def lonIndex(cls):
         """The distance between longitude lattice points"""
-        return .001                
+        return .001
+    
+    @classmethod
+    def getBaseDistance(cls):
+        """Returns the base distance of the map"""
+        return .013
+    
+    @classmethod
+    def getBaseZoomLevel(cls):
+        """Returns the zoom level associated with the map"""
+        return 16
+    
+    @classmethod
+    def getMapPixelWidth(cls):
+        """The width of the map in pixels"""
+        return 619
+    
+    @classmethod
+    def getMapPixelHeight(cls):
+        """The height of the map in pixels"""
+        return 419
+    
     
     @classmethod
     def maxInfluence(cls):
@@ -61,28 +82,7 @@ class GameChannel(db.Model):
 
 class User(db.Model):
     """The user of the game"""
-#    class __amf__:
-#        external = True
-#        amf3 = True
-#        
-#    def __writeamf__(self, output):
-#        """Encoding of the information"""
-#        output.writeInt(self.FacebookID)
-#        output.writeInt(self.Experience)
-#        output.writeUTF(self.Empire)
-#        output.writeInt(self.completeManaProduction)
-#        output.writeInt(self.completeStoneProduction)
-#        output.writeInt(self.completeWoodProduction)
-#        
-#    def __readamf__(self, input):
-#        """Decoding of the information"""
-#        self.FacebookID = input.readInt()
-#        self.Experience = input.readInt()
-#        self.Empire = input.readUTF()
-#        self.isEmperor = input.readBoolean()
-#        self.completeManaProduction = input.readInt()
-#        self.completeStoneProduction = input.readInt()
-#        self.completeWoodProduction = input.readInt()
+
     # AMF/XML information    
     FacebookID = db.IntegerProperty()
     Experience = db.IntegerProperty()
@@ -91,11 +91,12 @@ class User(db.Model):
     completeManaProduction = db.IntegerProperty()
     completeStoneProduction = db.IntegerProperty()
     completeWoodProduction = db.IntegerProperty()
+    totalMana = db.IntegerProperty()                                    # The total mana harvested
+    totalStone = db.IntegerProperty()                                   # The total stone mined 
+    totalWood = db.IntegerProperty()                                    # The total wood cut
+    productionDate = db.DateTimeProperty()                              # The date, and time when the production changed last
     alias = db.StringProperty()
-    
-    # State information
-    isLoggedIn = db.BooleanProperty()                       # True if the user is logged in
-    lastActive = db.DateTimeProperty()                      # The datetime that the user time was last active
+    neighbors = db.ListProperty(db.Key)                                 # A list of keys to users that are close 
     
     def toXML(self):
         """Return an xml representation of the google app engine model"""
@@ -111,6 +112,12 @@ class User(db.Model):
                  </User>""" % (self.FacebookID, self.completeWoodProduction, self.completeStoneProduction,
                                self.completeManaProduction, self.isEmperor, self.Empire, self.Experience,
                                self.alias)
+
+    def toJSON(self):
+        """Get the json equivalent of the model. The JSON should be consistent throughout
+        all of the models"""
+        return {"Class" : "User", "Value" : {'alias' : self.alias}}
+    
 
     @classmethod
     def createRandomUser(self):
@@ -251,6 +258,23 @@ class Road(GeoModel, BoundsPlugin):
                     %s
                   </Road>""" %(self.hitPoints, self.level, self.latitude, self.longitude, self.user.toXML())
 
+    def toJSON(self):
+        """Get the json equivalent of the model. The JSON should be consistent throughout
+        all of the models"""
+        return {"Class" : "Road", "Value" : {'level' : self.level,
+                                             'latitude' : self.latitude,
+                                             'longitude' : self.longitude,
+                                             'user' : self.user.toJSON()}}
+        
+    def toCompleteJSON(self):
+        """Get the complete json equivalent of the model. This object is sent only to the users
+        that own the object"""
+        return {"Class" : "User", "Value" : {'level' : self.level,
+                                             'hitpoints' : self.hitPoints,
+                                             'latitude' : self.latitude,
+                                             'longitude' : self.longitude,
+                                             'user' : self.user.toJSON()}}
+
     def setRandomlyInBounds(self, bounds):
         """
         Setup an object randomly in some model.Bounds
@@ -273,6 +297,10 @@ class Road(GeoModel, BoundsPlugin):
         r.level = random.randint(0, 10)
         r.user = User.createRandomUser()
         return r
+    
+    def getPosition(self):
+        """Returns a list of positions associated with this object"""
+        return [db.GeoPt(self.latitude, self.longitude)]
     
 class Tower(GeoModel, BoundsPlugin):
     """The tower object integrates with AMF"""
@@ -381,6 +409,26 @@ class Tower(GeoModel, BoundsPlugin):
                                  self.hasRuler, self.Level, self.manaProduction, self.stoneProduction,
                                  self.woodProduction, self.latitude, self.longitude, self.user.toXML())
 
+    def toJSON(self):
+        """Get the json equivalent of the model. The JSON should be consistent throughout
+        all of the models"""
+        return {"Class" : "Tower", "Value" : {"level" : self.level,
+                                             'latitude' : self.latitude,
+                                             'longitude' : self.longitude,
+                                             'user' : self.user.toJSON()}}
+        
+    def toCompleteJSON(self):
+        """Get the complete json equivalent of the model. This object is sent only to the users
+        that own the object"""
+        return {"Class" : "Tower", "Value" : {"experience" : self.Experience, "speed" : self.Speed,
+                                             "power" : self.Power, "armor" : self.Armor,
+                                             "range" : self.Range, "accuracy" : self.Accuracy,
+                                             "hitpoints" : self.HitPoints, "isisolated" : self.isIsolated,
+                                             "iscapital" : self.isCapital, "hasruler" : self.hasRuler,
+                                             "level" : self.level, "manaproduction" : self.manaProduction,
+                                             "stoneproduction" : self.stoneProduction, 'woodproduction' : self.woodProduction,
+                                             'latitude' : self.latitude,'longitude' : self.longitude,
+                                             'user' : self.user.toJSON()}}
 
     def setRandomlyInBounds(self, bounds):
         """
@@ -416,6 +464,10 @@ class Tower(GeoModel, BoundsPlugin):
         t.woodProduction = random.randint(0, 1000)
         t.manaProduction = random.randint(0, 1000)
         return t
+    
+    def getPosition(self):
+        """Returns a list of positions associated with this object"""
+        return [db.GeoPt(self.latitude, self.longitude)]
 
 class Portal(GeoModel, BoundsPlugin):
     """The portal objects integrates with AMF"""
@@ -496,6 +548,27 @@ class Portal(GeoModel, BoundsPlugin):
             self.startLocationLongitudeIndex = 0
             self.location = db.GeoPt(self.endLocationLatitude, self.endLocationLongitude)
             self.update_location()
+            
+    def toJSON(self):
+        """Get the json equivalent of the model. The JSON should be consistent throughout
+        all of the models"""
+        return {"Class" : "Portal", "Value" : {'level' : self.level,
+                                             'startLocationLatitude' : self.startLocationLatitude,
+                                             'startLocationLongitude' : self.startLocationLongitude,
+                                             'endLocationLatitude' : self.endLocationLatitude,
+                                             'endLocationLatitude' : self.endLocationLatitude,
+                                             'user' : self.user.toJSON()}}
+    def toCompleteJSON(self):
+        """Get the complete json equivalent of the model. This object is sent only to the users
+        that own the object"""
+        return {"Class" : "Portal", "Value" : {'level' : self.level,
+                                             "hitpoints" : self.hitPoints,
+                                             'startLocationLatitude' : self.startLocationLatitude,
+                                             'startLocationLongitude' : self.startLocationLongitude,
+                                             'endLocationLatitude' : self.endLocationLatitude,
+                                             'endLocationLatitude' : self.endLocationLatitude,
+                                             'user' : self.user.toJSON()}}
+    
     @classmethod
     def getLocationIndex(self):
         """Get the lat/lon indices"""
@@ -526,6 +599,11 @@ class Portal(GeoModel, BoundsPlugin):
         p.level = random.randint(0, 10)
         p.user = User.createRandomUser()
         return p
+    
+    def getPosition(self):
+        """Returns a list of positions associated with this object"""
+        return [db.GeoPt(self.startLocationLatitude, self.startLocationLongitude), 
+                db.GeoPt(self.endLocationLatitude, self.endLocationLongitude )]
 class Location(db.Model):
     """The location object integrates with AMF"""
 #    class __amf__:

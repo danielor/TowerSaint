@@ -189,8 +189,11 @@ package managers
 			// Save the capital
 			var a:Array = new Array();
 			a.push(this.currentCapital);
-			Alert.show(this.currentUser.toString());
 			this.userObjectManager.saveUserObjects(a, this.currentUser, ignoreResult);
+
+			// Save the updated production
+			_updateProductionOfUser();
+			this.userObjectManager.updateProduction(this.currentUser, true, ignoreResult);
 			
 			// Build the tower
 			this.mapEventHandler.RemoveEvents();
@@ -202,6 +205,17 @@ package managers
 			
 			// Change the state
 			this.app.currentState = "inApp";
+		}
+		
+		private function _updateProductionOfUser() : void {
+			// Setup the production variables
+			this.currentUser.completeManaProduction = this.currentCapital.manaProduction;
+			this.currentUser.completeStoneProduction = this.currentCapital.stoneProduction;
+			this.currentUser.completeWoodProduction = this.currentCapital.woodProduction;
+			this.currentUser.productionDate = new Date();
+			this.currentUser.totalMana = 0;
+			this.currentUser.totalStone = 0;
+			this.currentUser.totalWood = 0;
 		}
 		
 		private function ignoreResult(event:ResultEvent) : void {

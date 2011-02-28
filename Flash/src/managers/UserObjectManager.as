@@ -191,6 +191,20 @@ package managers
 			operation.send(arr, u);
 		}
 		
+		/*
+		Function builds objects in the game
+		*/
+		public function buildObject(s:Object, u:User) : void {
+			var servicesDictionary:Dictionary = this.serverState.getServices();
+			var _service:RemoteObject = servicesDictionary["towersaint"] as RemoteObject;
+			
+			// The abstract call
+			Alert.show("Do");
+			var operation:AbstractOperation = _service.getOperation("buildObject");
+			operation.addEventListener(ResultEvent.RESULT, onNull);	
+			operation.send(s, u);
+		}
+		
 		/* 
 		Returns true if there are any open connections
 		*/
@@ -333,6 +347,21 @@ package managers
 		}
 		
 		/* 
+		Function updates the global user production variables
+		b - The boolean flag determines if it is an inialization update or not
+		*/
+		public function updateProduction(u:User, b:Boolean, f:Function) : void {
+			var servicesDictionary:Dictionary = this.serverState.getServices();
+			var _service:RemoteObject = servicesDictionary["towersaint"] as RemoteObject;
+			
+			// If this.user is a new user, the service will create the user on the server.
+			// If not, then 
+			var operation:AbstractOperation = _service.getOperation("updateProduction");
+			operation.addEventListener(ResultEvent.RESULT, f);
+			operation.send(u, b);
+		}
+		
+		/* 
 		Function closes the game and all of the user channels
 		*/
 		public function closeGame(u:User) : void {
@@ -344,6 +373,20 @@ package managers
 			var operation:AbstractOperation = _service.getOperation("closeGame");
 			operation.addEventListener(ResultEvent.RESULT, onNull);
 			operation.send(u);
+		}
+		
+		/* 
+		Function sends a message to the server. Response occurs over the channel javascript api.
+		*/
+		public function sendMessage(u:User, s:String) : void {
+			var servicesDictionary:Dictionary = this.serverState.getServices();
+			var _service:RemoteObject = servicesDictionary["towersaint"] as RemoteObject;
+			
+			// If this.user is a new user, the service will create the user on the server.
+			// If not, then 
+			var operation:AbstractOperation = _service.getOperation("sendMessage");
+			operation.addEventListener(ResultEvent.RESULT, onNull);
+			operation.send(u, s);
 		}
 		
 		

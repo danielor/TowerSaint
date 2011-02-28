@@ -49,7 +49,7 @@ package models
 		private var hasFocus:Boolean;											/* True if the current object has user focus */
 		private var roadMarker:TowerSaintMarker;								/* The marker to be drawn on the map */
 		private var focusPolygon:Polygon;	
-		
+		private var roadIcon:BitmapAsset;										/* The bitmap associated with the object */
 		
 		public function Road()
 		{
@@ -76,10 +76,28 @@ package models
 			this.longitude = input.readFloat();
 		}
 		
+		public static function createUserRoadFromJSON(buildObject:Object, u:User):Road {
+			var r:Road = new Road();
+			r.hitPoints = buildObject.hitpoints;
+			r.level = buildObject.level;
+			r.latitude = buildObject.latitude;
+			r.longitude = buildObject.longitude;
+			return r;
+		}
+		
+		public static function createRoadFromJSON(buildObject:Object):Road{
+			var r:Road = new Road();
+			r.level = buildObject.level;
+			r.latitude = buildObject.latitude;
+			r.longitude = buildObject.longitude;
+			r.user = User.createUserFromJSON(buildObject.user);
+			return r;
+		}
+		
 		public function draw(drag:Boolean, map:Map, photo:PhotoAssets, fpm:FocusPanelManager, withBoundary:Boolean) : void{
 			
 			// Add a ground overlay
-			var roadIcon:BitmapAsset = getRoadFromNeighbors(photo);
+			roadIcon = getRoadFromNeighbors(photo);
 			
 			// Extract the position associated with remoteObject(Tower)			
 			var gposition:LatLng = new LatLng(latitude, longitude);
@@ -269,8 +287,25 @@ package models
 					return 1.;
 			}
 		}
+		
+		public function hasBoundary():Boolean {
+			return false;
+		}
+		
 		public function getPosition(b:LatLngBounds):LatLng{
 			return new LatLng(this.latitude, this.longitude);
+		}
+		
+		// Update the position of the tower
+		public function updatePosition(loc:LatLng): void{
+			this.latitude = loc.lat();
+			this.longitude = loc.lng();
+		}		
+		
+		public function isOverLappingBoundsOfObject(pos:LatLng, m:Map, photo:PhotoAssets) : Boolean {
+			var iPos:LatLng = this.roadMarker.getLatLng();
+			var bounds:LatLngBounds = GameConstants.getBaseLatticeBounds(iPos, m, photo);
+			return bounds.containsLatLng(pos);
 		}
 	}
 }

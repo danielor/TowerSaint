@@ -57,11 +57,11 @@
                         		desktopInit();
                         	}
                         });
-						
-                        $(window).unload( function() {
+						window.onbeforeunload = closeGame;
+						function closeGame(){
 							swf = document.getElementById("flashContent");
 							swf.closeGame();
-						});
+						}
                 </script>
         </head>
    <body>

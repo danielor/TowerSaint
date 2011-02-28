@@ -36,7 +36,7 @@ package models
 
 	[Bindbale]
 	[RemoteClass(alias="models.Tower")]
-	public class Tower  implements SuperObject 
+	public class Tower  implements BoundarySuperObject 
 	{
 		
 		// Stats
@@ -106,6 +106,56 @@ package models
 			t.latitude = loc.lat();
 			t.longitude = loc.lng();
 			return t;
+		}
+		
+		public static function createUserTowerFromJSON(buildObject:Object, u:User) : Tower {
+			var t:Tower = new Tower();
+			t.Experience = buildObject.experience;
+			t.Speed = buildObject.speed;
+			t.Power = buildObject.power;
+			t.Armor = buildObject.armor;
+			t.Range = buildObject.range;
+			t.Accuracy = buildObject.accuracy;
+			t.HitPoints = buildObject.hitpoints;
+			t.isIsolated = buildObject.isisolated;
+			t.isCapital = buildObject.iscapital;
+			t.hasRuler = buildObject.hasRuler;
+			t.user = u;
+			t.manaProduction = buildObject.manaproduction;
+			t.stoneProduction = buildObject.stoneproduction;
+			t.woodProduction = buildObject.woodproduction;
+			t.Level = buildObject.level;
+			t.latitude = buildObject.latitude;
+			t.longitude = buildObject.longitude;
+			return t;
+		}
+		
+		public static function createTowerFromJSON(buildObject:Object):Tower{
+			var t:Tower = new Tower();
+			t.Level = buildObject.level;
+			t.latitude = buildObject.latitude;
+			t.longitude = buildObject.longitude;
+			t.user = User.createUserFromJSON(buildObject.user);
+			return t;
+		}
+		
+		public function initalize(u:User): void {
+			this.Experience = 0;
+			this.Speed = 1;
+			this.Power = 1;
+			this.Armor = 1;
+			this.Range = 1;
+			this.Accuracy = .5;
+			this.HitPoints = 100;
+			this.isIsolated = false;
+			this.isCapital = true;
+			this.hasRuler = true;
+			this.user = u;
+			this.manaProduction = 50 + Math.floor( Math.random() * 50);
+			this.stoneProduction = 50 + Math.floor( Math.random() * 50);
+			this.woodProduction = 50 + Math.floor( Math.random() * 50);
+			this.Level = 0;
+
 		}
 
 		// Update the position of the tower
@@ -404,6 +454,10 @@ package models
 			
 		}
 		
+		public function hasBoundary():Boolean {
+			return true;
+		}
+		
 		/* Return the textflow representation of the model */
 		public function display():TextFlow {
 			var textFlow:TextFlow = new TextFlow();
@@ -477,6 +531,43 @@ package models
 		}
 		public function getPosition(b:LatLngBounds):LatLng{
 			return new LatLng(this.latitude, this.longitude);
+		}
+		
+		// The Boundary interface
+		private function getBoundsForScope( m:Map, influence:Number):LatLngBounds {
+			// Get the position of the marker
+			var pos:LatLng = this.towerMarker.getLatLng();
+			
+			// Get the width of the image
+			var options:MarkerOptions = towerMarker.getOptions();
+			var icon:BitmapAsset = options.icon as BitmapAsset;
+			var data:BitmapData = icon.bitmapData;
+			var width:Number = data.width;
+			
+			// Get the game constants
+			var aspectRatio:Number = GameConstants.getAspectRatio(m);
+			var lonOffset:Number = influence  * GameConstants.getLatOffsetFromMarkerPixelWidth(width, m);
+			var latOffset:Number =  lonOffset * aspectRatio;
+			
+			// Create the bounds
+			var southWest:LatLng = new LatLng(pos.lat() - latOffset, pos.lng() - lonOffset);
+			var northEast:LatLng = new LatLng(pos.lat() + latOffset, pos.lng() + lonOffset);
+			return new LatLngBounds(southWest, northEast);
+		}
+		
+		public function isInsideBoundary(pos:LatLng, m:Map):Boolean {
+			// Get the influence
+			var influence:Number = this.getMaxInfluence();
+	
+			var bounds:LatLngBounds = getBoundsForScope( m, influence);
+			return bounds.containsLatLng(pos);
+		
+		}
+		
+		public function isOverLappingBoundsOfObject(pos:LatLng, m:Map, photo:PhotoAssets) : Boolean {
+			var iPos:LatLng = this.towerMarker.getLatLng();
+			var bounds:LatLngBounds = GameConstants.getBaseLatticeBounds(iPos, m, photo);
+			return bounds.containsLatLng(pos);
 		}
 	}
 }

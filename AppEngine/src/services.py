@@ -11,7 +11,7 @@ from pyamf.flex import ArrayCollection, ObjectProxy
 from models import User, Road, Tower, Portal, Location, Bounds, Constants
 from models import GameChannel
 from geomodel.geomodel import GeoModel
-from sessions import UserManager
+from sessions import UserManager, ChatManager, GameManager
     
 class TowerSaintManager(object):
     def __init__(self):
@@ -21,6 +21,7 @@ class TowerSaintManager(object):
     
     def getObjectInBounds(self, latlng):
         """Get the object within the latlng bounds of {latlng}"""
+        logging.error(latlng)
         # Create the objects
         b = Bounds.createBoundsFromAMFData(latlng)
         # The list of road
@@ -75,8 +76,6 @@ class TowerSaintManager(object):
             """
             cU - the user that will be returned
             """
-            cU.isLoggedIn = True
-            cU.lastActive = datetime.datetime.now()
             cU.put()
             return cU
         # Get the user with id. Makes sure that only one user is created
@@ -88,8 +87,73 @@ class TowerSaintManager(object):
             return __getCurrentUser(u)
         else:
             return __getCurrentUser(user)
+    
+    def updateProduction(self, user, init):
+        """Update the global production variables of an empire. The function
+        should be called from the client upon build events, destroy events,
+        and on the initialization of the empire"""
+        # Get the user with id. Makes sure that only one user is created
+        # with the associated id.
+        u = User.all().filter('FacebookID =', user.FacebookID).get()
+        if init:
+            u.totalMana = user.totalMana
+            u.totalStone = user.totalStone
+            u.totalWood = user.totalWood
+        else:
+            # How much time has passed?
+            delta = user.productionDate - u.productionDate
+            totalNumberOfSecond = (delta.microseconds + (delta.seconds + delta.days * 24 * 3600) * 10**6) / 10**6
+            totalNumberOfMinutes = float(totalNumberOfSecond / 60.0)
+            u.totalMana = u.totalMana + totalNumberOfMinutes * u.completeManaProduction
+            u.totalStone = u.totalStone + totalNumberOfMinutes * u.completeStoneProduction
+            u.totalWood = u.totalWood + totalNumberOfMinutes * u.completeWoodProduction
+
+        # Save the user
+        u.completeManaProduction = user.completeManaProduction
+        u.completeStoneProduction = user.completeStoneProduction
+        u.completeWoodProduction = user.completeWoodProduction
+        u.productionDate = datetime.datetime.now()
+        u.put()
         
+        return True
+    
+    def buildObject(self, obj, user):
+        """Build an object in the game"""
+        # Save the object in the datastore
+        u =  User.all().filter('FacebookID =', user.FacebookID).get()
+        obj.user = u
+        obj.put()
         
+        logging.error("Inside")
+        # Find out objects in the proximity
+        for gameObject in [Portal, Tower, Road]:
+            # Filter out users that are already part of the neighbor list
+            whichObject = gameObject.all().filter('user !=', u)
+            for key in u.neighbors:
+                neighbor = db.get(key)
+                whichObject.filter('user !=', neighbor)
+            
+            # Proximity fetch
+            distance = Constants.getBaseDistance() * Constants.latToMiles()
+            for pos in gameObject.getPosition():
+                valueList = gameObject.proximity_fetch(whichObject, pos, max_results = 1000, max_distance = distance)
+                if valueList is not None:
+                    # Iterate over the results
+                    for obj in valueList:
+                        otherUser = obj.user
+                        if not otherUser in u.neighbors:
+                            # Add to both neighbors
+                            u.neighbors.append(otherUser.key())
+                            otherUser.neighbors.append(u.key())
+                            otherUser.put()
+        # Put the current user
+        u.put()
+        
+        # Instantiate the game manager, and build the object                    
+        manager = GameManager(u)
+        manager.build(obj)
+        return None
+    
     def getUserObjects(self, user):
         """Get all game objects associated with a user"""
         retList = []
@@ -136,11 +200,20 @@ class TowerSaintManager(object):
         """Close all of the game channels and tell the users that user is logged off"""
         # Get the channels and close them
         um = UserManager()
-        
+
         # Get the datastore user 
         u = User.all().filter('FacebookID =', user.FacebookID).get()
         um.logoutUser(u)
         return True
+    
+    def sendMessage(self, user, message):
+        """Send message from user to everyone logged in to the server"""
+        cm = ChatManager()
+        
+        # Send the message and return
+        cm.sendMessage(message, user)
+        return True
+        
     def satisfiesMinimumDistance(self, latlng):
         """If the tower satisfies the minimum distance from other towers, then it is true"""
         pt = db.GeoPt(latlng['latitude'], latlng['longitude'])

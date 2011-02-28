@@ -2,7 +2,20 @@
 <s:ItemRenderer xmlns:fx="http://ns.adobe.com/mxml/2009" 
 				xmlns:s="library://ns.adobe.com/flex/spark" 
 				xmlns:mx="library://ns.adobe.com/flex/mx" 
-				autoDrawBackground="true" width="115" height="70">
+				autoDrawBackground="true" width="115" height="70"
+				click="onItemClick(event)">
+	<fx:Script>
+		<![CDATA[
+			import mx.events.ItemClickEvent;
+			protected function onItemClick(evt:MouseEvent) : void {
+				var e:ItemClickEvent = new ItemClickEvent(ItemClickEvent.ITEM_CLICK, true);
+				e.item = this.data;
+				e.index = this.itemIndex;
+			
+				dispatchEvent(e);
+			}
+		]]>
+	</fx:Script>
 	
 	<s:Label text="{data.alias}" x="69" y="28" width="46" paddingBottom="0" fontSize="12" height="15"/>
 	<mx:Image source ="{data.icon}" x="5" y="5" width="60" height="60"/>

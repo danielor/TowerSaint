@@ -1,12 +1,16 @@
 package models
 {
+	import assets.PhotoAssets;
+	
 	import com.google.maps.LatLng;
 	import com.google.maps.LatLngBounds;
 	import com.google.maps.Map;
 	
+	import flash.display.BitmapData;
 	import flash.geom.Point;
 	
 	import mx.controls.Alert;
+	import mx.core.BitmapAsset;
 
 	public class GameConstants
 	{
@@ -58,6 +62,23 @@ package models
 			var baseExp:Number = 1000;
 			return int(Experience / baseExp);
 
+		}
+		
+		// Create the basic lattice bounds
+		public static function getBaseLatticeBounds(pos:LatLng, m:Map, p:PhotoAssets) :LatLngBounds {
+			var tower:BitmapAsset = new p.TowerLevel0() as BitmapAsset;
+			var data:BitmapData = tower.bitmapData;
+			var width:Number = data.width;
+			
+			// Get the game constants
+			var aspectRatio:Number = GameConstants.getAspectRatio(m);
+			var lonOffset:Number =  GameConstants.getLatOffsetFromMarkerPixelWidth(width, m);
+			var latOffset:Number =  lonOffset * aspectRatio;
+			
+			// Create the bounds
+			var southWest:LatLng = new LatLng(pos.lat() - latOffset, pos.lng() - lonOffset);
+			var northEast:LatLng = new LatLng(pos.lat() + latOffset, pos.lng() + lonOffset);
+			return new LatLngBounds(southWest, northEast);
 		}
 	}
 }

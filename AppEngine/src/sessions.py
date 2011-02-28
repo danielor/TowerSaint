@@ -44,14 +44,12 @@ class ChannelState(db.Model):
     state = JsonProperty()                              # The data in the channel
     manager = db.TextProperty()                         # The manager associated with the state
 
-class UserManager(object):
+class GlobalManager(object):
     """
-    The user manager is a borg. All instances of this manager
-    have the same state. The user manager keeps a tab of all
-    users logged into the application. It will send messages to 
-    all logged in users upon login/logout of any other user using
-    the channel api. The borg state is enforced by the datastore/
-    memcache
+    A global manager is a  sessions class, which requires the global user state(all of the users).
+    All manager that need broadcasting capabilities should inherit this class
+    channelId - The global channel identifier
+    users - ChannelState object
     """
     def __init__(self):
         """Load all of the data from the channel state"""
@@ -80,11 +78,55 @@ class UserManager(object):
             
             if not client.set("users", self.state):
                 logging.error("Memcache failed in UserManager")
-    
-        # The Base string associated with the channel
+                
+    # The Base string associated with the channel
     def getUserState(self):
         """Perform a gql query and return the state associated with the"""
         return ChannelState.all().filter("manager =", "users").get()
+
+class GameManager(object):
+    """
+    There is a one to one relationship between the game manager, and a user.
+    Using the proximity features of geomodel, we add users that are "close"
+    to the user(as in visible, which implies within the distance of the zoom
+    level associated with the game). When a game move is performed, the
+    update is *only* sent to these neighbors. The idea being that by using
+    a proximity graph the load on the server will be greatly decreased.
+    """
+    def __init__(self, user):
+        """
+        user - The user making the move in the game
+        """
+        self.user = user
+        
+    def build(self, obj):
+        """
+        Build an object(Tower, Portal, etc.) in the game
+        """
+        channelId = getChannelBaseString()
+        buildMessage = {'BUILD' :{'alias' : self.user.alias, 'buildObject' : obj.toJSON()}}
+        
+        # Send it to the neighbors
+        for key in self.user.neighbors:
+            u = db.get(key)
+            channel.send_message(channelId + u.alias, simplejson.dumps(buildMessage))
+        
+        # Send it to the self
+        buildOwnerMessage = {'BUILD' : {'alias' : self.user.alias, 'buildObject' : obj.toCompleteJSON()}}
+        channel.send_message(channelId + self.user.alias,simplejson.dumps(buildOwnerMessage))
+        
+class UserManager(GlobalManager):
+    """
+    The user manager is a borg. All instances of this manager
+    have the same state. The user manager keeps a tab of all
+    users logged into the application. It will send messages to 
+    all logged in users upon login/logout of any other user using
+    the channel api. The borg state is enforced by the datastore/
+    memcache
+    """
+    def __init__(self):
+        """Load all of the data from the channel state"""
+        GlobalManager.__init__(self)
     
     def loginUser(self, user):
         """Add a user to the user list"""
@@ -122,7 +164,7 @@ class UserManager(object):
         # Get the state and id
         channelId = self.channelId   
         jsonState = self.state 
-        del self.state.state[user.alias]
+        del jsonState.state[user.alias]
     
         # The key value pair
         addMessage = {"LOGOUT": {'alias' : user.alias, 'level' : user.level }}
@@ -143,19 +185,28 @@ class UserManager(object):
             if not client.set("users", self.state):
                 logging.error("Memcache failed in UserManager")
         
-    def getAllUsers(self, user):
-        """Upon initialization of the game get all current users of the game"""
-        channelId = self.channelId
-        
-        # The add message
-        addMessage = {"ADD" : self.state}
-        channel.send_message(channelId + user.alias, addMessage)
     
-class ChatManager(object):
+class ChatManager(GlobalManager):
     """
-    The chat manager is a borg. All instances of this manager
-    has the same state. The chat manager handles the one chat room.
+    The chat manager does not alter the state, but broadcasts all of the
+    information through the channel information
     """
-    _shared_state = {}
     def __init__(self):
-        self.__dict__ = self._shared_state
+        GlobalManager.__init__(self)
+        
+    def sendMessage(self, message, user):
+        """
+        Send the chat message to all of the users
+        message - A string to be sent in the chat
+        user - The user who sent the message.
+        """
+        channelId = self.channelId
+        jsonState = self.state
+        
+        # The message to send to everyone
+        jMsg = simplejson.dumps({"MESSAGE" : {'user' : user.alias, 'message' : message}})
+        
+        # Iterate over all of the channels
+        for alias, _ in jsonState.state.iteritems():
+            channel.send_message(channelId + alias, jMsg)
+        

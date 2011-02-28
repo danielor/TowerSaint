@@ -62,6 +62,7 @@ package messaging
 			var a:Array = [ChannelAttackEvent, ChannelBuildEvent, ChannelMessageEvent, ChannelMoveEvent, 
 				ChannelUserLoginEvent, ChannelUserLogoutEvent];
 	
+			try{
 			for(var i:int = 0; i < a.length; i++){
 				var obj:Object = new a[i]();
 				var json:ChannelJSON = obj as ChannelJSON;
@@ -75,7 +76,9 @@ package messaging
 					this.app.dispatchEvent(e);
 				}
 			} 
-		
+			}catch(e:Error){
+				Alert.show(e.toString());
+			}
 		}
 		
 		public function onChannelError(error:String) : void {

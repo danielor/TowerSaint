@@ -92,6 +92,28 @@ package models
 			this.endLocationLongitudeIndex = input.readInt();
 		}
 
+		public static function createUserPortalFromJSON(buildObject:Object, u:User) : Portal {
+			var p:Portal = new Portal();
+			p.hitPoints = buildObject.hitpoints;
+			p.level = buildObject.level;
+			p.user = u;
+			p.startLocationLatitude = buildObject.startlocationlatitude;
+			p.startLocationLongitude = buildObject.startlocationlongitude;
+			p.endLocationLatitude = buildObject.endlocationlatitude;
+			p.endLocationLongitude = buildObject.endlocationlongitude;
+			return p;
+		}
+		
+		public static function createPortalFromJSON(buildObject:Object) : Portal {
+			var p:Portal = new Portal();
+			p.hitPoints = buildObject.hitpoints;
+			p.endLocationLatitude = buildObject.endLocationLatitude;
+			p.endLocationLongitude = buildObject.endLocationLongitude;
+			p.startLocationLatitude = buildObject.startLocationLatitude;
+			p.startLocationLongitude = buildObject.startLocationLongitude;
+			p.user = User.createUserFromJSON(buildObject.user);
+			return p;
+		}
 		
 		public function draw(drag:Boolean, map:Map, photo:PhotoAssets, fpm:FocusPanelManager, withBoundary:Boolean) : void {
 			// Extract the position associated with remoteObject(Tower)			
@@ -182,6 +204,12 @@ package models
 			
 		}
 		
+		// Update the position of the tower
+		public function updatePosition(loc:LatLng): void{
+			this.startLocationLatitude = loc.lat();
+			this.startLocationLongitude = loc.lng();
+		}
+		
 		/* Get the image of the bitmap asset */
 		public function getImage(photo:PhotoAssets):BitmapAsset {
 			return new photo.ThePortal() as BitmapAsset;
@@ -253,6 +281,11 @@ package models
 					return 1.;
 			}
 		}
+		
+		public function hasBoundary():Boolean {
+			return false;
+		}
+		
 		public function getPosition(b:LatLngBounds):LatLng{
 			var sL:LatLng = new LatLng(this.startLocationLatitude, this.startLocationLongitude);
 			var eL:LatLng = new LatLng(this.endLocationLatitude, this.endLocationLongitude);
@@ -261,6 +294,12 @@ package models
 			}else{
 				return eL;
 			}
+		}
+		
+		public function isOverLappingBoundsOfObject(pos:LatLng, m:Map, photo:PhotoAssets) : Boolean {
+			var iPos:LatLng = this.portalMarker.getLatLng();
+			var bounds:LatLngBounds = GameConstants.getBaseLatticeBounds(iPos, m, photo);
+			return bounds.containsLatLng(pos);
 		}
 	}
 }
