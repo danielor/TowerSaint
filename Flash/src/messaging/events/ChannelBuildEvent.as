@@ -3,6 +3,8 @@ package messaging.events
 	import com.adobe.serialization.json.JSON;
 	
 	import flash.events.Event;
+	
+	import mx.controls.Alert;
 
 	public class ChannelBuildEvent extends Event implements ChannelJSON
 	{
@@ -25,11 +27,13 @@ package messaging.events
 		
 		// ChannelJSON interface
 		public function fromJSON(message:String) : void {
+			Alert.show(message);
 			var obj:Object = JSON.decode(message);
 			
 			// The object
-			buildUser = obj.alias;
-			buildObject = obj.buildObject;
+			var tempObj:Object = obj.BUILD;
+			buildUser = tempObj.alias;
+			buildObject = tempObj.buildObject;
 		}
 		
 		public function getJSONObject() : Object {

@@ -3,6 +3,8 @@ package models
 	import flash.utils.IDataInput;
 	import flash.utils.IDataOutput;
 	import flash.utils.IExternalizable;
+	
+	import models.constants.GameConstants;
 
 	[Bindable]
 	[RemoteClass(alias='models.User')]
@@ -59,6 +61,18 @@ package models
 			return u;
 		}
 		
+		public function purchaseObject(woodCost:Number, stoneCost:Number, manaCost:Number) : void {
+			this.totalMana -= woodCost;
+			this.totalStone -= stoneCost;
+			this.totalWood -= woodCost;
+		}
+		
+		public function updateProduction(woodProduction:Number, stoneProduction:Number, manaProduction:Number) : void {
+			this.completeManaProduction += manaProduction;
+			this.completeStoneProduction += stoneProduction;
+			this.completeWoodProduction += woodProduction;
+		}
+		
 		public function toString():String {
 			var s:String = "";
 			s = s + this.FacebookID.toString() + ":";
@@ -69,6 +83,9 @@ package models
 			s = s + this.completeStoneProduction.toString() + ":";
 			s = s + this.level.toString() + ":";
 			s = s + this.alias.toString() + ":";
+			s = s + this.totalMana.toString() + ":";
+			s = s + this.totalStone.toString() + ":";
+			s = s + this.totalWood.toString() + ":";
 			s = s + this.completeWoodProduction.toString() + "\n";
 			return s;
 		}

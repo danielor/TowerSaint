@@ -38,14 +38,45 @@ package models.away3D
 			var inSeconds:Number = 60.; 
 			
 			// Get the updated totals
-			var mProd:Number = _alwaysPositive(this.user.completeManaProduction, this.user.totalMana, numberOfMinutesAtProduction) / inSeconds;
-			var sProd:Number = _alwaysPositive(this.user.completeStoneProduction, this.user.totalStone, numberOfMinutesAtProduction) / inSeconds;
-			var wProd:Number = _alwaysPositive(this.user.completeWoodProduction, this.user.totalWood, numberOfMinutesAtProduction) / inSeconds;
+			var mProd:Number = _alwaysPositive(this.user.completeManaProduction / inSeconds, this.user.totalMana, numberOfMinutesAtProduction);
+			var sProd:Number = _alwaysPositive(this.user.completeStoneProduction / inSeconds, this.user.totalStone, numberOfMinutesAtProduction);
+			var wProd:Number = _alwaysPositive(this.user.completeWoodProduction / inSeconds, this.user.totalWood, numberOfMinutesAtProduction);
 			
 			// Save the updated text
 			this.text = StringUtil.substitute(this.templateString, mProd.toFixed(1), this.user.completeManaProduction, sProd.toFixed(1), this.user.completeStoneProduction,
 											  wProd.toFixed(1), this.user.completeWoodProduction);
 		}
+		
+		/*
+		Get the current supply of certain key resources
+		*/
+		public function getWoodProduction(d:Date):Number{
+			// Calculate the date difference
+			var minutesPerDay:Number =  60. * 24.;
+			var numberOfMinutesAtProduction:Number = Math.ceil((d.getTime() - user.productionDate.getTime()) / minutesPerDay);
+			var inSeconds:Number = 60.; 
+			
+			return _alwaysPositive(this.user.completeWoodProduction / inSeconds, this.user.totalWood, numberOfMinutesAtProduction);
+		}
+		
+		public function getStoneProduction(d:Date):Number{
+			// Calculate the date difference
+			var minutesPerDay:Number =  60. * 24.;
+			var numberOfMinutesAtProduction:Number = Math.ceil((d.getTime() - user.productionDate.getTime()) / minutesPerDay);
+			var inSeconds:Number = 60.; 
+			
+			return _alwaysPositive(this.user.completeStoneProduction / inSeconds, this.user.totalStone, numberOfMinutesAtProduction);
+		}
+		
+		public function getManaProduction(d:Date):Number{
+			// Calculate the date difference
+			var minutesPerDay:Number =  60. * 24.;
+			var numberOfMinutesAtProduction:Number = Math.ceil((d.getTime() - user.productionDate.getTime()) / minutesPerDay);
+			var inSeconds:Number = 60.; 
+			
+			return _alwaysPositive(this.user.completeManaProduction / inSeconds, this.user.totalMana, numberOfMinutesAtProduction);
+		}
+		
 		
 		/*
 		Always positive. How can an individual owe material 

@@ -164,10 +164,11 @@ class UserManager(GlobalManager):
         # Get the state and id
         channelId = self.channelId   
         jsonState = self.state 
+        level = Constants.levelFromExperience(user)
         del jsonState.state[user.alias]
     
         # The key value pair
-        addMessage = {"LOGOUT": {'alias' : user.alias, 'level' : user.level }}
+        addMessage = {"LOGOUT": {'alias' : user.alias, 'level' : level }}
         
         # Login in the user on all of the channels
         for alias, _ in jsonState.state.iteritems():

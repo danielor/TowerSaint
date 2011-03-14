@@ -51,6 +51,12 @@ package models
 		// Get the influence
 		function getMaxInfluence():Number;
 		
+		// Get the string associated with object
+		function getNameString():String;
+		
+		// Returns the production of resources associated with o
+		function getProduction():Production; 				
+		
 		// Boundary interface
 		function hasBoundary():Boolean;												/* Object for which this is true should implement the boundary super object interface */
 		function isOverLappingBoundsOfObject(pos:LatLng, map:Map, photo:PhotoAssets) : Boolean;		/* Check if the position is overlapping the image */

@@ -23,6 +23,7 @@ package models
 	
 	import managers.FocusPanelManager;
 	
+	import models.constants.GameConstants;
 	import models.map.TowerSaintMarker;
 	
 	import mx.core.BitmapAsset;
@@ -91,6 +92,12 @@ package models
 			this.endLocationLatitudeIndex = input.readInt();
 			this.endLocationLongitudeIndex = input.readInt();
 		}
+		
+		public function initialize(u:User):void {
+			this.user = u;
+			this.hitPoints = 10;
+			this.level = 0;
+		}
 
 		public static function createUserPortalFromJSON(buildObject:Object, u:User) : Portal {
 			var p:Portal = new Portal();
@@ -113,6 +120,14 @@ package models
 			p.startLocationLongitude = buildObject.startLocationLongitude;
 			p.user = User.createUserFromJSON(buildObject.user);
 			return p;
+		}
+		
+		public function getNameString():String {
+			return "Portal";
+		}
+		
+		public function getProduction():Production {
+			return new Production(0., 0., 0.);
 		}
 		
 		public function draw(drag:Boolean, map:Map, photo:PhotoAssets, fpm:FocusPanelManager, withBoundary:Boolean) : void {

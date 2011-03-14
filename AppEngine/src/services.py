@@ -9,7 +9,7 @@ import pyamf, random, string, logging, datetime
 from pyamf import amf3
 from pyamf.flex import ArrayCollection, ObjectProxy
 from models import User, Road, Tower, Portal, Location, Bounds, Constants
-from models import GameChannel
+from models import GameChannel, PurchaseConstants
 from geomodel.geomodel import GeoModel
 from sessions import UserManager, ChatManager, GameManager
     
@@ -102,11 +102,12 @@ class TowerSaintManager(object):
         else:
             # How much time has passed?
             delta = user.productionDate - u.productionDate
+            inSeconds = 60.
             totalNumberOfSecond = (delta.microseconds + (delta.seconds + delta.days * 24 * 3600) * 10**6) / 10**6
-            totalNumberOfMinutes = float(totalNumberOfSecond / 60.0)
-            u.totalMana = u.totalMana + totalNumberOfMinutes * u.completeManaProduction
-            u.totalStone = u.totalStone + totalNumberOfMinutes * u.completeStoneProduction
-            u.totalWood = u.totalWood + totalNumberOfMinutes * u.completeWoodProduction
+            totalNumberOfMinutes = float(totalNumberOfSecond / inSeconds)
+            u.totalMana = int(u.totalMana + totalNumberOfMinutes * (u.completeManaProduction  / inSeconds)) 
+            u.totalStone = int(u.totalStone + totalNumberOfMinutes * (u.completeStoneProduction / inSeconds))
+            u.totalWood = int(u.totalWood + totalNumberOfMinutes * (u.completeWoodProduction / inSeconds))
 
         # Save the user
         u.completeManaProduction = user.completeManaProduction
@@ -120,11 +121,30 @@ class TowerSaintManager(object):
     def buildObject(self, obj, user):
         """Build an object in the game"""
         # Save the object in the datastore
+        logging.error("Here")
         u =  User.all().filter('FacebookID =', user.FacebookID).get()
+        logging.error(u)
         obj.user = u
         obj.put()
         
-        logging.error("Inside")
+        # Get the cost of the purchase.
+        woodCost = PurchaseConstants.getWoodCost(obj, 0)
+        stoneCost = PurchaseConstants.getStoneCost(obj, 0)
+        manaCost = PurchaseConstants.getManaCost(obj, 0)
+        
+        # Update the resources
+        currentTime = datetime.datetime.now()
+        inSeconds = 60.
+        delta = currentTime - u.productionDate
+        totalNumberOfSecond = (delta.microseconds + (delta.seconds + delta.days * 24 * 3600) * 10**6) / 10**6
+        totalNumberOfMinutes = float(totalNumberOfSecond / inSeconds)
+        u.totalMana = int(u.totalMana + totalNumberOfMinutes * (u.completeManaProduction / inSeconds) - woodCost)
+        u.totalStone = int(u.totalStone + totalNumberOfMinutes *(u.completeStoneProduction / inSeconds) - stoneCost)
+        u.totalWood = int(u.totalWood + totalNumberOfMinutes * (u.completeWoodProduction / inSeconds) - manaCost)
+        logging.error(str(u.totalMana) + ":" + str(u.totalStone) + ":" + str(u.totalWood))
+        u.productionDate = currentTime
+        u.put()             # Save the updated resources
+        
         # Find out objects in the proximity
         for gameObject in [Portal, Tower, Road]:
             # Filter out users that are already part of the neighbor list
@@ -135,7 +155,7 @@ class TowerSaintManager(object):
             
             # Proximity fetch
             distance = Constants.getBaseDistance() * Constants.latToMiles()
-            for pos in gameObject.getPosition():
+            for pos in obj.getPosition():
                 valueList = gameObject.proximity_fetch(whichObject, pos, max_results = 1000, max_distance = distance)
                 if valueList is not None:
                     # Iterate over the results

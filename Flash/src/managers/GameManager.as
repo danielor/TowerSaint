@@ -48,11 +48,13 @@ package managers
 	import models.BoundarySuperObject;
 	import models.GameChannel;
 	import models.Portal;
+	import models.Production;
 	import models.Road;
 	import models.SuperObject;
 	import models.Tower;
 	import models.User;
 	import models.away3D.ResourceProductionText;
+	import models.constants.PurchaseConstants;
 	
 	import mx.collections.ArrayCollection;
 	import mx.containers.TabNavigator;
@@ -60,6 +62,7 @@ package managers
 	import mx.core.BitmapAsset;
 	import mx.core.IVisualElement;
 	import mx.core.UIComponent;
+	import mx.events.CloseEvent;
 	import mx.events.ItemClickEvent;
 	import mx.managers.CursorManager;
 	import mx.managers.CursorManagerPriority;
@@ -70,6 +73,7 @@ package managers
 	import spark.components.Application;
 	import spark.components.Button;
 	import spark.components.HGroup;
+	import spark.components.Label;
 	import spark.components.List;
 	import spark.components.NavigatorContent;
 	import spark.components.RichEditableText;
@@ -444,46 +448,48 @@ package managers
 		}
 		
 		private function onMapDragEnd(event:MapMouseEvent) : void {
-			var finalDragPosition:LatLng = event.latLng;
-			
-			// The center of the map, and bounds
-			var centerOfMap:LatLng = this.map.getCenter();
-			var bounds:LatLngBounds = this.map.getLatLngBounds();
-			var mapDimension:LatLng = new LatLng(bounds.getNorth() - bounds.getSouth(), bounds.getWest() - bounds.getEast());
-			
-			
-			// The net distance
-			var netDragLongitude:Number = finalDragPosition.lng() - initialMapDragMouse.lng();
-			var netDragLatitude:Number = finalDragPosition.lat() - initialMapDragMouse.lat();
-			
-			// The new center position
-			var newCenterLatitude:Number;
-			var newCenterLongitude:Number;
-			
-			if(Math.abs(netDragLongitude) > Math.abs(netDragLatitude)) {
-				if(netDragLongitude > 0.0){
-					newCenterLatitude = centerOfMap.lat();
-					newCenterLongitude = centerOfMap.lng() +  mapDimension.lng();
+			if(! this.inBuildState){
+				var finalDragPosition:LatLng = event.latLng;
+				
+				// The center of the map, and bounds
+				var centerOfMap:LatLng = this.map.getCenter();
+				var bounds:LatLngBounds = this.map.getLatLngBounds();
+				var mapDimension:LatLng = new LatLng(bounds.getNorth() - bounds.getSouth(), bounds.getWest() - bounds.getEast());
+				
+				
+				// The net distance
+				var netDragLongitude:Number = finalDragPosition.lng() - initialMapDragMouse.lng();
+				var netDragLatitude:Number = finalDragPosition.lat() - initialMapDragMouse.lat();
+				
+				// The new center position
+				var newCenterLatitude:Number;
+				var newCenterLongitude:Number;
+				
+				if(Math.abs(netDragLongitude) > Math.abs(netDragLatitude)) {
+					if(netDragLongitude > 0.0){
+						newCenterLatitude = centerOfMap.lat();
+						newCenterLongitude = centerOfMap.lng() +  mapDimension.lng();
+					}else{
+						newCenterLatitude = centerOfMap.lat();
+						newCenterLongitude = centerOfMap.lng() - mapDimension.lng();	
+					}
 				}else{
-					newCenterLatitude = centerOfMap.lat();
-					newCenterLongitude = centerOfMap.lng() - mapDimension.lng();	
+					if(netDragLatitude > 0.0){
+						newCenterLatitude = centerOfMap.lat() + mapDimension.lat();
+						newCenterLongitude = centerOfMap.lng();
+					}else{
+						newCenterLatitude = centerOfMap.lat() - mapDimension.lat();
+						newCenterLongitude = centerOfMap.lng();
+					}
 				}
-			}else{
-				if(netDragLatitude > 0.0){
-					newCenterLatitude = centerOfMap.lat() + mapDimension.lat();
-					newCenterLongitude = centerOfMap.lng();
-				}else{
-					newCenterLatitude = centerOfMap.lat() - mapDimension.lat();
-					newCenterLongitude = centerOfMap.lng();
-				}
+				
+				// Create the new position, and pan to the new position
+				centerOfMap = new LatLng(newCenterLatitude, newCenterLongitude);
+				this.map.panTo(centerOfMap);
+				
+				// Set the mouse pan to true
+				userMousePan = true;
 			}
-			
-			// Create the new position, and pan to the new position
-			centerOfMap = new LatLng(newCenterLatitude, newCenterLongitude);
-			this.map.panTo(centerOfMap);
-			
-			// Set the mouse pan to true
-			userMousePan = true;
 			
 		}
 		
@@ -543,6 +549,7 @@ package managers
 						
 						// Create an object from the object picture
 						newBuildObject = this.getItemFromClass(this.buildObjectPicture, pos);
+						newBuildObject.initialize(this.user);
 						newBuildObject.draw(true, this.map, this.photo, this.focusPanelManager, true);
 						
 						// Change the cursor manager
@@ -633,18 +640,29 @@ package managers
 		
 		private function getBuildString():String {
 			var s:String ="\n";
+			
+			// Create a temporary object without fixed position
+			var pos:LatLng =  this.map.getCenter();
+			var tempObject:SuperObject = this.getItemFromClass(this.buildObjectPicture, pos);
+			 
+			// Find the cost for that temporary object
+			var woodCost:Number = PurchaseConstants.woodCost(tempObject, 0);
+			var stoneCost:Number = PurchaseConstants.stoneCost(tempObject, 0);
+			var magicCost:Number = PurchaseConstants.manaCost(tempObject, 0);
+			
 			if(this.buildObjectPicture == this.photo.TowerLevel0){
-				s+="Stone  :1000\n";
-				s+="Wood  :1000\n";
-				s+="Magic  :1000\n";
+				s+="Stone  :" + stoneCost.toString() + "\n";
+				s+="Wood  :" + woodCost.toString() + "\n";
+				s+="Magic  :" + magicCost.toString() + "\n";
 			}else if(this.buildObjectPicture == this.photo.ThePortal){
-				s+="Stone :500\n";
-				s+="Wood  :500\n";
-				s+="Magic :2000\n";
+				s+="Stone :" + stoneCost.toString() + "\n";
+				s+="Wood  :" + woodCost.toString() + "\n";
+				s+="Magic :" + magicCost.toString() + "\n";
 			}else if(this.buildObjectPicture == this.photo.EastRoad){
-				s+="Stone :250\n";
-				s+="Wood  :250\n";
+				s+="Stone :" + stoneCost.toString() + "\n";
+				s+="Wood  :" + woodCost.toString() + "\n";
 			}
+			
 			return s;
 		}
 	
@@ -666,7 +684,68 @@ package managers
 		public function onBuildButton(event:MouseEvent):void{
 			// Copy the tower
 			//var s:Object = ObjectUtil.clone(this.newBuildObject) as SuperObject;
-			this.userObjectManager.buildObject(this.newBuildObject, this.user);
+			var d:Date = new Date();
+			Alert.show(this.newBuildObject.getNameString());
+			if(canPurchase(d)){
+				
+				// Build the object 
+				this.userObjectManager.buildObject(this.newBuildObject, this.user);
+				
+				// Subtract the purchase prices from the current user.
+				var woodCost:Number = PurchaseConstants.woodCost(this.newBuildObject, 0);
+				var stoneCost:Number = PurchaseConstants.stoneCost(this.newBuildObject, 0);
+				var manaCost:Number = PurchaseConstants.manaCost(this.newBuildObject, 0);
+				
+				// Get the production associated with the superobject
+				var production:Production = this.newBuildObject.getProduction();
+				
+				// Purchase the objects, update resource total
+				this.user.purchaseObject(woodCost, stoneCost, manaCost);
+				this.user.updateProduction(production.woodProduction, production.stoneProduction, production.manaProduction);
+				
+				// Send the new production stats to the server.
+				this.userObjectManager.updateProduction(this.user, false, this.onNull);
+			}else{
+				// Get the current production
+				var totalWood:Number = this.resourceText.getWoodProduction(d);
+				var totalStone:Number = this.resourceText.getManaProduction(d);
+				var totalMana:Number = this.resourceText.getManaProduction(d);
+				
+				// Find out why the purchase failed, and tell the user
+				var failureString:String = PurchaseConstants.missingResourcesString(this.newBuildObject, 0, totalWood, totalStone, totalMana);
+
+				// Setup and create a popup to inform the user.
+				var s:SimplePopup = new SimplePopup();
+				popup = s;
+				
+				PopUpManager.addPopUp(s, this.app, true);
+				PopUpManager.centerPopUp(s);
+				
+				// Setup up the events
+				s.addEventListener(CloseEvent.CLOSE, onCloseBuildPopup);
+				s.okButton.addEventListener(MouseEvent.CLICK, onCloseBuildPopup);
+				s.theText.text = failureString;
+				s.title = "You do not have enough resources!";
+				
+				// Remove the current build object from the map
+				this.newBuildObject.eraseFromMap(this.map);
+			}
+			
+			// Change the state 
+			this.changeState(this.emptyState);
+		}
+		
+		private function onCloseBuildPopup(event:Event) : void {
+			PopUpManager.removePopUp(popup);
+		}
+		
+		private function canPurchase(d:Date) : Boolean {
+			// Get the current production
+			var totalWood:Number = this.resourceText.getWoodProduction(d);
+			var totalStone:Number = this.resourceText.getManaProduction(d);
+			var totalMana:Number = this.resourceText.getManaProduction(d);
+			
+			return PurchaseConstants.canPurchase(this.newBuildObject, 0, totalWood, totalStone, totalMana);
 		}
 		
 		public function onCancelBuildButton(event:MouseEvent) : void {

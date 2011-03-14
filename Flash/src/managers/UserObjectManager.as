@@ -199,11 +199,11 @@ package managers
 			var _service:RemoteObject = servicesDictionary["towersaint"] as RemoteObject;
 			
 			// The abstract call
-			Alert.show("Do");
 			var operation:AbstractOperation = _service.getOperation("buildObject");
 			operation.addEventListener(ResultEvent.RESULT, onNull);	
 			operation.send(s, u);
 		}
+	
 		
 		/* 
 		Returns true if there are any open connections

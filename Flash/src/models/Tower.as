@@ -28,6 +28,7 @@ package models
 	import messaging.ChannelJavascriptBridge;
 	import messaging.events.ChannelAttackEvent;
 	
+	import models.constants.GameConstants;
 	import models.map.TowerSaintMarker;
 	
 	import mx.controls.Alert;
@@ -139,7 +140,7 @@ package models
 			return t;
 		}
 		
-		public function initalize(u:User): void {
+		public function initialize(u:User): void {
 			this.Experience = 0;
 			this.Speed = 1;
 			this.Power = 1;
@@ -150,7 +151,7 @@ package models
 			this.isIsolated = false;
 			this.isCapital = true;
 			this.hasRuler = true;
-			this.user = u;
+			//this.user = u;
 			this.manaProduction = 50 + Math.floor( Math.random() * 50);
 			this.stoneProduction = 50 + Math.floor( Math.random() * 50);
 			this.woodProduction = 50 + Math.floor( Math.random() * 50);
@@ -274,6 +275,11 @@ package models
 			var r:ChannelJavascriptBridge;
 		}
 		
+		public function getNameString():String {
+			return "Tower";
+		}
+		
+		
 		// Generate the boundary around the objects
 		private function generateBoundaryPolygon(m:Map) : void {
 			// Get the position of the marker
@@ -331,6 +337,10 @@ package models
 			if(towerMarker != null){
 				map.removeOverlay(towerMarker);
 			}
+			
+			if(this.boundaryPolygon != null){
+				map.removeOverlay(this.boundaryPolygon);
+			}
 		}
 		
 		public function setFocusOnObject(error:Boolean) : void{
@@ -343,6 +353,10 @@ package models
 			// Set the focus
 			createFocusPolygonAtPosition(error);
 			hasFocus = true;
+		}
+		
+		public function getProduction():Production {
+			return new Production(this.woodProduction, this.stoneProduction, this.manaProduction);
 		}
 		
 		public function removeFocusOnObject() : void {

@@ -26,6 +26,7 @@ package models
 	import models.map.TowerSaintMarker;
 	
 	import mx.core.BitmapAsset;
+	import models.constants.GameConstants;
 
 	[Bindable]
 	[RemoteClass(alias="models.Road")]
@@ -74,6 +75,20 @@ package models
 			this.latIndex = input.readInt();
 			this.latitude = input.readFloat();
 			this.longitude = input.readFloat();
+		}
+		
+		public function initialize(u:User) : void {
+			this.user = user;
+			this.hitPoints = 50;
+			this.level = 0;
+		}
+		
+		public function getNameString():String {
+			return "Road";
+		}
+		
+		public function getProduction():Production {
+			return new Production(0., 0., 0.);
 		}
 		
 		public static function createUserRoadFromJSON(buildObject:Object, u:User):Road {

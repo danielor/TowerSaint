@@ -9,7 +9,7 @@ are important. The flex, and gae must be consistent.
 '''
 from google.appengine.ext import db
 import logging, random, string
-from math import fabs
+from math import fabs, pow
 from xml.etree import cElementTree as cTree
 from geomodel.geomodel import GeoModel
 from geomodel.geotypes import Box
@@ -17,6 +17,99 @@ from geomodel.geotypes import Box
 def createRandomString(length = 10):
     """Create the random string"""
     return "".join([random.choice(string.letters) for _ in range(length)])
+
+
+"""
+A class full of constans used to purchase items
+"""
+class PurchaseConstants(object):
+    
+    @classmethod
+    def getWoodCost(cls, obj, level):
+        """
+        Return the cost of build/upgrading an object in the game
+        """
+        if isinstance(obj, Tower):
+            return PurchaseConstants.getTowerWoodCost(level)
+        elif isinstance(obj, Portal):
+            return PurchaseConstants.getPortalWoodCost(level)
+        elif isinstance(obj, Road):
+            return PurchaseConstants.getRoadWoodCost(level)
+        else: 
+            return 0.0;
+    
+    @classmethod
+    def getTowerWoodCost(cls, level): 
+        """Get the wood cost for a tower"""
+        return pow(10, 2 * level) * 1000;
+    
+    @classmethod
+    def getPortalWoodCost(cls, level):
+        """Get the wood cost for a portal"""
+        return pow(10, level) * 500;
+    
+    @classmethod
+    def getRoadWoodCost(cls, level):
+        """Get the wood cost of a road""" 
+        return pow(10, level) * 250;
+    
+    @classmethod
+    def getStoneCost(cls, obj, level):
+        """
+        Return the cost of build/upgrading an object in the game
+        """
+        if isinstance(obj, Tower):
+            return PurchaseConstants.getTowerStoneCost(level)
+        elif isinstance(obj, Portal):
+            return PurchaseConstants.getPortalStoneCost(level)
+        elif isinstance(obj, Road):
+            return PurchaseConstants.getRoadStoneCost(level)
+        else: 
+            return 0.0;
+        
+    @classmethod
+    def getTowerStoneCost(cls, level): 
+        """Get the wood cost for a tower"""
+        return pow(10, 2 * level) * 1000;
+    
+    @classmethod
+    def getPortalStoneCost(cls, level):
+        """Get the wood cost for a portal"""
+        return pow(10, level) * 500;
+    
+    @classmethod
+    def getRoadStoneCost(cls, level):
+        """Get the wood cost of a road""" 
+        return pow(10, level) * 250;
+    
+    @classmethod
+    def getManaCost(cls, obj, level):
+        """
+        Return the cost of build/upgrading an object in the game
+        """
+        if isinstance(obj, Tower):
+            return PurchaseConstants.getTowerManaCost(level)
+        elif isinstance(obj, Portal):
+            return PurchaseConstants.getPortalManaCost(level)
+        elif isinstance(obj, Road):
+            return PurchaseConstants.getRoadManaCost(level)
+        else: 
+            return 0.0;
+        
+    @classmethod
+    def getTowerManaCost(cls, level): 
+        """Get the wood cost for a tower"""
+        return pow(10, 2 * level) * 1000;
+    
+    @classmethod
+    def getPortalManaCost(cls, level):
+        """Get the wood cost for a portal"""
+        return pow(10, level) * 500;
+    
+    @classmethod
+    def getRoadManaCost(cls, level):
+        """Get the wood cost of a road""" 
+        return 0.0
 
 """
 A class full of the constants used to runs the game
@@ -412,7 +505,7 @@ class Tower(GeoModel, BoundsPlugin):
     def toJSON(self):
         """Get the json equivalent of the model. The JSON should be consistent throughout
         all of the models"""
-        return {"Class" : "Tower", "Value" : {"level" : self.level,
+        return {"Class" : "Tower", "Value" : {"level" : self.Level,
                                              'latitude' : self.latitude,
                                              'longitude' : self.longitude,
                                              'user' : self.user.toJSON()}}
@@ -425,7 +518,7 @@ class Tower(GeoModel, BoundsPlugin):
                                              "range" : self.Range, "accuracy" : self.Accuracy,
                                              "hitpoints" : self.HitPoints, "isisolated" : self.isIsolated,
                                              "iscapital" : self.isCapital, "hasruler" : self.hasRuler,
-                                             "level" : self.level, "manaproduction" : self.manaProduction,
+                                             "level" : self.Level, "manaproduction" : self.manaProduction,
                                              "stoneproduction" : self.stoneProduction, 'woodproduction' : self.woodProduction,
                                              'latitude' : self.latitude,'longitude' : self.longitude,
                                              'user' : self.user.toJSON()}}
