@@ -94,6 +94,7 @@ class TowerSaintManager(object):
         and on the initialization of the empire"""
         # Get the user with id. Makes sure that only one user is created
         # with the associated id.
+        logging.error("Update Production")
         u = User.all().filter('FacebookID =', user.FacebookID).get()
         if init:
             u.totalMana = user.totalMana
@@ -105,26 +106,88 @@ class TowerSaintManager(object):
             inSeconds = 60.
             totalNumberOfSecond = (delta.microseconds + (delta.seconds + delta.days * 24 * 3600) * 10**6) / 10**6
             totalNumberOfMinutes = float(totalNumberOfSecond / inSeconds)
-            u.totalMana = int(u.totalMana + totalNumberOfMinutes * (u.completeManaProduction  / inSeconds)) 
-            u.totalStone = int(u.totalStone + totalNumberOfMinutes * (u.completeStoneProduction / inSeconds))
-            u.totalWood = int(u.totalWood + totalNumberOfMinutes * (u.completeWoodProduction / inSeconds))
+            logging.error(str(u.totalMana) + ":" + str(u.totalStone) + ":" + str(u.totalWood))
+
+            u.totalMana = int(u.totalMana + totalNumberOfMinutes * (u.completeManaProduction  )) 
+            u.totalStone = int(u.totalStone + totalNumberOfMinutes * (u.completeStoneProduction))
+            u.totalWood = int(u.totalWood + totalNumberOfMinutes * (u.completeWoodProduction ))
+            logging.error(str(u.totalMana) + ":" + str(u.totalStone) + ":" + str(u.totalWood))
 
         # Save the user
+        logging.error(str(u.completeManaProduction) + ":" + str(u.completeStoneProduction) + ":" + str(u.completeWoodProduction))
         u.completeManaProduction = user.completeManaProduction
         u.completeStoneProduction = user.completeStoneProduction
         u.completeWoodProduction = user.completeWoodProduction
+        logging.error(str(u.completeManaProduction) + ":" + str(u.completeStoneProduction) + ":" + str(u.completeWoodProduction))
+        logging.error(str(u.productionDate))
+        logging.error(str(user.productionDate))
         u.productionDate = datetime.datetime.now()
         u.put()
         
         return True
     
     def buildObject(self, obj, user):
-        """Build an object in the game"""
+        """Build an object in the game. The state information is not relayed to everyone in the
+        game because the building command does not imply the completion of the object. @func(
+        buildObjectComplete) will relay the new object to all of the users."""
         # Save the object in the datastore
-        logging.error("Here")
-        u =  User.all().filter('FacebookID =', user.FacebookID).get()
-        logging.error(u)
+        u = User.all().filter("FacebookID =", user.FacebookID).get()
         obj.user = u
+        obj.isComplete = False
+        obj.foundingDate = datetime.datetime.now()
+        
+        # Tell geomodel where we are.
+        obj.location = obj.getPosition()[0]
+        obj.update_location()
+        obj.put()
+        
+    def buildObjectCancel(self, oldobj, user):
+        """Cancel a partially built object do it being destroyed or maually cancelled during
+        construction"""
+        u =  User.all().filter('FacebookID =', user.FacebookID).get()
+        
+        # Proximity fetch
+        distance = Constants.getBaseDistance() * Constants.latToMiles()
+        
+        # Find the build object
+        cls = oldobj.getClass()
+        query = cls.all().filter('isComplete =', False).filter('user =', u)
+        obj = cls.proximity_fetch(query, oldobj.getPosition()[0], max_results = 1, max_distance = distance)
+        if obj is None:
+            logging.error("Unknown objects" + str(oldobj) + ":" + str(user))
+            return
+        obj = obj[0]                # Get the first value of the fetch
+        # Delete the built object
+        obj.delete()            
+        
+    def buildObjectComplete(self, oldobj, user):
+        """Finish the object building"""
+        logging.error("buildObjectComplete")
+        u =  User.all().filter('FacebookID =', user.FacebookID).get()
+        
+        # Proximity fetch
+        milesToMeters = 1609.4
+        distance = Constants.getBaseDistance() * Constants.latToMiles() * milesToMeters
+        
+        # Find the build object
+        cls = oldobj.getClass()
+        query = cls.all().filter('isComplete =', False).filter('user =', u)
+        obj = cls.proximity_fetch(query, oldobj.getPosition()[0], max_results = 1, max_distance = distance)
+        if obj is None:
+            logging.error("Unknown objects" + str(oldobj) + ":" + str(user))
+            return
+        if len(obj) == 0:
+
+            for obj in cls.all():
+                logging.error(str(obj.toXML()))
+                
+            # Find out where the error is
+            logging.error(str(oldobj.toXML()))
+            logging.error(str(distance))
+            logging.error(str(oldobj.getPosition()))
+            return
+        obj = obj[0]                # Get the first value of the fetch
+        obj.isComplete = True
         obj.put()
         
         # Get the cost of the purchase.
@@ -138,9 +201,11 @@ class TowerSaintManager(object):
         delta = currentTime - u.productionDate
         totalNumberOfSecond = (delta.microseconds + (delta.seconds + delta.days * 24 * 3600) * 10**6) / 10**6
         totalNumberOfMinutes = float(totalNumberOfSecond / inSeconds)
-        u.totalMana = int(u.totalMana + totalNumberOfMinutes * (u.completeManaProduction / inSeconds) - woodCost)
-        u.totalStone = int(u.totalStone + totalNumberOfMinutes *(u.completeStoneProduction / inSeconds) - stoneCost)
-        u.totalWood = int(u.totalWood + totalNumberOfMinutes * (u.completeWoodProduction / inSeconds) - manaCost)
+        logging.error(str(woodCost) + ":" + str(stoneCost) + ":" + str(manaCost))
+        logging.error(str(u.totalMana) + ":" + str(u.totalStone) + ":" + str(u.totalWood))
+        u.totalMana = int(u.totalMana + totalNumberOfMinutes * (u.completeManaProduction ) - woodCost)
+        u.totalStone = int(u.totalStone + totalNumberOfMinutes *(u.completeStoneProduction ) - stoneCost)
+        u.totalWood = int(u.totalWood + totalNumberOfMinutes * (u.completeWoodProduction ) - manaCost)
         logging.error(str(u.totalMana) + ":" + str(u.totalStone) + ":" + str(u.totalWood))
         u.productionDate = currentTime
         u.put()             # Save the updated resources
@@ -153,8 +218,7 @@ class TowerSaintManager(object):
                 neighbor = db.get(key)
                 whichObject.filter('user !=', neighbor)
             
-            # Proximity fetch
-            distance = Constants.getBaseDistance() * Constants.latToMiles()
+          
             for pos in obj.getPosition():
                 valueList = gameObject.proximity_fetch(whichObject, pos, max_results = 1000, max_distance = distance)
                 if valueList is not None:

@@ -297,6 +297,10 @@ class BoundsPlugin(object):
         """
         raise NotImplementedError("FilterPlugin.createRandomObject needs to be implemented in inherited class")
 
+    @classmethod
+    def getClass(cls):
+        """Return the class object of the object"""
+        return cls
 class Road(GeoModel, BoundsPlugin):
     """The road object integrates with AMF"""
 #    class __amf__:
@@ -325,6 +329,8 @@ class Road(GeoModel, BoundsPlugin):
     # Descriptive
     hitPoints = db.IntegerProperty()
     level = db.IntegerProperty()
+    isComplete = db.BooleanProperty()
+    foundingDate = db.DateTimeProperty()
     
     # A Reference to the user
     user = db.ReferenceProperty(User)
@@ -343,13 +349,18 @@ class Road(GeoModel, BoundsPlugin):
     
     def toXML(self):
         """Return an xml representation of the google app engine model"""
+        if self.user is not None:
+            userString = self.user.toXML()
+        else:
+            userString = ""
+        
         return """<Road>
                     <hitpoints>%s</hitpoints>
                     <level>%s</level>
                     <latitude>%s</latitude>
                     <longitude>%s</longitude>
                     %s
-                  </Road>""" %(self.hitPoints, self.level, self.latitude, self.longitude, self.user.toXML())
+                  </Road>""" %(self.hitPoints, self.level, self.latitude, self.longitude, userString)
 
     def toJSON(self):
         """Get the json equivalent of the model. The JSON should be consistent throughout
@@ -455,7 +466,10 @@ class Tower(GeoModel, BoundsPlugin):
     HitPoints = db.IntegerProperty()
     isIsolated = db.BooleanProperty()
     isCapital = db.BooleanProperty()
+    isComplete = db.BooleanProperty()
     hasRuler = db.BooleanProperty()
+    foundingDate = db.DateTimeProperty()
+
     
     # The user who owns the object
     user = db.ReferenceProperty(User)
@@ -479,6 +493,10 @@ class Tower(GeoModel, BoundsPlugin):
     
     def toXML(self):
         """Return an xml representation of the google app engine model"""
+        if self.user is not None:
+            userString = self.user.toXML()
+        else:
+            userString = ""
         return """<Tower>
                     <experience>%s</experience>
                     <speed>%s</speed>
@@ -500,7 +518,7 @@ class Tower(GeoModel, BoundsPlugin):
                   </Tower>""" % (self.Experience, self.Speed, self.Power, self.Armor, self.Range,
                                  self.Accuracy, self.HitPoints, self.isIsolated, self.isCapital,
                                  self.hasRuler, self.Level, self.manaProduction, self.stoneProduction,
-                                 self.woodProduction, self.latitude, self.longitude, self.user.toXML())
+                                 self.woodProduction, self.latitude, self.longitude, userString)
 
     def toJSON(self):
         """Get the json equivalent of the model. The JSON should be consistent throughout
@@ -598,7 +616,9 @@ class Portal(GeoModel, BoundsPlugin):
     # Descriptive
     hitPoints = db.IntegerProperty()
     level = db.IntegerProperty()
-    
+    isComplete = db.BooleanProperty()
+    foundingDate = db.DateTimeProperty()
+
     # A Reference to the user
     user = db.ReferenceProperty(User)
     
@@ -670,6 +690,10 @@ class Portal(GeoModel, BoundsPlugin):
 
     def toXML(self):
         """Return an xml representation of the google app engine model"""
+        if self.user is not None:
+            userString = self.user.toXML()
+        else:
+            userString = ""
         return """<Portal>
                     <hitpoints>%s</hitpoints>
                     <level>%s</level>
@@ -680,7 +704,7 @@ class Portal(GeoModel, BoundsPlugin):
                     %s
                   </Portal>""" %(self.hitPoints, self.level, self.startLocationLatitude,
                                  self.startLocationLongitude, self.endLocationLatitude,
-                                 self.endLocationLongitude, self.user.toXML())
+                                 self.endLocationLongitude, userString)
 
     @classmethod
     def createRandomObject(cls):

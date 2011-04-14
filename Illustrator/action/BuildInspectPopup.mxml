@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:TitleWindow xmlns:fx="http://ns.adobe.com/mxml/2009" 
+			   xmlns:s="library://ns.adobe.com/flex/spark" 
+			   xmlns:mx="library://ns.adobe.com/flex/mx" width="400" height="300">
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+	</fx:Declarations>
+	
+	<s:HGroup x="0" y="0" width="400" height="260">
+		<s:VGroup x="10" y="10" width="132" height="259">
+			<s:HGroup width="138" height="71">
+				<mx:Image width="61" height="65" id="focusImage"/>
+				<s:RichEditableText height="66" id="titleText" width="60"/>
+			</s:HGroup>
+			<s:Scroller width="128" height="180">
+				<s:RichEditableText x="6" y="11" width="128" height="180" id="bodyText" ></s:RichEditableText>
+			</s:Scroller>
+		</s:VGroup>
+		<s:VGroup width="260" height="260">
+			<s:TextArea height="67" width="255" id="description"/>
+			<mx:ProgressBar width="255" id="progress" labelPlacement="bottom" mode="manual"/>
+			<mx:Spacer width = "255" height = "118"/>
+			<s:HGroup width="255" height="22">
+				<s:Button label="Cancel" id="cancelButton"/>
+				<mx:Spacer width ="101" height="22"/>
+				<s:Button label="Ok" id="okButton"/>
+			</s:HGroup>
+		</s:VGroup>
+	</s:HGroup>
+
+</s:TitleWindow>
