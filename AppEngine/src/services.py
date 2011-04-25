@@ -44,7 +44,9 @@ class TowerSaintManager(object):
         for piece in objects:
             # Save the user reference
             piece.user = u
-            logging.error(piece)
+            
+            # Set the state of the piece
+            piece.setComplete()
             
             # Put the user
             piece.put()
@@ -130,6 +132,7 @@ class TowerSaintManager(object):
         """Build an object in the game. The state information is not relayed to everyone in the
         game because the building command does not imply the completion of the object. @func(
         buildObjectComplete) will relay the new object to all of the users."""
+        logging.error("buildObject")
         # Save the object in the datastore
         u = User.all().filter("FacebookID =", user.FacebookID).get()
         obj.user = u
@@ -147,7 +150,8 @@ class TowerSaintManager(object):
         u =  User.all().filter('FacebookID =', user.FacebookID).get()
         
         # Proximity fetch
-        distance = Constants.getBaseDistance() * Constants.latToMiles()
+        milesToMeters = 1609.4
+        distance = Constants.getBaseDistance() * Constants.latToMiles() * milesToMeters
         
         # Find the build object
         cls = oldobj.getClass()
@@ -156,6 +160,19 @@ class TowerSaintManager(object):
         if obj is None:
             logging.error("Unknown objects" + str(oldobj) + ":" + str(user))
             return
+        if len(obj) == 0:
+            for val in query.fetch(1000):
+                logging.error(val.toXML())
+                logging.error(val.location)
+                logging.error(val.location_geocells)
+            # Find out where the error is
+            logging.error(str(distance))
+            pt = oldobj.getPosition()
+            pos = pt[0]
+            logging.error(pt)
+            logging.error(pos)
+            return
+            
         obj = obj[0]                # Get the first value of the fetch
         # Delete the built object
         obj.delete()            
@@ -172,19 +189,22 @@ class TowerSaintManager(object):
         # Find the build object
         cls = oldobj.getClass()
         query = cls.all().filter('isComplete =', False).filter('user =', u)
-        obj = cls.proximity_fetch(query, oldobj.getPosition()[0], max_results = 1, max_distance = distance)
+        pos = oldobj.getPosition()[0]
+        obj = cls.proximity_fetch(query, pos, max_results = 1, max_distance = distance)
         if obj is None:
             logging.error("Unknown objects" + str(oldobj) + ":" + str(user))
             return
         if len(obj) == 0:
-
-            for obj in cls.all():
-                logging.error(str(obj.toXML()))
-                
+            for val in query.fetch(1000):
+                logging.error(val.toXML())
+                logging.error(val.location)
+                logging.error(val.location_geocells)
             # Find out where the error is
-            logging.error(str(oldobj.toXML()))
             logging.error(str(distance))
-            logging.error(str(oldobj.getPosition()))
+            pt = oldobj.getPosition()
+            pos = pt[0]
+            logging.error(pt)
+            logging.error(pos)
             return
         obj = obj[0]                # Get the first value of the fetch
         obj.isComplete = True
@@ -249,6 +269,7 @@ class TowerSaintManager(object):
         for cls in [Tower, Portal, Road]:
             query =  cls.all().filter('user =', u)
             retList.extend([value for value in query.fetch(1000)])
+        logging.error(str("\n".join([j.toXML() for j in retList])))
         return ArrayCollection(retList)
     
     def initGameChannels(self, user):

@@ -6,12 +6,22 @@ package models.constants
 		{
 		}
 		
+		// TODO: Handle year/month modifications
 		public static function numberOfMinutes(d:Date, d2:Date) : Number{
-			return Math.ceil((d.getTime() - d2.getTime()) / 60 * 24);
+			var minutes:Number = 0;
+			minutes += (d.getDay() - d2.getDay()) * 24. * 60.;
+			minutes += (d.getHours() - d2.getHours()) * 60.;
+			minutes += (d.getMinutes() - d2.getMinutes());
+			return minutes;
 		}
 		
 		public static function numberOfSeconds(d:Date, d2:Date) : Number {
-			return Math.ceil((d.getTime() - d2.getTime()) / 60 * 24);
+			var seconds:Number = 0;
+			seconds += (d.getDay() - d2.getDay()) * 24. * 60. * 60.;
+			seconds += (d.getHours() - d2.getHours()) * 60. * 60.;
+			seconds += (d.getMinutes() - d2.getMinutes()) * 60.;
+			seconds += (d.getSeconds() - d2.getSeconds());
+			return seconds;
 		}
 		
 		public static function addTimeToDate(d:Date, nOfM:Number = 0, nOfS:Number = 0) : void{

@@ -136,6 +136,7 @@ package models
 		
 		public function getFoundingDate():Date{
 			return this.foundingDate;
+
 		}
 		
 		public function setUser(u:User):void {

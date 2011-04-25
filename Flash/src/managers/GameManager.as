@@ -116,6 +116,7 @@ package managers
 		private var newBuildObject:SuperObject;								/* The new build object(tower, portal, or road */
 		private var mapGroup:VGroup;										/* The group that contains the map */
 		private var queueManager:QueueManager;								/* The manager handles the queue manager */
+		private var userBoundary:PolygonBoundaryManager;						/* The boundary of towers associated with this user */
 		
 		// Constants
 		private const emptyState:String = "Empty";							/* The constant string associated with the empty state */
@@ -187,15 +188,16 @@ package managers
 		public function run() : void{
 			// Setup Map events
 			this.initializeMap();
-			
-			// Get all user objects
-			this.getUserObjects();
-			
+		
 			// Setup up the game channels. The channels run the game
 			this.setupGameChannels();
 			
 			// Initialize the game
 			this.initGame();
+			
+			// Get all user objects
+			this.getUserObjects();
+			
 			this.setupChat();	
 			this.setupUIEvents();				// Sets up the events associated with UI elements
 			this.init3DView();					// Initialize away3D
@@ -205,6 +207,12 @@ package managers
 			// Remove the current marker from the map
 			capital.eraseFromMap(this.map);
 			capital.removeFocusOnObject();
+			
+			// Setup up the game channels. The channels run the game
+			this.setupGameChannels();
+			
+			// Initialize the game
+			this.initGame();
 			
 			// Setup Map Events
 			this.initializeMap();
@@ -216,11 +224,7 @@ package managers
 			this.listOfUserModels.addItem(capital);
 			this.listOfUserObjects.dataProvider = this.listOfUserModels;
 			
-			// Setup up the game channels. The channels run the game
-			this.setupGameChannels();
 			
-			// Initialize the game
-			this.initGame();
 			this.setupChat();
 			this.setupUIEvents();
 			this.init3DView();
@@ -260,11 +264,18 @@ package managers
 			bounds = this.map.getLatLngBounds();
 
 			
+			// Dereference the user
+			this.user = this.user.cloneUser();
+			for(var i:int = 0; i < this.listOfUserModels.length; i++){
+				var sobj:SuperObject = this.listOfUserModels.getItemAt(i) as SuperObject;
+				sobj.setUser(null);
+			}
+			
 			// Draw all user objects on the map
-			this.drawUserObjectsInBounds(bounds);
+			var drawnObjects:ArrayCollection = this.drawUserObjectsInBounds(bounds);
 			
 			// Show all of the user objects
-			this.listOfUserObjects.dataProvider = this.listOfUserModels;
+			this.listOfUserObjects.dataProvider = drawnObjects;
 		}
 		
 		// ==== CHANNEL INTERFACE =====
@@ -303,10 +314,10 @@ package managers
 				}else{
 					return;
 				}
-				// Append the new object
-				this.listOfUserModels.addItem(s);
-				
-				
+				// The two lists can be fundamentally different
+				this.listOfUserObjects.dataProvider.addItem(s);		/* Add to the display list */
+				this.listOfUserModels.addItem(s);					/* Add to the list of user models */
+								
 			}else{
 				if(buildObject.Class == "Tower"){
 					s = Tower.createTowerFromJSON(buildObject.Value);
@@ -317,6 +328,8 @@ package managers
 				}else{
 					return;
 				}
+				
+				// TODO: Get the object for other user
 			}
 			// Add the user object to the list of relevant user objects
 			var bounds:LatLngBounds = this.map.getLatLngBounds();
@@ -325,7 +338,9 @@ package managers
 				s.draw(true, this.map, this.photo, this.focusPanelManager, true);	
 			
 				// Remove the currently drawn object
-				this.newBuildObject.eraseFromMap(this.map);
+				if(this.newBuildObject != null){
+					this.newBuildObject.eraseFromMap(this.map);
+				}
 			}
 			
 			// Get the queue manager 
@@ -449,19 +464,21 @@ package managers
 		}
 		
 		// Draw object with bounds
-		private function drawUserObjectsInBounds(bounds:LatLngBounds) : void {
+		private function drawUserObjectsInBounds(bounds:LatLngBounds) : ArrayCollection {
 			// Set the array of queue objects
 			var arrayOfQueueObjects:ArrayCollection = new ArrayCollection();
 			
 			// We need to dereference the user object from all of the user objects
 			// in the game objects, so that the game objects users' can be dereferenced
 			// without affecting the global user object. 
-			this.user = this.user.cloneUser();
+			//xwthis.user = this.user.cloneUser();
 			
 			// Get dates
 			var d:Date = new Date();
-			var maxDate:Date = PurchaseConstants.getMaximumTime(0);
 			var b:LatLngBounds = this.map.getLatLngBounds();
+			
+			// Create a list of draw objects to later draw their boundaries
+			var listOfDrawnObjects:ArrayCollection = new ArrayCollection();
 			
 			for(var i:int = 0; i < this.listOfUserModels.length; i++){
 				var obj:SuperObject = this.listOfUserModels.getItemAt(i) as SuperObject;
@@ -469,55 +486,64 @@ package managers
 				
 				// Check if the object is visbile
 				if(bounds.containsLatLng(pos)){
-					
 					// Check if the object has finished building
-					if(obj.isIncompleteState()){
+					if(!obj.isIncompleteState()){
+						var mDate:Date = PurchaseConstants.buildTime(obj, 0);
 						var foundingDate:Date = obj.getFoundingDate();
-						var productionTime:Number = DateConstants.numberOfMinutes(maxDate, d);
-						var timeAlive:Number = DateConstants.numberOfMinutes(foundingDate, d);
-						if(productionTime > timeAlive){
+						var productionTime:Number = DateConstants.numberOfMinutes(mDate, d);
+						var timeAlive:Number = DateConstants.numberOfMinutes(d, foundingDate);
+						if(productionTime < timeAlive){
+							Alert.show("Here");
 							// Draw the object
 							obj.draw(true, this.map, this.photo, this.focusPanelManager, true);
 					
-							// TODO: Reference key error associated with the object.
-							obj.setUser(null); // Dereferencing is necessary since the Key is not active in GAE
+							// Finish the building of the object. The code must be here because no users
+							// could be logged in the association graph of the user.
+							//obj.setUser(null); // Dereferencing is necessary since the Key is not active in GAE
 							onBuildEnd(obj);
-							obj.setUser(this.user);
+							//this.userObjectManager.buildObjectComplete(obj, this.user);
+							//obj.setUser(this.user);
+							
+							// Append the list of draw objects
+							listOfDrawnObjects.addItem(obj);
 						}else{
 							arrayOfQueueObjects.addItem(obj);
 						}
 					}else{
 						obj.draw(true, this.map, this.photo, this.focusPanelManager, true);
+						listOfDrawnObjects.addItem(obj);
 					}
 				}
 			}
 			
-			// The queue objects
-			//Alert.show(arrayOfQueueObjects.length.toString());
-			/*
+			// Create the polygon empire boundary for the current user
+			userBoundary = new PolygonBoundaryManager(this.map, listOfDrawnObjects, this.user);
+			userBoundary.initDraw()
+			
+			
 			for(var j:int = 0; j < arrayOfQueueObjects.length; j++){
 				var nobj:SuperObject = arrayOfQueueObjects[j] as SuperObject;
 				
 				// Add time to the production date
-				var buildTime:Date = PurchaseConstants.buildTime(nobj, 0);
+				var maxDate:Date = PurchaseConstants.buildTime(nobj, 0);
 				var fDate:Date = nobj.getFoundingDate();
-				var minutes:Number = DateConstants.numberOfMinutes(buildTime, fDate);
-				var seconds:Number = DateConstants.numberOfSeconds(buildTime, fDate);
+				var netMinutes:Number = DateConstants.numberOfMinutes(maxDate, d) - DateConstants.numberOfMinutes(d, fDate);
+				var netSeconds:Number = DateConstants.numberOfSeconds(maxDate, d) - DateConstants.numberOfSeconds(d, fDate);
 				var effectiveBuildTime:Date = new Date();
-				DateConstants.addTimeToDate(effectiveBuildTime, minutes, seconds);
-				
+				DateConstants.addTimeToDate(effectiveBuildTime, netMinutes, netSeconds);
+								
 				// Create a new queue object
 				var objectString:String = nobj.getNameString();
 				var q:QueueObject = new QueueObject("Building " + objectString + " at" + nobj.getPosition(b),
 					effectiveBuildTime, onBuildEnd, nobj.updateBuildState, nobj, onBuildCancel);
-				
+			
 				// Add the queue object to the manager
 				this.queueManager.addQueueObject(q);
 				if(!this.queueManager.isVisible){
 					this.changeState(this.queueState);
 				}
 			}
-			*/
+			return listOfDrawnObjects;
 		}
 		
 
@@ -840,7 +866,7 @@ package managers
 			this.userObjectManager.buildObjectCancel(s, this.user);
 			
 			// Change the state
-			this.newBuildObject.eraseFromMap(this.map);
+			s.eraseFromMap(this.map);
 			if(this.queueManager.isEmpty()){
 				this.changeState(this.emptyState);
 			}

@@ -321,8 +321,9 @@ package models
 			// Keep a reference to the focus polygon.
 			this.boundaryPolygon = polygon;
 			
+			// Let the PolygonEmpireBoudnary handle the drawing of the boundary
 			// Add the polygon to the map
-			m.addOverlay(this.boundaryPolygon);
+			//m.addOverlay(this.boundaryPolygon);
 		}
 		
 		public function getBoundaryPolygon():Polygon {

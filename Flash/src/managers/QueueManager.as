@@ -259,8 +259,14 @@ package managers
 			okButton.addEventListener(MouseEvent.CLICK, onClosePopup);
 			
 		}
-		
+		 
 		private function onPopupCancelButton(event:Event) : void {
+			// Remove the popup
+			PopUpManager.removePopUp(this.popup);
+			
+			// Return to the previous state
+			this.popup = null;
+			
 			// Get the index
 			var s:List = this.currentQueue.actionQueue;
 			var data:DataGroup = s.dataGroup;
@@ -272,11 +278,6 @@ package managers
 			this.listOfQueueObjects.removeItemAt(tieIndex);
 			tq.failureFunction(tq.buildObject, tq.percentComplete);
 			
-			// Remove the popup
-			PopUpManager.removePopUp(this.popup);
-			
-			// Return to the previous state
-			this.popup = null
 		}
 		
 

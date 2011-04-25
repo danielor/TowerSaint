@@ -8,7 +8,7 @@ are important. The flex, and gae must be consistent.
 @author: danielo
 '''
 from google.appengine.ext import db
-import logging, random, string
+import logging, random, string, datetime
 from math import fabs, pow
 from xml.etree import cElementTree as cTree
 from geomodel.geomodel import GeoModel
@@ -301,6 +301,12 @@ class BoundsPlugin(object):
     def getClass(cls):
         """Return the class object of the object"""
         return cls
+    
+    def setComplete(self):
+        """Set the complete state to true"""
+        self.isComplete = True
+        self.foundingDate = datetime.datetime.now()
+        
 class Road(GeoModel, BoundsPlugin):
     """The road object integrates with AMF"""
 #    class __amf__:
@@ -359,8 +365,9 @@ class Road(GeoModel, BoundsPlugin):
                     <level>%s</level>
                     <latitude>%s</latitude>
                     <longitude>%s</longitude>
+                    <isComplete>%s</isComplete>
                     %s
-                  </Road>""" %(self.hitPoints, self.level, self.latitude, self.longitude, userString)
+                  </Road>""" %(self.hitPoints, self.level, self.latitude, self.longitude, self.isComplete, userString)
 
     def toJSON(self):
         """Get the json equivalent of the model. The JSON should be consistent throughout
@@ -514,11 +521,13 @@ class Tower(GeoModel, BoundsPlugin):
                     <woodproduction>%s</woodproduction>
                     <latitude>%s</latitude>
                     <longitude>%s</longitude>
+                    <isComplete>%s</isComplete>
                     %s
                   </Tower>""" % (self.Experience, self.Speed, self.Power, self.Armor, self.Range,
                                  self.Accuracy, self.HitPoints, self.isIsolated, self.isCapital,
                                  self.hasRuler, self.Level, self.manaProduction, self.stoneProduction,
-                                 self.woodProduction, self.latitude, self.longitude, userString)
+                                 self.woodProduction, self.latitude, self.longitude, self.isComplete,
+                                 userString)
 
     def toJSON(self):
         """Get the json equivalent of the model. The JSON should be consistent throughout
@@ -701,10 +710,11 @@ class Portal(GeoModel, BoundsPlugin):
                     <startlongitude>%s</startlongitude>
                     <endlatitude>%s</endlatitude>
                     <endlongitude>%s</endlongitude>
+                    <isComplete>%s</isComplete>
                     %s
                   </Portal>""" %(self.hitPoints, self.level, self.startLocationLatitude,
                                  self.startLocationLongitude, self.endLocationLatitude,
-                                 self.endLocationLongitude, userString)
+                                 self.endLocationLongitude,self.isComplete, userString)
 
     @classmethod
     def createRandomObject(cls):

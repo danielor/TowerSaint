@@ -101,13 +101,10 @@ package models
 		}
 		
 		public function updateProduction(woodProduction:Number, stoneProduction:Number, manaProduction:Number) : void {
-			Alert.show(this.completeManaProduction.toString() + ":" + this.completeStoneProduction.toString() + ":" + this.completeWoodProduction.toString());
 			this.completeManaProduction += manaProduction;
 			this.completeStoneProduction += stoneProduction;
 			this.completeWoodProduction += woodProduction;
 			this.productionDate = new Date();
-			Alert.show(this.completeManaProduction.toString() + ":" + this.completeStoneProduction.toString() + ":" + this.completeWoodProduction.toString());
-
 		}
 		
 		public function toString():String {
