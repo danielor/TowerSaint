@@ -48,6 +48,9 @@ def main():
         'towersaint': TowerSaintManager()
     }
     
+    logging.basicConfig(level=logging.DEBUG,
+           format='%(asctime)s %(levelname)-5.5s [%(name)s] %(message)s')
+
 
     # Register the classes in the AMF namespace
     register_classes()

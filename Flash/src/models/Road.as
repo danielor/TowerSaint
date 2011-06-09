@@ -2,6 +2,9 @@ package models
 {
 	import assets.PhotoAssets;
 	
+	import away3d.containers.Scene3D;
+	import away3d.containers.View3D;
+	
 	import com.google.maps.LatLng;
 	import com.google.maps.LatLngBounds;
 	import com.google.maps.Map;
@@ -22,7 +25,7 @@ package models
 	import flashx.textLayout.elements.SpanElement;
 	import flashx.textLayout.elements.TextFlow;
 	
-	import managers.FocusPanelManager;
+	import managers.GameFocusManager;
 	
 	import models.constants.GameConstants;
 	import models.map.TowerSaintMarker;
@@ -94,6 +97,20 @@ package models
 			return new Production(0., 0., 0.);
 		}
 		
+		// Hide the 3d model
+		public function hide():void {
+			// TODO
+		}
+		// View the 3D model
+		public function view():void {
+			// TODO
+		}
+		// Return the drawing state
+		public function isDrawn():Boolean{
+			// TODO
+			return false;
+		}
+		
 		public static function createUserRoadFromJSON(buildObject:Object, u:User):Road {
 			var r:Road = new Road();
 			r.hitPoints = buildObject.hitpoints;
@@ -111,8 +128,7 @@ package models
 			r.user = User.createUserFromJSON(buildObject.user);
 			return r;
 		}
-		
-		public function draw(drag:Boolean, map:Map, photo:PhotoAssets, fpm:FocusPanelManager, withBoundary:Boolean) : void{
+		public function draw(drag:Boolean, map:Map, photo:PhotoAssets, fpm:GameFocusManager, withBoundary:Boolean, scence:Scene3D, view:View3D) : void{
 			
 			// Add a ground overlay
 			roadIcon = getRoadFromNeighbors(photo);
@@ -129,9 +145,16 @@ package models
 			markerOptions.draggable = drag;
 			
 			// Create the marker
-			roadMarker = new TowerSaintMarker(this, gposition, markerOptions, map);
+			roadMarker = new TowerSaintMarker(this, gposition, markerOptions, map, view);
 			roadMarker.addEventListener(MapMouseEvent.CLICK, fpm.onMarkerClick);
 			map.addOverlay(roadMarker);
+		}
+		public function isReady():Boolean{
+			return true;
+		}
+		
+		public function isAtValidLocation():Boolean {
+			return false;
 		}
 		
 		// Erase the marker
@@ -242,7 +265,9 @@ package models
 			
 		}
 			
-
+		public function getBounds():LatLngBounds{
+			return new LatLngBounds(new LatLng(0, 0), new LatLng(0, 0));
+		}
 		
 		public function getRoadFromNeighbors(_photo:PhotoAssets):BitmapAsset {
 			

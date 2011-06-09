@@ -2,12 +2,12 @@ package models.map
 {
 	import com.google.maps.Map;
 	
-	import managers.FocusPanelManager;
+	import managers.GameFocusManager;
 
 	public class TowerSaintMap extends Map
 	{
-		public var focusPanelManager:FocusPanelManager;
-		public function TowerSaintMap(fPM:FocusPanelManager)
+		public var focusPanelManager:GameFocusManager;
+		public function TowerSaintMap(fPM:GameFocusManager)
 		{
 			this.focusPanelManager = fPM;	
 		}

@@ -1,4 +1,4 @@
-# Copyright (c) 2009 The PyAMF Project.
+# Copyright (c) The PyAMF Project.
 # See LICENSE.txt for details.
 
 """
@@ -34,17 +34,17 @@ class ClassAliasTestCase(ClassCacheClearingTestCase):
         self.assertFalse(x.amf3)
         self.assertFalse(x.external)
 
-        self.assertEquals(x.readonly_attrs, None)
-        self.assertEquals(x.static_attrs, None)
-        self.assertEquals(x.exclude_attrs, None)
-        self.assertEquals(x.proxy_attrs, None)
+        self.assertEqual(x.readonly_attrs, None)
+        self.assertEqual(x.static_attrs, [])
+        self.assertEqual(x.exclude_attrs, None)
+        self.assertEqual(x.proxy_attrs, None)
 
-        self.assertEquals(x.alias, '')
-        self.assertEquals(x.klass, Spam)
+        self.assertEqual(x.alias, '')
+        self.assertEqual(x.klass, Spam)
 
         # compiled attributes
-        self.assertEquals(x.decodable_properties, None)
-        self.assertEquals(x.encodable_properties, None)
+        self.assertEqual(x.decodable_properties, None)
+        self.assertEqual(x.encodable_properties, None)
         self.assertTrue(x._compiled)
 
     def test_init_deferred(self):
@@ -54,17 +54,17 @@ class ClassAliasTestCase(ClassCacheClearingTestCase):
         x = ClassAlias(Spam, defer=True)
 
         self.assertTrue(x.anonymous)
-        self.assertEquals(x.dynamic, None)
+        self.assertEqual(x.dynamic, None)
         self.assertFalse(x.amf3)
         self.assertFalse(x.external)
 
-        self.assertEquals(x.readonly_attrs, None)
-        self.assertEquals(x.static_attrs, None)
-        self.assertEquals(x.exclude_attrs, None)
-        self.assertEquals(x.proxy_attrs, None)
+        self.assertEqual(x.readonly_attrs, None)
+        self.assertEqual(x.static_attrs, None)
+        self.assertEqual(x.exclude_attrs, None)
+        self.assertEqual(x.proxy_attrs, None)
 
-        self.assertEquals(x.alias, '')
-        self.assertEquals(x.klass, Spam)
+        self.assertEqual(x.alias, '')
+        self.assertEqual(x.klass, Spam)
 
         # compiled attributes
         self.assertFalse(hasattr(x, 'static_properties'))
@@ -76,21 +76,21 @@ class ClassAliasTestCase(ClassCacheClearingTestCase):
             external='eggs', dynamic='goo', proxy_attrs=('blarg',))
 
         self.assertFalse(x.anonymous)
-        self.assertEquals(x.dynamic, 'goo')
-        self.assertEquals(x.amf3, 'spam')
-        self.assertEquals(x.external, 'eggs')
+        self.assertEqual(x.dynamic, 'goo')
+        self.assertEqual(x.amf3, 'spam')
+        self.assertEqual(x.external, 'eggs')
 
-        self.assertEquals(x.readonly_attrs, ['a', 'g', 'k'])
-        self.assertEquals(x.static_attrs, ['bar'])
-        self.assertEquals(x.exclude_attrs, ['baz'])
-        self.assertEquals(x.proxy_attrs, ['blarg'])
+        self.assertEqual(x.readonly_attrs, ['a', 'g', 'k'])
+        self.assertEqual(x.static_attrs, ['bar'])
+        self.assertEqual(x.exclude_attrs, ['baz'])
+        self.assertEqual(x.proxy_attrs, ['blarg'])
 
-        self.assertEquals(x.alias, 'foo')
-        self.assertEquals(x.klass, Spam)
+        self.assertEqual(x.alias, 'foo')
+        self.assertEqual(x.klass, Spam)
 
         # compiled attributes
-        self.assertEquals(x.encodable_properties, ['bar'])
-        self.assertEquals(x.decodable_properties, ['bar'])
+        self.assertEqual(x.encodable_properties, ['bar'])
+        self.assertEqual(x.decodable_properties, ['bar'])
         self.assertTrue(x._compiled)
 
     def test_bad_class(self):
@@ -106,7 +106,7 @@ class ClassAliasTestCase(ClassCacheClearingTestCase):
                 pass
 
         self.assertRaises(TypeError, ClassAlias, ClassicFoo)
-        self.assertRaises(TypeError, ClassAlias, NewFoo)
+        ClassAlias(NewFoo)
 
     def test_createInstance(self):
         x = ClassAlias(Spam, 'org.example.spam.Spam')
@@ -121,7 +121,7 @@ class ClassAliasTestCase(ClassCacheClearingTestCase):
 
         x = ClassAlias(Eggs, 'org.example.eggs.Eggs')
 
-        self.assertEquals(str(x), 'org.example.eggs.Eggs')
+        self.assertEqual(str(x), 'org.example.eggs.Eggs')
 
     def test_eq(self):
         class A(object):
@@ -134,8 +134,8 @@ class ClassAliasTestCase(ClassCacheClearingTestCase):
         y = ClassAlias(A, 'org.example.A')
         z = ClassAlias(B, 'org.example.B')
 
-        self.assertEquals(x, A)
-        self.assertEquals(x, y)
+        self.assertEqual(x, A)
+        self.assertEqual(x, y)
         self.assertNotEquals(x, z)
 
 
@@ -149,9 +149,9 @@ class GetEncodableAttributesTestCase(unittest.TestCase):
         self.obj = Spam()
 
     def test_empty(self):
-        sa, da = self.alias.getEncodableAttributes(self.obj)
+        attrs = self.alias.getEncodableAttributes(self.obj)
 
-        self.assertEquals(sa, da, None)
+        self.assertEqual(attrs, {})
 
     def test_static(self):
         self.alias.static_attrs = ['foo', 'bar']
@@ -161,49 +161,66 @@ class GetEncodableAttributesTestCase(unittest.TestCase):
         # leave self.obj.bar
         self.assertFalse(hasattr(self.obj, 'bar'))
 
-        sa, da = self.alias.getEncodableAttributes(self.obj)
+        attrs = self.alias.getEncodableAttributes(self.obj)
 
-        self.assertEquals(sa, {'foo': 'bar', 'bar': pyamf.Undefined})
-        self.assertEquals(da, None)
+        self.assertEqual(attrs, {'foo': 'bar', 'bar': pyamf.Undefined})
 
     def test_not_dynamic(self):
         self.alias.compile()
         self.alias.dynamic = False
 
-        self.assertEquals(self.alias.getEncodableAttributes(self.obj), (None, None))
+        self.assertEqual(self.alias.getEncodableAttributes(self.obj), {})
 
     def test_dynamic(self):
         self.alias.compile()
 
-        self.assertEquals(self.alias.encodable_properties, None)
+        self.assertEqual(self.alias.encodable_properties, None)
         self.obj.foo = 'bar'
         self.obj.bar = 'foo'
 
-        sa, da = self.alias.getEncodableAttributes(self.obj)
-        self.assertEquals(sa, None)
-        self.assertEquals(da, {'foo': 'bar', 'bar': 'foo'})
+        attrs = self.alias.getEncodableAttributes(self.obj)
+        self.assertEqual(attrs, {'foo': 'bar', 'bar': 'foo'})
 
     def test_proxy(self):
         from pyamf import flex
 
-        self.alias.amf3 = True
+        c = pyamf.get_encoder(pyamf.AMF3)
+
         self.alias.proxy_attrs = ('foo', 'bar')
         self.alias.compile()
 
-        self.assertEquals(self.alias.proxy_attrs, ['bar', 'foo'])
+        self.assertEqual(self.alias.proxy_attrs, ['bar', 'foo'])
 
         self.obj.foo = ['bar', 'baz']
         self.obj.bar = {'foo': 'gak'}
 
-        sa, da = self.alias.getEncodableAttributes(self.obj)
-        self.assertEquals(sa, None)
-        self.assertEquals(da.keys(), ['foo', 'bar'])
+        attrs = self.alias.getEncodableAttributes(self.obj, c)
 
-        self.assertTrue(isinstance(da['foo'], flex.ArrayCollection))
-        self.assertEquals(da['foo'], ['bar', 'baz'])
+        k = attrs.keys()
 
-        self.assertTrue(isinstance(da['bar'], flex.ObjectProxy))
-        self.assertEquals(da['bar']._amf_object, {'foo': 'gak'})
+        k.sort()
+
+        self.assertEqual(k, ['bar', 'foo'])
+
+        self.assertTrue(isinstance(attrs['foo'], flex.ArrayCollection))
+        self.assertEqual(attrs['foo'], ['bar', 'baz'])
+
+        self.assertTrue(isinstance(attrs['bar'], flex.ObjectProxy))
+        self.assertEqual(attrs['bar']._amf_object, {'foo': 'gak'})
+
+    def test_synonym(self):
+        self.alias.synonym_attrs = {'foo': 'bar'}
+        self.alias.compile()
+
+        self.assertFalse(self.alias.shortcut_encode)
+        self.assertFalse(self.alias.shortcut_decode)
+
+        self.obj.foo = 'bar'
+        self.obj.spam = 'eggs'
+
+        ret = self.alias.getEncodableAttributes(self.obj)
+
+        self.assertEquals(ret, {'bar': 'bar', 'spam': 'eggs'})
 
 
 class GetDecodableAttributesTestCase(unittest.TestCase):
@@ -238,7 +255,7 @@ class GetDecodableAttributesTestCase(unittest.TestCase):
 
         ret = self.alias.getDecodableAttributes(self.obj, attrs)
 
-        self.assertEquals(attrs, {'foo': None, 'bar': [1, 2, 3]})
+        self.assertEqual(ret, {'foo': None, 'bar': [1, 2, 3]})
 
     def test_readonly(self):
         self.alias.compile()
@@ -249,7 +266,7 @@ class GetDecodableAttributesTestCase(unittest.TestCase):
 
         ret = self.alias.getDecodableAttributes(self.obj, attrs)
 
-        self.assertEquals(ret, {'foo': None})
+        self.assertEqual(ret, {'foo': None})
 
     def test_not_dynamic(self):
         self.alias.compile()
@@ -261,7 +278,7 @@ class GetDecodableAttributesTestCase(unittest.TestCase):
 
         ret = self.alias.getDecodableAttributes(self.obj, attrs)
 
-        self.assertEquals(ret, {'bar': [1, 2, 3]})
+        self.assertEqual(ret, {'bar': [1, 2, 3]})
 
     def test_dynamic(self):
         self.alias.compile()
@@ -273,7 +290,7 @@ class GetDecodableAttributesTestCase(unittest.TestCase):
 
         ret = self.alias.getDecodableAttributes(self.obj, attrs)
 
-        self.assertEquals(ret, {'foo': None, 'bar': [1, 2, 3]})
+        self.assertEqual(ret, {'foo': None, 'bar': [1, 2, 3]})
 
     def test_complex(self):
         self.alias.compile()
@@ -295,7 +312,12 @@ class GetDecodableAttributesTestCase(unittest.TestCase):
 
         ret = self.alias.getDecodableAttributes(self.obj, attrs)
 
-        self.assertEquals(ret, {'foo': 'foo', 'bar': 'bar', 'dyn2': 'dyn2', 'dyn1': 'dyn1'})
+        self.assertEquals(ret, {
+            'foo': 'foo',
+            'bar': 'bar',
+            'dyn2': 'dyn2',
+            'dyn1': 'dyn1'
+        })
 
     def test_complex_not_dynamic(self):
         self.alias.compile()
@@ -318,7 +340,7 @@ class GetDecodableAttributesTestCase(unittest.TestCase):
 
         ret = self.alias.getDecodableAttributes(self.obj, attrs)
 
-        self.assertEquals(ret, {'foo': 'foo', 'bar': 'bar'})
+        self.assertEqual(ret, {'foo': 'foo', 'bar': 'bar'})
 
     def test_static(self):
         self.alias.dynamic = False
@@ -335,28 +357,45 @@ class GetDecodableAttributesTestCase(unittest.TestCase):
 
         ret = self.alias.getDecodableAttributes(self.obj, attrs)
 
-        self.assertEquals(ret, {'foo': 'foo', 'bar': 'bar'})
+        self.assertEqual(ret, {'foo': 'foo', 'bar': 'bar'})
 
     def test_proxy(self):
         from pyamf import flex
 
-        self.alias.amf3 = True
+        c = pyamf.get_encoder(pyamf.AMF3)
+
         self.alias.proxy_attrs = ('foo', 'bar')
         self.alias.compile()
 
-        self.assertEquals(self.alias.proxy_attrs, ['bar', 'foo'])
+        self.assertEqual(self.alias.proxy_attrs, ['bar', 'foo'])
 
         attrs = {
             'foo': flex.ArrayCollection(['bar', 'baz']),
             'bar': flex.ObjectProxy({'foo': 'gak'})
         }
 
-        ret = self.alias.getDecodableAttributes(self.obj, attrs)
+        ret = self.alias.getDecodableAttributes(self.obj, attrs, c)
 
-        self.assertEquals(ret, {
+        self.assertEqual(ret, {
             'foo': ['bar', 'baz'],
             'bar': {'foo': 'gak'}
         })
+
+    def test_synonym(self):
+        self.alias.synonym_attrs = {'foo': 'bar'}
+        self.alias.compile()
+
+        self.assertFalse(self.alias.shortcut_encode)
+        self.assertFalse(self.alias.shortcut_decode)
+
+        attrs = {
+            'foo': 'foo',
+            'spam': 'eggs'
+        }
+
+        ret = self.alias.getDecodableAttributes(self.obj, attrs)
+
+        self.assertEquals(ret, {'bar': 'foo', 'spam': 'eggs'})
 
 
 class ApplyAttributesTestCase(unittest.TestCase):
@@ -365,7 +404,7 @@ class ApplyAttributesTestCase(unittest.TestCase):
     """
 
     def setUp(self):
-        self.alias = ClassAlias(Spam, 'foo')
+        self.alias = ClassAlias(Spam, 'foo', defer=True)
         self.obj = Spam()
 
     def test_object(self):
@@ -376,10 +415,10 @@ class ApplyAttributesTestCase(unittest.TestCase):
         self.obj = Foo()
         self.alias = ClassAlias(Foo, 'foo', defer=True)
 
-        self.assertEquals(self.obj.__dict__, {})
+        self.assertEqual(self.obj.__dict__, {})
         self.alias.applyAttributes(self.obj, attrs)
 
-        self.assertEquals(self.obj.__dict__, {'foo': 'spam', 'bar': 'eggs'})
+        self.assertEqual(self.obj.__dict__, {'foo': 'spam', 'bar': 'eggs'})
 
     def test_classic(self):
         class Foo:
@@ -389,30 +428,30 @@ class ApplyAttributesTestCase(unittest.TestCase):
         self.obj = Foo()
         self.alias = ClassAlias(Foo, 'foo', defer=True)
 
-        self.assertEquals(self.obj.__dict__, {})
+        self.assertEqual(self.obj.__dict__, {})
         self.alias.applyAttributes(self.obj, attrs)
 
-        self.assertEquals(self.obj.__dict__, {'foo': 'spam', 'bar': 'eggs'})
+        self.assertEqual(self.obj.__dict__, {'foo': 'spam', 'bar': 'eggs'})
 
     def test_readonly(self):
         self.alias.readonly_attrs = ['foo', 'bar']
 
         attrs = {'foo': 'spam', 'bar': 'eggs'}
 
-        self.assertEquals(self.obj.__dict__, {})
+        self.assertEqual(self.obj.__dict__, {})
         self.alias.applyAttributes(self.obj, attrs)
 
-        self.assertEquals(self.obj.__dict__, {})
+        self.assertEqual(self.obj.__dict__, {})
 
     def test_exclude(self):
         self.alias.exclude_attrs = ['foo', 'bar']
 
         attrs = {'foo': 'spam', 'bar': 'eggs'}
 
-        self.assertEquals(self.obj.__dict__, {})
+        self.assertEqual(self.obj.__dict__, {})
         self.alias.applyAttributes(self.obj, attrs)
 
-        self.assertEquals(self.obj.__dict__, {})
+        self.assertEqual(self.obj.__dict__, {})
 
     def test_not_dynamic(self):
         self.alias.static_properties = None
@@ -420,19 +459,19 @@ class ApplyAttributesTestCase(unittest.TestCase):
 
         attrs = {'foo': 'spam', 'bar': 'eggs'}
 
-        self.assertEquals(self.obj.__dict__, {})
+        self.assertEqual(self.obj.__dict__, {})
         self.alias.applyAttributes(self.obj, attrs)
 
-        self.assertEquals(self.obj.__dict__, {})
+        self.assertEqual(self.obj.__dict__, {})
 
     def test_dict(self):
         attrs = {'foo': 'spam', 'bar': 'eggs'}
-        self.obj = {}
+        self.obj = Spam()
 
-        self.assertEquals(self.obj, {})
+        self.assertEqual(self.obj.__dict__, {})
         self.alias.applyAttributes(self.obj, attrs)
 
-        self.assertEquals(self.obj, {'foo': 'spam', 'bar': 'eggs'})
+        self.assertEqual(self.obj.__dict__, {'foo': 'spam', 'bar': 'eggs'})
 
 
 class SimpleCompliationTestCase(unittest.TestCase):
@@ -486,33 +525,33 @@ class SimpleCompliationTestCase(unittest.TestCase):
         a = ClassAlias(A, external=True)
         b = ClassAlias(B, external=True)
 
-        self.assertEquals(a.readonly_attrs, None)
-        self.assertEquals(a.static_attrs, None)
-        self.assertEquals(a.decodable_properties, None)
-        self.assertEquals(a.encodable_properties, None)
-        self.assertEquals(a.exclude_attrs, None)
+        self.assertEqual(a.readonly_attrs, None)
+        self.assertEqual(a.static_attrs, [])
+        self.assertEqual(a.decodable_properties, None)
+        self.assertEqual(a.encodable_properties, None)
+        self.assertEqual(a.exclude_attrs, None)
 
         self.assertTrue(a.anonymous)
         self.assertTrue(a.external)
         self.assertTrue(a._compiled)
 
-        self.assertEquals(a.klass, A)
-        self.assertEquals(a.alias, '')
+        self.assertEqual(a.klass, A)
+        self.assertEqual(a.alias, '')
 
         # now b
 
-        self.assertEquals(b.readonly_attrs, None)
-        self.assertEquals(b.static_attrs, None)
-        self.assertEquals(b.decodable_properties, None)
-        self.assertEquals(b.encodable_properties, None)
-        self.assertEquals(b.exclude_attrs, None)
+        self.assertEqual(b.readonly_attrs, None)
+        self.assertEqual(b.static_attrs, [])
+        self.assertEqual(b.decodable_properties, None)
+        self.assertEqual(b.encodable_properties, None)
+        self.assertEqual(b.exclude_attrs, None)
 
         self.assertTrue(b.anonymous)
         self.assertTrue(b.external)
         self.assertTrue(b._compiled)
 
-        self.assertEquals(b.klass, B)
-        self.assertEquals(b.alias, '')
+        self.assertEqual(b.klass, B)
+        self.assertEqual(b.alias, '')
 
     def test_anonymous(self):
         x = ClassAlias(Spam, None)
@@ -522,35 +561,35 @@ class SimpleCompliationTestCase(unittest.TestCase):
         self.assertTrue(x.anonymous)
         self.assertTrue(x._compiled)
 
-        self.assertEquals(x.klass, Spam)
-        self.assertEquals(x.alias, '')
+        self.assertEqual(x.klass, Spam)
+        self.assertEqual(x.alias, '')
 
     def test_exclude(self):
         x = ClassAlias(Spam, exclude_attrs=['foo', 'bar'], defer=True)
 
-        self.assertEquals(x.exclude_attrs, ['foo', 'bar'])
+        self.assertEqual(x.exclude_attrs, ['foo', 'bar'])
 
         x.compile()
 
-        self.assertEquals(x.exclude_attrs, ['bar', 'foo'])
+        self.assertEqual(x.exclude_attrs, ['bar', 'foo'])
 
     def test_readonly(self):
         x = ClassAlias(Spam, readonly_attrs=['foo', 'bar'], defer=True)
 
-        self.assertEquals(x.readonly_attrs, ['foo', 'bar'])
+        self.assertEqual(x.readonly_attrs, ['foo', 'bar'])
 
         x.compile()
 
-        self.assertEquals(x.readonly_attrs, ['bar', 'foo'])
+        self.assertEqual(x.readonly_attrs, ['bar', 'foo'])
 
     def test_static(self):
         x = ClassAlias(Spam, static_attrs=['foo', 'bar'], defer=True)
 
-        self.assertEquals(x.static_attrs, ['foo', 'bar'])
+        self.assertEqual(x.static_attrs, ['foo', 'bar'])
 
         x.compile()
 
-        self.assertEquals(x.static_attrs, ['bar', 'foo'])
+        self.assertEqual(x.static_attrs, ['foo', 'bar'])
 
     def test_custom_properties(self):
         class A(ClassAlias):
@@ -560,14 +599,14 @@ class SimpleCompliationTestCase(unittest.TestCase):
 
         a = A(Spam)
 
-        self.assertEquals(a.encodable_properties, ['bar', 'foo'])
-        self.assertEquals(a.decodable_properties, ['bar', 'foo'])
+        self.assertEqual(a.encodable_properties, ['bar', 'foo'])
+        self.assertEqual(a.decodable_properties, ['bar', 'foo'])
 
         # test combined
         b = A(Spam, static_attrs=['foo', 'baz', 'gak'])
 
-        self.assertEquals(b.encodable_properties, ['bar', 'baz', 'foo', 'gak'])
-        self.assertEquals(b.decodable_properties, ['bar', 'baz', 'foo', 'gak'])
+        self.assertEqual(b.encodable_properties, ['bar', 'baz', 'foo', 'gak'])
+        self.assertEqual(b.decodable_properties, ['bar', 'baz', 'foo', 'gak'])
 
     def test_amf3(self):
         x = ClassAlias(Spam, amf3=True)
@@ -583,6 +622,34 @@ class SimpleCompliationTestCase(unittest.TestCase):
         x = ClassAlias(Spam)
         self.assertTrue(x.dynamic)
 
+    def test_sealed_external(self):
+        class A(object):
+            __slots__ = ('foo',)
+
+            class __amf__:
+                external = True
+
+            def __readamf__(self, foo):
+                pass
+
+            def __writeamf__(self, foo):
+                pass
+
+        x = ClassAlias(A)
+
+        x.compile()
+
+        self.assertTrue(x.sealed)
+
+    def test_synonym_attrs(self):
+        x = ClassAlias(Spam, synonym_attrs={'foo': 'bar'}, defer=True)
+
+        self.assertEquals(x.synonym_attrs, {'foo': 'bar'})
+
+        x.compile()
+
+        self.assertEquals(x.synonym_attrs, {'foo': 'bar'})
+
 
 class CompilationInheritanceTestCase(ClassCacheClearingTestCase):
     """
@@ -593,6 +660,37 @@ class CompilationInheritanceTestCase(ClassCacheClearingTestCase):
         pyamf.CLASS_CACHE[alias.klass] = alias
 
         return alias
+
+    def test_bases(self):
+        class A:
+            pass
+
+        class B(A):
+            pass
+
+        class C(B):
+            pass
+
+        a = self._register(ClassAlias(A, 'a', defer=True))
+        b = self._register(ClassAlias(B, 'b', defer=True))
+        c = self._register(ClassAlias(C, 'c', defer=True))
+
+        self.assertEqual(a.bases, None)
+        self.assertEqual(b.bases, None)
+        self.assertEqual(c.bases, None)
+
+        a.compile()
+        self.assertEqual(a.bases, [])
+
+        b.compile()
+        self.assertEqual(a.bases, [])
+        self.assertEqual(b.bases, [(A, a)])
+
+        c.compile()
+        self.assertEqual(a.bases, [])
+        self.assertEqual(b.bases, [(A, a)])
+        self.assertEqual(c.bases, [(B, b), (A, a)])
+
 
     def test_exclude_classic(self):
         class A:
@@ -618,9 +716,9 @@ class CompilationInheritanceTestCase(ClassCacheClearingTestCase):
         self.assertTrue(b._compiled)
         self.assertTrue(c._compiled)
 
-        self.assertEquals(a.exclude_attrs, ['foo'])
-        self.assertEquals(b.exclude_attrs, ['foo'])
-        self.assertEquals(c.exclude_attrs, ['bar', 'foo'])
+        self.assertEqual(a.exclude_attrs, ['foo'])
+        self.assertEqual(b.exclude_attrs, ['foo'])
+        self.assertEqual(c.exclude_attrs, ['bar', 'foo'])
 
     def test_exclude_new(self):
         class A(object):
@@ -646,9 +744,9 @@ class CompilationInheritanceTestCase(ClassCacheClearingTestCase):
         self.assertTrue(b._compiled)
         self.assertTrue(c._compiled)
 
-        self.assertEquals(a.exclude_attrs, ['foo'])
-        self.assertEquals(b.exclude_attrs, ['foo'])
-        self.assertEquals(c.exclude_attrs, ['bar', 'foo'])
+        self.assertEqual(a.exclude_attrs, ['foo'])
+        self.assertEqual(b.exclude_attrs, ['foo'])
+        self.assertEqual(c.exclude_attrs, ['bar', 'foo'])
 
     def test_readonly_classic(self):
         class A:
@@ -674,9 +772,9 @@ class CompilationInheritanceTestCase(ClassCacheClearingTestCase):
         self.assertTrue(b._compiled)
         self.assertTrue(c._compiled)
 
-        self.assertEquals(a.readonly_attrs, ['foo'])
-        self.assertEquals(b.readonly_attrs, ['foo'])
-        self.assertEquals(c.readonly_attrs, ['bar', 'foo'])
+        self.assertEqual(a.readonly_attrs, ['foo'])
+        self.assertEqual(b.readonly_attrs, ['foo'])
+        self.assertEqual(c.readonly_attrs, ['bar', 'foo'])
 
     def test_readonly_new(self):
         class A(object):
@@ -702,9 +800,9 @@ class CompilationInheritanceTestCase(ClassCacheClearingTestCase):
         self.assertTrue(b._compiled)
         self.assertTrue(c._compiled)
 
-        self.assertEquals(a.readonly_attrs, ['foo'])
-        self.assertEquals(b.readonly_attrs, ['foo'])
-        self.assertEquals(c.readonly_attrs, ['bar', 'foo'])
+        self.assertEqual(a.readonly_attrs, ['foo'])
+        self.assertEqual(b.readonly_attrs, ['foo'])
+        self.assertEqual(c.readonly_attrs, ['bar', 'foo'])
 
     def test_static_classic(self):
         class A:
@@ -730,9 +828,9 @@ class CompilationInheritanceTestCase(ClassCacheClearingTestCase):
         self.assertTrue(b._compiled)
         self.assertTrue(c._compiled)
 
-        self.assertEquals(a.static_attrs, ['foo'])
-        self.assertEquals(b.static_attrs, ['foo'])
-        self.assertEquals(c.static_attrs, ['bar', 'foo'])
+        self.assertEqual(a.static_attrs, ['foo'])
+        self.assertEqual(b.static_attrs, ['foo'])
+        self.assertEqual(c.static_attrs, ['foo', 'bar'])
 
     def test_static_new(self):
         class A(object):
@@ -758,9 +856,9 @@ class CompilationInheritanceTestCase(ClassCacheClearingTestCase):
         self.assertTrue(b._compiled)
         self.assertTrue(c._compiled)
 
-        self.assertEquals(a.static_attrs, ['foo'])
-        self.assertEquals(b.static_attrs, ['foo'])
-        self.assertEquals(c.static_attrs, ['bar', 'foo'])
+        self.assertEqual(a.static_attrs, ['foo'])
+        self.assertEqual(b.static_attrs, ['foo'])
+        self.assertEqual(c.static_attrs, ['foo', 'bar'])
 
     def test_amf3(self):
         class A:
@@ -819,6 +917,35 @@ class CompilationInheritanceTestCase(ClassCacheClearingTestCase):
         self.assertTrue(c.dynamic)
 
 
+    def test_synonym_attrs(self):
+        class A(object):
+            pass
+
+        class B(A):
+            pass
+
+        class C(B):
+            pass
+
+        a = self._register(ClassAlias(A, 'a', synonym_attrs={'foo': 'bar', 'bar': 'baz'}, defer=True))
+        b = self._register(ClassAlias(B, 'b', defer=True))
+        c = self._register(ClassAlias(C, 'c', synonym_attrs={'bar': 'spam'}, defer=True))
+
+        self.assertFalse(a._compiled)
+        self.assertFalse(b._compiled)
+        self.assertFalse(c._compiled)
+
+        c.compile()
+
+        self.assertTrue(a._compiled)
+        self.assertTrue(b._compiled)
+        self.assertTrue(c._compiled)
+
+        self.assertEquals(a.synonym_attrs, {'foo': 'bar', 'bar': 'baz'})
+        self.assertEquals(b.synonym_attrs, {'foo': 'bar', 'bar': 'baz'})
+        self.assertEquals(c.synonym_attrs, {'foo': 'bar', 'bar': 'spam'})
+
+
 class CompilationIntegrationTestCase(unittest.TestCase):
     """
     Integration tests for ClassAlias's
@@ -840,26 +967,26 @@ class CompilationIntegrationTestCase(unittest.TestCase):
         a = ClassAlias(A)
 
         self.assertFalse(a.dynamic)
-        self.assertEquals(a.encodable_properties, ['bar', 'foo'])
-        self.assertEquals(a.decodable_properties, ['bar', 'foo'])
+        self.assertEqual(a.encodable_properties, ['bar', 'foo'])
+        self.assertEqual(a.decodable_properties, ['bar', 'foo'])
 
         b = ClassAlias(B)
 
         self.assertFalse(b.dynamic)
-        self.assertEquals(b.encodable_properties, ['bar', 'foo', 'gak'])
-        self.assertEquals(b.decodable_properties, ['bar', 'foo', 'gak'])
+        self.assertEqual(b.encodable_properties, ['bar', 'foo', 'gak'])
+        self.assertEqual(b.decodable_properties, ['bar', 'foo', 'gak'])
 
         c = ClassAlias(C)
 
         self.assertFalse(c.dynamic)
-        self.assertEquals(c.encodable_properties, ['bar', 'foo', 'gak'])
-        self.assertEquals(c.decodable_properties, ['bar', 'foo', 'gak'])
+        self.assertEqual(c.encodable_properties, ['bar', 'foo', 'gak'])
+        self.assertEqual(c.decodable_properties, ['bar', 'foo', 'gak'])
 
         d = ClassAlias(D)
 
         self.assertFalse(d.dynamic)
-        self.assertEquals(d.encodable_properties, ['bar', 'foo', 'gak', 'spam'])
-        self.assertEquals(d.decodable_properties, ['bar', 'foo', 'gak', 'spam'])
+        self.assertEqual(d.encodable_properties, ['bar', 'foo', 'gak', 'spam'])
+        self.assertEqual(d.decodable_properties, ['bar', 'foo', 'gak', 'spam'])
 
     def test_slots_new(self):
         class A(object):
@@ -877,26 +1004,26 @@ class CompilationIntegrationTestCase(unittest.TestCase):
         a = ClassAlias(A)
 
         self.assertFalse(a.dynamic)
-        self.assertEquals(a.encodable_properties, ['bar', 'foo'])
-        self.assertEquals(a.decodable_properties, ['bar', 'foo'])
+        self.assertEqual(a.encodable_properties, ['bar', 'foo'])
+        self.assertEqual(a.decodable_properties, ['bar', 'foo'])
 
         b = ClassAlias(B)
 
         self.assertFalse(b.dynamic)
-        self.assertEquals(b.encodable_properties, ['bar', 'foo', 'gak'])
-        self.assertEquals(b.decodable_properties, ['bar', 'foo', 'gak'])
+        self.assertEqual(b.encodable_properties, ['bar', 'foo', 'gak'])
+        self.assertEqual(b.decodable_properties, ['bar', 'foo', 'gak'])
 
         c = ClassAlias(C)
 
         self.assertTrue(c.dynamic)
-        self.assertEquals(c.encodable_properties, ['bar', 'foo', 'gak'])
-        self.assertEquals(c.decodable_properties, ['bar', 'foo', 'gak'])
+        self.assertEqual(c.encodable_properties, ['bar', 'foo', 'gak'])
+        self.assertEqual(c.decodable_properties, ['bar', 'foo', 'gak'])
 
         d = ClassAlias(D)
 
         self.assertTrue(d.dynamic)
-        self.assertEquals(d.encodable_properties, ['bar', 'foo', 'gak', 'spam'])
-        self.assertEquals(d.decodable_properties, ['bar', 'foo', 'gak', 'spam'])
+        self.assertEqual(d.encodable_properties, ['bar', 'foo', 'gak', 'spam'])
+        self.assertEqual(d.decodable_properties, ['bar', 'foo', 'gak', 'spam'])
 
     def test_properties(self):
         class A:
@@ -913,20 +1040,20 @@ class CompilationIntegrationTestCase(unittest.TestCase):
         a = ClassAlias(A)
 
         self.assertTrue(a.dynamic)
-        self.assertEquals(a.encodable_properties, ['a_ro', 'a_rw'])
-        self.assertEquals(a.decodable_properties, ['a_rw'])
+        self.assertEqual(a.encodable_properties, ['a_ro', 'a_rw'])
+        self.assertEqual(a.decodable_properties, ['a_rw'])
 
         b = ClassAlias(B)
 
         self.assertTrue(b.dynamic)
-        self.assertEquals(b.encodable_properties, ['a_ro', 'a_rw', 'b_ro', 'b_rw'])
-        self.assertEquals(b.decodable_properties, ['a_rw', 'b_rw'])
+        self.assertEqual(b.encodable_properties, ['a_ro', 'a_rw', 'b_ro', 'b_rw'])
+        self.assertEqual(b.decodable_properties, ['a_rw', 'b_rw'])
 
         c = ClassAlias(C)
 
         self.assertTrue(c.dynamic)
-        self.assertEquals(c.encodable_properties, ['a_ro', 'a_rw', 'b_ro', 'b_rw'])
-        self.assertEquals(c.decodable_properties, ['a_rw', 'b_rw'])
+        self.assertEqual(c.encodable_properties, ['a_ro', 'a_rw', 'b_ro', 'b_rw'])
+        self.assertEqual(c.decodable_properties, ['a_rw', 'b_rw'])
 
 
 class RegisterClassTestCase(ClassCacheClearingTestCase):
@@ -950,11 +1077,11 @@ class RegisterClassTestCase(ClassCacheClearingTestCase):
         alias = pyamf.register_class(Spam)
 
         self.assertTrue('spam.eggs' in pyamf.CLASS_CACHE.keys())
-        self.assertEquals(pyamf.CLASS_CACHE['spam.eggs'], alias)
+        self.assertEqual(pyamf.CLASS_CACHE['spam.eggs'], alias)
 
         self.assertTrue(isinstance(alias, pyamf.ClassAlias))
-        self.assertEquals(alias.klass, Spam)
-        self.assertEquals(alias.alias, 'spam.eggs')
+        self.assertEqual(alias.klass, Spam)
+        self.assertEqual(alias.alias, 'spam.eggs')
 
         self.assertFalse(alias._compiled)
 
@@ -964,11 +1091,11 @@ class RegisterClassTestCase(ClassCacheClearingTestCase):
         alias = pyamf.register_class(Spam, 'spam.eggs')
 
         self.assertTrue('spam.eggs' in pyamf.CLASS_CACHE.keys())
-        self.assertEquals(pyamf.CLASS_CACHE['spam.eggs'], alias)
+        self.assertEqual(pyamf.CLASS_CACHE['spam.eggs'], alias)
 
         self.assertTrue(isinstance(alias, pyamf.ClassAlias))
-        self.assertEquals(alias.klass, Spam)
-        self.assertEquals(alias.alias, 'spam.eggs')
+        self.assertEqual(alias.klass, Spam)
+        self.assertEqual(alias.alias, 'spam.eggs')
 
         self.assertFalse(alias._compiled)
 
@@ -1013,28 +1140,3 @@ class UnregisterClassTestCase(ClassCacheClearingTestCase):
         self.assertTrue('foo' in pyamf.CLASS_CACHE)
         self.assertFalse(Spam in pyamf.CLASS_CACHE)
         self.assertTrue(ret is alias)
-
-
-def suite():
-    suite = unittest.TestSuite()
-
-    test_cases = [
-        ClassAliasTestCase,
-        GetDecodableAttributesTestCase,
-        GetEncodableAttributesTestCase,
-        ApplyAttributesTestCase,
-        SimpleCompliationTestCase,
-        CompilationIntegrationTestCase,
-        CompilationInheritanceTestCase,
-        RegisterClassTestCase,
-        UnregisterClassTestCase
-    ]
-
-    for tc in test_cases:
-        suite.addTest(unittest.makeSuite(tc))
-
-    return suite
-
-
-if __name__ == '__main__':
-    unittest.main(defaultTest='suite')

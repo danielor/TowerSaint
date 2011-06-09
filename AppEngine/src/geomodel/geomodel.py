@@ -28,6 +28,7 @@ import math
 import sys
 
 from google.appengine.ext import db
+from google.appengine.ext.db import polymodel
 
 import geocell
 import geomath
@@ -42,7 +43,7 @@ def default_cost_function(num_cells, resolution):
     return 1e10000 if num_cells > pow(geocell._GEOCELL_GRID_SIZE, 2) else 0
 
 
-class GeoModel(db.Model):
+class GeoModel(polymodel.PolyModel):
     """A base model class for single-point geographically located entities.
 
     Attributes:

@@ -55,6 +55,7 @@ package managers
 		private var currentList:List;								/* The current list of the view */
 		private var popup:BuildInspectPopup;						/* Reference to the inpsect popup */
 	    private var selectedIndex:int;								/* The index selected from the queue */
+		
 		public function QueueManager(a:Application, p:PhotoAssets)
 		{
 			// Save a reference to the application

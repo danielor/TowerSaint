@@ -245,6 +245,7 @@ class BoundsPlugin(object):
     The filter plugin adds filter functionality to all of the model object.
     Static methods will be inherited by all of children methods
     """
+    
     @classmethod
     def createRandomObjectInBounds(cls, bounds):
         """
@@ -414,12 +415,18 @@ class Road(GeoModel, BoundsPlugin):
         return [db.GeoPt(self.latitude, self.longitude)]
     
 class Tower(GeoModel, BoundsPlugin):
+#class Tower(db.Model):
     """The tower object integrates with AMF"""
+
 #    class __amf__:
 #        external = True
-#        amf3 = True
-#        
-#    def __writeamf__(self, output):
+#    
+#    def __readamf__(self, i):
+#        self.readAMF(i)
+#    def __writeamf__(self, o):
+#        self.writeAMF(o)
+#    
+#    def writeAMF(self, output):
 #        """Encoding of the information"""
 #        output.writeInt(self.Experience)
 #        output.writeInt(self.Speed)
@@ -440,9 +447,12 @@ class Tower(GeoModel, BoundsPlugin):
 #        output.writeInt(self.lonIndex)
 #        output.writeFloat(self.latitude)
 #        output.writeFloat(self.longitude)
+#        output.writeObject(self.foundingDate)
 #        
-#    def __readamf__(self, input):
+#    def readAMF(self, input):
 #        """Decoding of the information"""
+#        logging.error("Iam here")
+#        logging.error(str(input))
 #        self.Experience = input.readInt()
 #        self.Speed = input.readInt()
 #        self.Power = input.readInt()
@@ -453,7 +463,6 @@ class Tower(GeoModel, BoundsPlugin):
 #        self.isIsolated = input.readBoolean()
 #        self.isCapital = input.readBoolean()
 #        self.hasRuler = input.readBoolean()
-#        self.user = input.readObject()
 #        self.manaProduction = input.readInt()
 #        self.stoneProduction = input.readInt()
 #        self.woodProduction = input.readInt()
@@ -462,6 +471,7 @@ class Tower(GeoModel, BoundsPlugin):
 #        self.lonIndex = input.readInt()
 #        self.latitude = input.readFloat()
 #        self.longitude = input.readFloat()
+#        self.foundingDate = input.readObject()
         
     # Description of the objects
     Experience = db.IntegerProperty()

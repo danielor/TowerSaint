@@ -53,7 +53,7 @@ package models
 			this.totalWood = 0;
 			this.productionDate = new Date();
 			this.level = 0;
-			this.alias = "danielo2";
+			this.alias = "danielo";
 		}
 		
 		public function isEqual(u:User) : Boolean{

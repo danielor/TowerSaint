@@ -55,7 +55,7 @@ package managers
 		private var currentCapital:Tower;					/* The current location of the new empire */
 		private var currentUser:User;						/* The current user of the game */
 		private var photo:PhotoAssets;						/* The assets to the draw the markers */
-		private var fpm:FocusPanelManager;					/* The manager used to inspect focus panel manager */
+		private var fpm:GameFocusManager;					/* The manager used to inspect focus panel manager */
 		private var initialMapDragMouse:LatLng;				/* The initial position associated with a map drag */
 		private var mapDimension:LatLng; 					/* The dimensions(lat, lng) of a map associated with the zoom level */
 		private var scopePolygon:Polygon;					/* The polygon is drawn around the capital */
@@ -66,7 +66,7 @@ package managers
 		// The event handler
 		private var mapEventHandler:EventManager;
 		
-		public function InitManager(m:Map, s:Button, uOM:UserObjectManager, a:Application, u:User, ph:PhotoAssets, fpm:FocusPanelManager, bB:Button)
+		public function InitManager(m:Map, s:Button, uOM:UserObjectManager, a:Application, u:User, ph:PhotoAssets, fpm:GameFocusManager, bB:Button)
 		{
 			// Setup the constructor variables
 			this.map = m;
@@ -257,7 +257,7 @@ package managers
 				this.currentCapital.updatePosition(loc);
 				
 				// Get the marker
-				this.currentCapital.draw(true, this.map, this.photo, this.fpm, false);
+				//this.currentCapital.draw(true, this.map, this.photo, this.fpm, false);
 
 				// Set the events associated with dragging to test the whether an
 				// individual can	

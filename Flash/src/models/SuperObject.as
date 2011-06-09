@@ -2,6 +2,9 @@ package models
 {
 	import assets.PhotoAssets;
 	
+	import away3d.containers.Scene3D;
+	import away3d.containers.View3D;
+	
 	import com.google.maps.LatLng;
 	import com.google.maps.LatLngBounds;
 	import com.google.maps.Map;
@@ -9,7 +12,7 @@ package models
 	
 	import flashx.textLayout.elements.TextFlow;
 	
-	import managers.FocusPanelManager;
+	import managers.GameFocusManager;
 	
 	import models.Bounds;
 	
@@ -18,11 +21,19 @@ package models
 	public interface SuperObject
 	{
 		// Draw the object on the map
-		function draw(drag:Boolean, map:Map, photo:PhotoAssets, fpm:FocusPanelManager, withBoundary:Boolean) : void;
+		function draw(drag:Boolean, map:Map, photo:PhotoAssets, fpm:GameFocusManager, withBoundary:Boolean, scence:Scene3D, view:View3D) : void;
 		//function initializeIcon(photo:PhotoAssets):void;
 		
 		// Display information associated with object in text
 		function display() : TextFlow;
+		function hide():void;											/* Hide the 3d model */
+		function view():void;											/* Redisplay the 3d model */
+		function isDrawn():Boolean;										/* Flag for whether the object is drawn */
+		
+		// Flag deterimens whether is the object is valid(not dragged, at a valid location)
+		function isReady() : Boolean;
+		function isAtValidLocation() : Boolean;							/* Returns true if the object does not intersect with any other empires */
+		function getBounds():LatLngBounds;								/* Get the bounds of the object on the map */
 		
 		// Initialize the information for a new build object
 		function initialize(u:User) : void;

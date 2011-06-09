@@ -1,11 +1,19 @@
 package models
 {
+	import assets.ColladaAssetLoader;
 	import assets.PhotoAssets;
+	
+	import away3d.containers.ObjectContainer3D;
+	import away3d.containers.Scene3D;
+	import away3d.containers.View3D;
+	import away3d.events.MouseEvent3D;
+	import away3d.loaders.Collada;
 	
 	import com.google.maps.LatLng;
 	import com.google.maps.LatLngBounds;
 	import com.google.maps.Map;
 	import com.google.maps.MapMouseEvent;
+	import com.google.maps.interfaces.IProjection;
 	import com.google.maps.overlays.Marker;
 	import com.google.maps.overlays.MarkerOptions;
 	import com.google.maps.overlays.Polygon;
@@ -13,7 +21,15 @@ package models
 	import com.google.maps.styles.FillStyle;
 	import com.google.maps.styles.StrokeStyle;
 	
+	import flash.display.Bitmap;
 	import flash.display.BitmapData;
+	import flash.display.DisplayObject;
+	import flash.events.Event;
+	import flash.events.EventDispatcher;
+	import flash.events.IEventDispatcher;
+	import flash.events.MouseEvent;
+	import flash.geom.Point;
+	import flash.utils.ByteArray;
 	import flash.utils.IDataInput;
 	import flash.utils.IDataOutput;
 	import flash.utils.IExternalizable;
@@ -23,21 +39,24 @@ package models
 	import flashx.textLayout.elements.TextFlow;
 	
 	import managers.EventManager;
-	import managers.FocusPanelManager;
+	import managers.GameFocusManager;
 	
 	import messaging.ChannelJavascriptBridge;
 	import messaging.events.ChannelAttackEvent;
 	
+	import models.away3D.Tower3D;
 	import models.constants.GameConstants;
 	import models.map.TowerSaintMarker;
 	
 	import mx.controls.Alert;
 	import mx.controls.List;
 	import mx.core.BitmapAsset;
+	import mx.events.PropertyChangeEvent;
+	import mx.events.PropertyChangeEventKind;
 
 	[Bindbale]
 	[RemoteClass(alias="models.Tower")]
-	public class Tower  implements BoundarySuperObject 
+	public class Tower implements BoundarySuperObject, IEventDispatcher
 	{
 		
 		// Stats
@@ -72,21 +91,56 @@ package models
 		// State variables
 		private var isModified:Boolean;
 		private var hasFocus:Boolean;											/* True if the current object has user focus */
+		private var _atValidLocation:Boolean;									/* Flag true if a valid location is used */
+		private var _isDragging:Boolean;										/* Flag true if the tower is being dragged */
+		private var _isDrawn:Boolean;											/* Flag for when the tower is drawn */
+		public static const AT_VALID_LOCATION_CHANGE:String = "AtValidLocation";		/* Event string associated with the object */
+		public static const ON_DRAG_START:String = "OnDragStart";						/* Event string for the tower dragging */
+		public static const ON_DRAG_END:String = "OnDragEnd";							/* Event string for the tower dragging */
 		
 		// Keep a reference to the marker
 		private var towerMarker:TowerSaintMarker;								/* The marker to be drawn on the map */
 		private var focusPolygon:Polygon;										/* The polygon used to show focus */
 		private var boundaryPolygon:Polygon;									/* The polygon associated with the boundary */
 		private var tMEventManager:EventManager;								/* Manages events of the tower view */
+		private var towerBounds:LatLngBounds;									/* Get the bounds of the 
 		
 		// Item Renderer interface (HUserObjectRenderer)
 		public const alias:String = "Tower";									/* The name of the tower */
 		public var icon:BitmapAsset;											/* The icon associated with the current tower */
+		private var model:Tower3D;												/* The 3D representation */
+		private var modelDispatcher:EventDispatcher;							/* The event dispatcher sends events */
 		
 		public function Tower()
 		{
-			super();
+			
+			// Set the initial state of the tower
+			this._atValidLocation = true;		
+			this.hasFocus = false;
+			this._isDragging = false;
+			this._isDrawn = false;
+			this.modelDispatcher = new EventDispatcher(this);					/* Create the event dispatcher */
+			this.model = new Tower3D(.1);										/* Create the view */
 		}
+		
+		/* The dispatcher interface */
+		
+		public function dispatchEvent(evt:Event):Boolean{
+			return modelDispatcher.dispatchEvent(evt);
+		}
+		
+		public function hasEventListener(type:String):Boolean{
+			return modelDispatcher.hasEventListener(type);
+		}
+		
+		public function removeEventListener(type:String, listener:Function, useCapture:Boolean = false):void{
+			modelDispatcher.removeEventListener(type, listener, useCapture);
+		}
+		
+		public function willTrigger(type:String):Boolean {
+			return modelDispatcher.willTrigger(type);
+		}
+
 		
 		// Factory functions for differenct cases
 		public static function createCapitalAtPosition(loc:LatLng, u:User):Tower {
@@ -133,6 +187,22 @@ package models
 			return t;
 		}
 		
+		// Valid Location is a flag used when the 
+		public function set atValidLocation(iVL:Boolean) : void {
+			// Create a proprety change event
+			if(this._atValidLocation != iVL){
+				var event:PropertyChangeEvent = new PropertyChangeEvent(Tower.AT_VALID_LOCATION_CHANGE, false, false, 
+					PropertyChangeEventKind.UPDATE, 'atValidLocation', this._atValidLocation, iVL, this);
+				this.dispatchEvent(event);
+			}
+			
+			this._atValidLocation = iVL;
+		}
+		public function get atValidLocation() : Boolean {
+			return this._atValidLocation;
+		}
+		
+		
 		public static function createTowerFromJSON(buildObject:Object):Tower{
 			var t:Tower = new Tower();
 			t.Level = buildObject.level;
@@ -165,6 +235,10 @@ package models
 		public function updatePosition(loc:LatLng): void{
 			this.latitude = loc.lat();
 			this.longitude = loc.lng();
+		
+			if(this.towerMarker != null){
+				this.towerMarker.setLatLng(loc); 
+			}
 		}
 		
 		// IExternalizable interface		
@@ -179,7 +253,6 @@ package models
 			output.writeBoolean(this.isIsolated);
 			output.writeBoolean(this.isCapital);
 			output.writeBoolean(this.hasRuler);
-			output.writeObject(this.user);
 			output.writeInt(this.manaProduction);
 			output.writeInt(this.stoneProduction);
 			output.writeInt(this.woodProduction);
@@ -188,6 +261,9 @@ package models
 			output.writeInt(this.lonIndex);
 			output.writeFloat(this.latitude);
 			output.writeFloat(this.longitude);
+			output.writeObject(this.foundingDate);
+			
+			
 		}
 		public function readExternal(input:IDataInput) : void {
 			this.Experience = input.readInt();
@@ -209,6 +285,7 @@ package models
 			this.lonIndex = input.readInt();
 			this.latitude = input.readFloat();
 			this.longitude = input.readFloat();
+			this.foundingDate = input.readObject();
 		}
 		
 		public function toString() : String {
@@ -233,17 +310,37 @@ package models
 			return s;
 		}
 		
+		/* Override the event listener to use the marker event manager where appropriate. If not away3D's base class is a displayObject */
+		public function addEventListener(type:String, listener:Function, useCapture:Boolean=false, priority:int=0, useWeakReference:Boolean=false):void{
+			if(this.tMEventManager == null){
+				this.modelDispatcher.addEventListener(type, listener, useCapture, priority, useWeakReference);
+			}else{
+				var mouseEventArray:Array = [MapMouseEvent.CLICK, MapMouseEvent.DOUBLE_CLICK, MapMouseEvent.DRAG_END, MapMouseEvent.DRAG_START, 
+				MapMouseEvent.DRAG_STEP, MapMouseEvent.MOUSE_DOWN, MapMouseEvent.MOUSE_MOVE, MapMouseEvent.MOUSE_UP, MapMouseEvent.ROLL_OUT,
+				MapMouseEvent.ROLL_OVER];
+				if(mouseEventArray.indexOf(type) >= 0 ){
+					this.tMEventManager.addEventListener(type,listener, useCapture, priority, useWeakReference);
+				}else{
+					this.modelDispatcher.addEventListener(type, listener, useCapture, priority, useWeakReference);
+				}
+			}
+		}
 		
-		public function draw(drag:Boolean, map:Map, _photo:PhotoAssets, fpm:FocusPanelManager, withBoundary:Boolean) : void {
-			// Add a test ground overlay
-			var towerIcon:BitmapAsset = _getImage(_photo);
+		
+		
+		public function draw(drag:Boolean, map:Map, _photo:PhotoAssets, fpm:GameFocusManager, withBoundary:Boolean, scene:Scene3D, view:View3D) : void {
+			
+			// TODO: Make this more robust
+			// Create a bounding box. 2~ is an estimation of a bounding box
+			var bitmapData:BitmapData = new BitmapData(this.model.objectWidth / 2., this.model.objectHeight / 2., true, 0x00FFFFFF);
+			var asset:BitmapAsset = new BitmapAsset(bitmapData);
 			
 			// Extract the position associated with remoteObject(Tower)			
 			var gposition:LatLng = new LatLng(latitude, longitude);
 			
 			// Create test overlays
 			var markerOptions : MarkerOptions = new MarkerOptions();
-			markerOptions.icon = towerIcon;
+			markerOptions.icon = asset;
 			markerOptions.iconAlignment = MarkerOptions.ALIGN_BOTTOM | MarkerOptions.ALIGN_HORIZONTAL_CENTER;
 			markerOptions.hasShadow = true;
 			markerOptions.clickable = true;
@@ -251,12 +348,12 @@ package models
 			markerOptions.draggable = drag;
 			
 			// Create the marker
-			towerMarker = new TowerSaintMarker(this, gposition, markerOptions, map);
+			towerMarker = new TowerSaintMarker(this, gposition, markerOptions, map, view);
+
 			
 			// Create an event manager associated with the marker
-			this.tMEventManager = new EventManager(towerMarker)
-			
-			this.tMEventManager.addEventListener(MapMouseEvent.CLICK, fpm.onMarkerClick);
+			this.tMEventManager = new EventManager(towerMarker);
+			this.tMEventManager.addEventListener(MapMouseEvent.CLICK, onMarkerClick);
 			if(drag){
 				// Add events associated with the dragging of the marker on the screen
 				this.tMEventManager.addEventListener(MapMouseEvent.DRAG_START, this.onTowerDragStart);
@@ -267,34 +364,75 @@ package models
 			map.addOverlay(towerMarker);
 			
 			// Copy over the icon data
-			icon = new BitmapAsset(towerIcon.bitmapData.clone());
+			icon = _getImage(_photo);
 			
 			// Potentially add a boundary
 			if(withBoundary){
 				this.generateBoundaryPolygon(map);
 			}
-			var e:ChannelAttackEvent;
-			var r:ChannelJavascriptBridge;
+		
+			// Change the state of the program
+			this._isDrawn = true;
+			
+			// Map the position to the map
+			var position:LatLng = new LatLng(this.latitude, this.longitude);
+			var p:Point = GameConstants.fromMapToAway3D(position, map);
+			this.model.x = p.x;
+			this.model.y = p.y;
+			this.model.z = 0.;
+			this.model.ownCanvas = true;
+			
+			// Add the container to the scene
+			scene.addChild(this.model);
+			
+			// Create the bounds around the point
+			this.createBoundsAroundPoint(gposition, map, view);
+		}
+		
+		private function createBoundsAroundPoint(gposition:LatLng, map:Map, view:View3D):void {
+			// Find the bouds of the object
+			var bounds:LatLngBounds = map.getLatLngBounds();
+			var width:Number = Math.abs(this.model.minX - this.model.maxX);
+			var height:Number = Math.abs(this.model.minY - this.model.maxY);
+			var widthFraction:Number = width / view.width;
+			var heightFraction:Number = height / view.height;
+			var latFraction:Number = heightFraction * Math.abs(bounds.getNorth() - bounds.getSouth());
+			var lonFraction:Number = widthFraction * Math.abs(bounds.getEast() - bounds.getWest());
+			var sw:LatLng = new LatLng(gposition.lat() - latFraction / 2., gposition.lng() - lonFraction/2.);
+			var ne:LatLng = new LatLng(gposition.lat() + latFraction / 2., gposition.lng() + lonFraction/2.);
+			towerBounds = new LatLngBounds(sw, ne);
+		}
+		
+		private function onMouseDown(e:MouseEvent3D):void {
+			Alert.show(e.sceneX + ":" + e.sceneY + ":" + e.sceneZ);
+		}
+		private function onMouseUp(e:MouseEvent3D):void {
+			
+		}	
+	
+		public function getBounds():LatLngBounds{
+			return this.towerBounds;
 		}
 		
 		public function getNameString():String {
 			return "Tower";
 		}
 		
+		public function isAtValidLocation():Boolean {
+			return this._atValidLocation;
+		}
+		
 		
 		// Generate the boundary around the objects
 		private function generateBoundaryPolygon(m:Map) : void {
 			// Get the position of the marker
-			var pos:LatLng = this.towerMarker.getLatLng();
+			var pos:LatLng = new LatLng(this.latitude, this.longitude);
 			
 			// Get the influence
 			var influence:Number = this.getMaxInfluence();
 			
 			// Get the width of the image
-			var options:MarkerOptions = towerMarker.getOptions();
-			var icon:BitmapAsset = options.icon as BitmapAsset;
-			var data:BitmapData = icon.bitmapData;
-			var width:Number = data.width;
+			var width:Number = Math.abs(this.model.minX - this.model.maxX);
 			
 			// Get the game constants
 			var aspectRatio:Number = GameConstants.getAspectRatio(m);
@@ -303,7 +441,7 @@ package models
 			
 			// Get the points associated with the boundary
 			var points:Array = this.generateSquarePolygonPoints(pos, latOffset, lonOffset);
-			
+
 			// Create a polygon for an empire boundary
 			var boundaryColor:Number = 0xffffff;
 			var polygon:Polygon = new Polygon(points, 
@@ -343,12 +481,46 @@ package models
 		}
 		
 		// Events associated with the dragging of a marker
-		protected function onTowerDragStart(event:MapMouseEvent) : void {
+		public function onTowerDragStart(event:MapMouseEvent) : void {
 			var m:Map = towerMarker.getMap();
 			m.removeOverlay(this.focusPolygon);
+			this._isDragging = true;
+
+			// Dispatch that we have begun dragging the tower
+			var e:PropertyChangeEvent = new PropertyChangeEvent(Tower.ON_DRAG_START, false, false, 
+				PropertyChangeEventKind.UPDATE, 'onDragStart', this._isDragging, true, this);
+			this.dispatchEvent(e);
 		}
-		protected function onTowerDragEnd(event:MapMouseEvent) : void {
-			createFocusPolygonAtPosition(true);
+		public function onTowerDragEnd(event:MapMouseEvent) : void {
+			//createFocusPolygonAtPosition(true);
+			var l:LatLng = event.latLng;
+
+			// Update the position
+			var m:Map = this.towerMarker.getMap();
+			var v:View3D = this.towerMarker.getView();
+			var p:Point = GameConstants.fromMapToAway3D(l, m);
+			this.model.x = p.x;
+			this.model.y = p.y;
+			
+			// Set the flag
+			this._isDragging = false;
+			
+			// Update the position and redraw the boundary
+			this.latitude = l.lat();
+			this.longitude = l.lng();
+			this.generateBoundaryPolygon(m);
+			
+			// Update the bounds of the object
+			this.createBoundsAroundPoint(l, m, v);
+			
+			// Dispatch that we have begun dragging the tower
+			var e:PropertyChangeEvent = new PropertyChangeEvent(Tower.ON_DRAG_END, false, false, 
+				PropertyChangeEventKind.UPDATE, 'onDragEnd', this._isDragging, true, this);
+			this.dispatchEvent(e);
+			
+		}
+		public function isReady():Boolean{
+			return !this._isDragging;
 		}
 		
 		// Erase the marker
@@ -360,6 +532,19 @@ package models
 			if(this.boundaryPolygon != null){
 				map.removeOverlay(this.boundaryPolygon);
 			}
+		}
+		
+		// Hide the 3d model
+		public function hide():void {
+			this.model.alpha = 1.0;
+		}
+		// View the 3D model
+		public function view():void {
+			this.model.alpha = 0.0;
+		}
+		// Flag for the 3D model
+		public function isDrawn():Boolean{
+			return this._isDrawn;
 		}
 		public function updateBuildState(i:Number) : void {
 			if(this.towerMarker != null){
@@ -475,6 +660,7 @@ package models
 			
 		}
 		
+		
 		private function generateSquarePolygonPoints(pos:LatLng, latOffset:Number, lonOffset:Number):Array {
 			var lat:Number = pos.lat(); 
 			var lon:Number = pos.lng();
@@ -518,6 +704,28 @@ package models
 					break;
 			}
 			return towerIcon
+		}
+		
+		/* Extract the 3D model that corresponds to the level of the model */
+		private function _get3DModel(_collada:ColladaAssetLoader):Class {
+			var newClass:Class;
+			switch(this.Level){
+				case 0:
+					newClass = ColladaAssetLoader.TowerLevel0;
+					break;
+				case 1:
+					newClass =  ColladaAssetLoader.TowerLevel0;
+					break;
+				case 2:
+					newClass = ColladaAssetLoader.TowerLevel0;
+					break;
+				case 3:
+					newClass =  ColladaAssetLoader.TowerLevel0;
+					break;
+				default:
+					break;
+			}
+			return newClass;
 		}
 		
 		public function getImage(photo:PhotoAssets):BitmapAsset {

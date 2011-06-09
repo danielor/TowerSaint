@@ -2,6 +2,9 @@ package models
 {
 	import assets.PhotoAssets;
 	
+	import away3d.containers.Scene3D;
+	import away3d.containers.View3D;
+	
 	import com.google.maps.LatLng;
 	import com.google.maps.LatLngBounds;
 	import com.google.maps.Map;
@@ -22,7 +25,7 @@ package models
 	import flashx.textLayout.elements.SpanElement;
 	import flashx.textLayout.elements.TextFlow;
 	
-	import managers.FocusPanelManager;
+	import managers.GameFocusManager;
 	
 	import models.constants.GameConstants;
 	import models.map.TowerSaintMarker;
@@ -122,6 +125,20 @@ package models
 			return p;
 		}
 		
+		// Hide the 3d model
+		public function hide():void {
+			// TODO
+		}
+		// View the 3D model
+		public function view():void {
+			// TODO
+		}
+		// Return the drawing state
+		public function isDrawn():Boolean{
+			// TODO
+			return false;
+		}
+		
 		public function getNameString():String {
 			return "Portal";
 		}
@@ -147,7 +164,7 @@ package models
 			return new Polygon([]);
 		}
 		
-		public function draw(drag:Boolean, map:Map, photo:PhotoAssets, fpm:FocusPanelManager, withBoundary:Boolean) : void {
+		public function draw(drag:Boolean, map:Map, photo:PhotoAssets, fpm:GameFocusManager, withBoundary:Boolean,  scence:Scene3D, view:View3D) : void {
 			// Extract the position associated with remoteObject(Tower)			
 			var firstPosition:LatLng = new LatLng(endLocationLatitude, endLocationLongitude);
 			var secondPosition:LatLng = new LatLng(startLocationLatitude, startLocationLongitude);
@@ -155,14 +172,22 @@ package models
 			// Create both portals
 			var bounds:LatLngBounds = map.getLatLngBounds();
 			if(bounds.containsLatLng(firstPosition)){
-				_drawPortal(firstPosition, photo, map, drag, fpm);
+				_drawPortal(firstPosition, photo, map, drag, fpm, view);
 			}
 			if(bounds.containsLatLng(secondPosition)){
-				_drawPortal(secondPosition, photo, map, drag, fpm);
+				_drawPortal(secondPosition, photo, map, drag, fpm, view);
 			}
 		}
 		
-		private function _drawPortal(pos:LatLng, photo:PhotoAssets, map:Map, drag:Boolean, fpm:FocusPanelManager) : void {
+		public function getBounds():LatLngBounds{
+			return new LatLngBounds(new LatLng(0, 0), new LatLng(0, 0));
+		}
+		
+		public function isAtValidLocation():Boolean {
+			return true;
+		}
+		
+		private function _drawPortal(pos:LatLng, photo:PhotoAssets, map:Map, drag:Boolean, fpm:GameFocusManager, view:View3D) : void {
 			// The portal icon
 			var portalIcon:BitmapAsset = new photo.ThePortal() as BitmapAsset;
 			
@@ -175,7 +200,7 @@ package models
 			markerOptions.draggable = drag;
 	
 			// Create the marker
-			portalMarker = new TowerSaintMarker(this, pos, markerOptions, map);
+			portalMarker = new TowerSaintMarker(this, pos, markerOptions, map, view);
 			portalMarker.addEventListener(MapMouseEvent.CLICK, fpm.onMarkerClick);
 			map.addOverlay(portalMarker);
 			
@@ -189,6 +214,9 @@ package models
 		public function setFocusOnObject(error:Boolean) : void{
 			createFocusPolygonAtPosition(error);
 			hasFocus = true;
+		}
+		public function isReady():Boolean{
+			return true;
 		}
 		
 		private function createFocusPolygonAtPosition(color:Boolean):void {

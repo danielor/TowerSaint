@@ -340,6 +340,7 @@ def register_classes(AMF_NAMESPACE = 'models'):
     """Register the amf classes in a namespace"""
     # set this so returned objects and arrays are bindable
     amf3.use_proxies_default = True
+    
     # register domain objects that will be used with PyAMF
     pyamf.register_class(User, '%s.User' % AMF_NAMESPACE)
     pyamf.register_class(Location, '%s.Location' % AMF_NAMESPACE)

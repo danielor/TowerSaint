@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# Copyright (c) 2007-2009 The PyAMF Project.
+# Copyright (c) The PyAMF Project.
 # See LICENSE.txt for details.
 
 """
@@ -11,7 +11,8 @@ Tests for XML library integration
 
 import unittest
 
-import pyamf
+import pyamf.xml
+from pyamf import util
 
 
 class ElementTreeTestCase(unittest.TestCase):
@@ -19,76 +20,65 @@ class ElementTreeTestCase(unittest.TestCase):
     Tests the type mappings.
     """
 
-    amf0_encoding = '\x0f\x00\x00\x00\x11<foo bar="baz" />'
-    amf3_encoding = '\x0b#<foo bar="baz" />'
+    xml = '<foo bar="baz" />'
 
-    def _encode(self, mod):
-        element = mod.Element('foo', bar='baz')
+    def check_amf0(self, bytes, xml):
+        b = util.BufferedByteStream(bytes)
 
-        return (
-            pyamf.encode(element, encoding=pyamf.AMF0).getvalue(),
-            pyamf.encode(element, encoding=pyamf.AMF3).getvalue()
-        )
+        self.assertEqual(b.read_char(), 15)
 
-    def test_cElementTree(self):
-        import cElementTree
+        l = b.read_ulong()
 
-        self.assertEquals(self._encode(cElementTree), (
-            ElementTreeTestCase.amf0_encoding,
-            ElementTreeTestCase.amf3_encoding
-        ))
+        self.assertEqual(l, b.remaining())
+        self.assertEqual(b.read(), xml)
 
-    def test_xe_cElementTree(self):
-        from xml.etree import cElementTree
+    def check_amf3(self, bytes, xml):
+        b = util.BufferedByteStream(bytes)
 
-        self.assertEquals(self._encode(cElementTree), (
-            ElementTreeTestCase.amf0_encoding,
-            ElementTreeTestCase.amf3_encoding
-        ))
+        self.assertEqual(b.read_char(), 11)
 
-    def test_xe_ElementTree(self):
-        from xml.etree import ElementTree
+        l = b.read_uchar()
 
-        self.assertEquals(self._encode(ElementTree), (
-            ElementTreeTestCase.amf0_encoding,
-            ElementTreeTestCase.amf3_encoding
-        ))
-
-    def test_ElementTree(self):
-        from elementtree import ElementTree
-
-        self.assertEquals(self._encode(ElementTree), (
-            ElementTreeTestCase.amf0_encoding,
-            ElementTreeTestCase.amf3_encoding
-        ))
-
-try:
-    from xml.etree import cElementTree
-except ImportError:
-    del ElementTreeTestCase.test_xe_cElementTree
-
-try:
-    import cElementTree
-except ImportError:
-    del ElementTreeTestCase.test_cElementTree
-
-try:
-    from xml.etree import ElementTree
-except ImportError:
-    del ElementTreeTestCase.test_xe_ElementTree
-
-try:
-    from elementtree import ElementTree
-except ImportError:
-    del ElementTreeTestCase.test_ElementTree
+        self.assertEqual(l >> 1, b.remaining())
+        self.assertEqual(b.read(), xml)
 
 
-def suite():
-    suite = unittest.TestSuite()
+for mod in pyamf.xml.ETREE_MODULES:
+    name = 'test_' + mod.replace('.', '_')
 
-    suite.addTest(unittest.makeSuite(ElementTreeTestCase))
+    def check_etree(self):
+        # holy hack batman
+        import inspect
 
-    return suite
+        mod = inspect.stack()[1][0].f_locals['testMethod'].__name__[5:]
+        mod = mod.replace('_', '.')
 
-if __name__ == '__main__':
-    unittest.main(defaultTest='suite')
+        try:
+            etree = util.get_module(mod)
+        except ImportError:
+            self.skipTest('%r is not available' % (mod,))
+
+        element = etree.fromstring(self.xml)
+        xml = etree.tostring(element)
+
+        old = pyamf.set_default_etree(etree)
+
+        if old:
+            self.addCleanup(lambda x: pyamf.set_default_etree(x), old)
+
+        bytes = pyamf.encode(element, encoding=pyamf.AMF0).getvalue()
+        self.check_amf0(bytes, xml)
+
+        new_element = pyamf.decode(bytes, encoding=pyamf.AMF0).next()
+        self.assertIdentical(type(element), type(new_element))
+
+        bytes = pyamf.encode(element, encoding=pyamf.AMF3).getvalue()
+        self.check_amf3(bytes, xml)
+
+        new_element = pyamf.decode(bytes, encoding=pyamf.AMF3).next()
+        self.assertIdentical(type(element), type(new_element))
+
+    check_etree.__name__ = name
+
+    setattr(ElementTreeTestCase, name, check_etree)
+

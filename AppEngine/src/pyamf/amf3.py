@@ -21,7 +21,7 @@ L{ByteArray} and L{ArrayCollection}.
 @since: 0.1
 """
 
-import datetime
+import datetime, logging
 import zlib
 
 import pyamf
@@ -947,7 +947,7 @@ class Decoder(codec.Decoder):
         """
         is_ref = ref & REFERENCE_BIT == 0
         ref >>= 1
-
+        
         if is_ref:
             class_def = self.context.getClassByReference(ref)
 
@@ -955,7 +955,6 @@ class Decoder(codec.Decoder):
 
         name = self.readBytes()
         alias = None
-
         if name == '':
             name = pyamf.ASObject
 
@@ -1461,6 +1460,9 @@ class Encoder(codec.Encoder):
         if definition.encoding == ObjectEncoding.DYNAMIC:
             if attrs:
                 for attr, value in attrs.iteritems():
+                    if type(attr) in python.int_types:
+                        attr = str(attr)
+
                     self.serialiseString(attr)
                     self.writeElement(value)
 

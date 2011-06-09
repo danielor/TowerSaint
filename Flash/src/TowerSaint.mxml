@@ -4,7 +4,8 @@
 	<fx:Script>
 		<![CDATA[
 			import assets.PhotoAssets;
-	
+			
+			import away3d.containers.Scene3D;
 			
 			import com.facebook.graph.Facebook;
 			import com.facebook.graph.controls.Distractor;
@@ -29,7 +30,7 @@
 			import flash.net.*;
 			import flash.utils.Dictionary;
 			
-			import managers.FocusPanelManager;
+			import managers.GameFocusManager;
 			import managers.GameManager;
 			import managers.InitManager;
 			import managers.UserObjectManager;
@@ -67,6 +68,8 @@
 			[Bindable] protected var _user:User;
 			[Bindable] public var _friends:Array = new Array();
 			
+			// The 3D scene
+			[Bindable] public var scence:Scene3D;
 			
 			// The image data
 			[Bindable] public var _photo:PhotoAssets = new PhotoAssets();
@@ -74,7 +77,7 @@
 			// State/Manager data
 			[Bindable] public var _serverState:TowerSaintServiceState;
 			[Bindable] public var _userObjectManager:UserObjectManager;
-			[Bindable] public var _focusPanelManager:FocusPanelManager;
+			[Bindable] public var _focusPanelManager:GameFocusManager;
 			[Bindable] public var _initManager:InitManager;
 			[Bindable] public var _gameManager:GameManager;
 			
@@ -91,8 +94,10 @@
 			// Init App
 			protected function initApp() : void
 			{
-				// Initialize the basic objects
+				// Include the body text in serveral states
+				this._gameManager = null;
 				
+				// Initialize the basic objects
 				this.addEventListener(StateChangeEvent.CURRENT_STATE_CHANGE, onStateChange);
 								
 				// Initialize facebook
@@ -114,17 +119,35 @@
 			}
 			
 			protected function onStateChange(s:StateChangeEvent) : void {
-				if(this.currentState == "initUser"){
-					this._initManager = new InitManager(this.map, this.locationChanger, this._userObjectManager,
-						this, this._user, this._photo, this._focusPanelManager, this.buildButton);
-					this._initManager.run();
+				if(this.currentState == "initUser" || this.currentState == "inApp"){
+					if(this.initializedInAppManagers){
+						if(this._gameManager == null){
+							this._focusPanelManager = new GameFocusManager(focusImage, bodyText, titleText, _photo, this.map, this);
+							this._gameManager = new GameManager(this._user, this.map, this._photo, this._focusPanelManager, this,
+								this.sendButton, this.chatFeed, this.userList, this.userObjectList, this.chatText, this._userObjectManager,
+								this.mySprite, this.sendButton, this.buildList, this.theTab, this.mapGroup, this.buildButton,
+								this.locationChanger);
+							this._gameManager.run();
+						}
+					}
+					/*
+					//this._initManager = new InitManager(this.map, this.locationChanger, this._userObjectManager,
+						//this, this._user, this._photo, this._focusPanelManager, this.buildButton);
+					//this._initManager.run();
+					this._gameManager = new GameManager(this._user, this.map, this._photo, this._focusPanelManager, this,
+						this.sendButton, this.chatFeed, this.userList, this.userObjectList, this.chatText, this._userObjectManager,
+						this.mySprite, this.sendButton, this.buildList, this.theTab, this.mapGroup);
+					this._gameManager.run();
+					*/
 				}else if(this.currentState == "inApp"  && s.oldState == "initUser"){
+					/*
 					// Get the initialization manager
-					var capital:Tower = this._initManager.getNewCapital();
+					//var capital:Tower = this._initManager.getNewCapital();
 					this._gameManager = new GameManager(this._user, this.map, this._photo, this._focusPanelManager, this,
 						this.sendButton, this.chatFeed, this.userList, this.userObjectList, this.chatText, this._userObjectManager,
 					    this.mySprite, this.sendButton, this.buildList, this.theTab, this.mapGroup);
-					this._gameManager.runFromInitManager(capital);
+					//this._gameManager.runFromInitManager(capital);
+					*/
 					
 				}
 			}
@@ -137,7 +160,7 @@
 			
 			protected function initBaseObjects() : void {
 				// Initialize the services needed with the server over amf
-				this._focusPanelManager = new FocusPanelManager(focusImage, bodyText, titleText, _photo);
+				this._focusPanelManager = new GameFocusManager(focusImage, bodyText, titleText, _photo, this.map, this);
 				this._serverState = new TowerSaintServiceState();
 			}
 			
@@ -148,8 +171,16 @@
 			
 			protected function play() : void
 			{
-				this.currentState = "inApp";
+				//this.currentState = "inApp";
 				this.login();
+				
+				// Initialize the object manager, and make the game user specific.
+				this._serverState = new TowerSaintServiceState();
+				this._userObjectManager = new UserObjectManager(this.map, this._user, this._serverState, this._photo, this);
+				
+				if(isDesktop){
+					this._userObjectManager.saveUser(this._user, onSaveUser);
+				}
 				//init3DView();
 			}
 			
@@ -205,16 +236,16 @@
 				
 				// Calculate the bounds of the map
 				if(!initializedInAppManagers){
-				
-					
-					// Initialize the object manager, and make the game user specific.
-					this._focusPanelManager = new FocusPanelManager(focusImage, bodyText, titleText, _photo);
-					this._serverState = new TowerSaintServiceState();
-					this._userObjectManager = new UserObjectManager(this.map, this._user, this._serverState, this._photo, this._focusPanelManager, this);
-	
-	   				if(isDesktop){
-						this._userObjectManager.saveUser(this._user, onSaveUser);
+					if(this.currentState == "initUser" || this.currentState == "inApp"){
+						this._focusPanelManager = new GameFocusManager(focusImage, bodyText, titleText, _photo, this.map, this);
+						this._gameManager = new GameManager(this._user, this.map, this._photo, this._focusPanelManager, this,
+							this.sendButton, this.chatFeed, this.userList, this.userObjectList, this.chatText, this._userObjectManager,
+							this.mySprite, this.sendButton, this.buildList, this.theTab, this.mapGroup, this.buildButton,
+							this.locationChanger);
+						this._gameManager.run();
 					}
+					
+					
 					
 					initializedInAppManagers = true;
 				}
@@ -225,16 +256,20 @@
 			protected function onSaveUser(event:ResultEvent) : void{
 				var u:User = event.result as User;
 				// If it returns the same user, then the user is new, and we should start the initManager
-				if(!ObjectUtil.compare(this._user, u)){
+				if(ObjectUtil.compare(this._user, u)){
 					// Change the state
 					currentState = "initUser";
 				}else{
+					currentState = "inApp";
 					this._user = u;
-					this._gameManager = new GameManager(this._user, this.map, this._photo, this._focusPanelManager, this,
-						this.sendButton, this.chatFeed, this.userList, this.userObjectList, this.chatText, this._userObjectManager,
-						this.mySprite, this.sendButton, this.buildList, this.theTab, this.mapGroup);
-					this._gameManager.run();
 				}
+				/*
+				this._gameManager = new GameManager(this._user, this.map, this._photo, this._focusPanelManager, this,
+					this.sendButton, this.chatFeed, this.userList, this.userObjectList, this.chatText, this._userObjectManager,
+					this.mySprite, this.sendButton, this.buildList, this.theTab, this.mapGroup, this.buildButton,
+					this.locationChanger);
+				this._gameManager.run();
+				*/
 				
 			}
 		
@@ -264,17 +299,21 @@
 		<!-- Place non-visual elements (e.g., services, value objects) here -->
 	</fx:Declarations>
 	
-	<s:VGroup includeIn="inApp,initUser" top="50" left="0" right="0" bottom="0" top.inApp="10" left.inApp="171" bottom.inApp="10" right.inApp="10" id = "mapGroup">
+	<s:VGroup includeIn="inApp,initUser" x="0" y="0" id="mapGroup">
 		<mx:MenuBar includeIn="inApp" width="619"></mx:MenuBar>
+		<s:HGroup includeIn="initUser" width="625" height="22">
+			<s:Button includeIn="initUser" label="changeLocation" id="locationChanger"/>
+			<mx:Spacer height="18" width="439"/>
+			<s:Button includeIn="initUser" label="Build" id="buildButton"/>
+		</s:HGroup>
 		<s:SpriteVisualElement id="mySprite"/>
-			
-		<maps:Map id="map" includeIn="inApp,initUser" width="619" height="80%" mapevent_mapready="onMapReady(event)" key="ABQIAAAA5PSKhvT9XxMwIJsiXZLnshROkT7oJpmGVVDvh2HNZs_1KkkwNxQMSTOQJaZvC41MHmPhrh-NHIDstw" sensor="false" width.inApp="619" height.inApp="419" width.initUser="793"/>
-		<s:List includeIn="inApp" height="91" width="615" id="userObjectList" itemRenderer="HUserObjectRenderer">
+		<maps:Map id="map" includeIn="inApp,initUser" width="619" height="80%" mapevent_mapready="onMapReady(event)" key="ABQIAAAA5PSKhvT9XxMwIJsiXZLnshROkT7oJpmGVVDvh2HNZs_1KkkwNxQMSTOQJaZvC41MHmPhrh-NHIDstw" sensor="false" width.inApp="619" height.inApp="419" width.initUser="619" height.initUser="420"/>
+		<s:List height="91" width="615" id="userObjectList" itemRenderer="HUserObjectRenderer">
 			<s:layout>
 				<s:HorizontalLayout/>
 			</s:layout>
 		</s:List>
-		<s:HGroup includeIn="inApp" width="616" height="33">
+		<s:HGroup includeIn="inApp,initUser" width="616" height="33">
 			<s:TextInput width="537" id="chatText"/>
 			<s:Button label="Send" id="sendButton"/>
 		</s:HGroup>
@@ -282,9 +321,7 @@
 	</s:VGroup>
 
 	<s:Button includeIn="start" x="315" y="221" label="Play" click="play()"/>
-	<s:Button includeIn="initUser" x="689" y="20" label="changeLocation" id="locationChanger"/>
-	<s:Button includeIn="initUser" x="10" y="21" label="Build" id="buildButton"/>
-	<s:VGroup includeIn="inApp" x="10" y="10" width="153" height="580">
+	<s:VGroup includeIn="inApp,initUser"  width="153" height="580" x = "631" y="8">
 		<mx:Image width="153" height="66" id="logo"  source="@Embed(source='assets/pictures/TowerSaintLogo.gif')"/>
 		<s:List width="152" height="123" id="userList" itemRenderer="UserListRenderer"></s:List>
 		<s:BorderContainer height="109" width="152">
@@ -292,20 +329,20 @@
 				<s:RichEditableText height="100%" width="100%" id="chatFeed"/>
 			</s:Scroller>
 		</s:BorderContainer>
-		<mx:TabNavigator width="153" height="262" width.inApp="154" id="theTab">
+		<mx:TabNavigator width="153" includeIn="inApp,initUser" height="262"  id="theTab">
 			<s:NavigatorContent label="Inspect" width="100%" height="100%">
-				<s:VGroup x="10" y="10" width="132" height="201">
-					<s:HGroup width="138" height="71">
+				<s:VGroup x="10" y="10" width="132" height="201" includeIn="inApp,initUser">
+					<s:HGroup width="138" height="71" includeIn="inApp,initUser">
 						<mx:Image width="61" height="65" id="focusImage"/>
 						<s:RichEditableText height="66" id="titleText" width="60"/>
 					</s:HGroup>
-					<s:Scroller width="128" height="123">
-						<s:RichEditableText x="6" y="11" width="113" height="123" id="bodyText" ></s:RichEditableText>
+					<s:Scroller width="128" height="123" includeIn="inApp,initUser">
+						<s:RichEditableText x="6" y="11"  width="113" height="123"  id="bodyText"  />
 					</s:Scroller>
 				</s:VGroup>
 			</s:NavigatorContent>
 			<s:NavigatorContent label="Build" width="100%" height="100%">
-				<s:List x="10" y="10" width="132" height="209" id="buildList" itemRenderer="BuildListItemRenderer" includeIn="inApp">
+				<s:List x="10" y="10" width="132" height="209" id="buildList" itemRenderer="BuildListItemRenderer" includeIn="inApp,initUser">
 					<s:layout>
 						<s:VerticalLayout/>
 					</s:layout>

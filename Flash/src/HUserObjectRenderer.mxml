@@ -6,7 +6,7 @@
 	<s:layout>
 		<s:VerticalLayout paddingLeft="5" paddingTop="5" paddingRight="5" paddingBottom="5"/>
 	</s:layout>
-	<s:Label text="{data.alias}" width="60" textAlign="center"/>
+	<s:Label text="{data.getNameString()}" width="60" textAlign="center"/>
 	<mx:Image width="60" height="60" source="{data.icon}"/>
 	
 </s:ItemRenderer>

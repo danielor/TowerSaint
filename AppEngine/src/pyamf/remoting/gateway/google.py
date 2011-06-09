@@ -70,6 +70,7 @@ class WebAppGateway(webapp.RequestHandler, gateway.BaseGateway):
         body = self.request.body_file.read()
         stream = None
         timezone_offset = self._get_timezone_offset()
+
         # Decode the request
         try:
             request = remoting.decode(body, strict=self.strict,
@@ -108,6 +109,7 @@ class WebAppGateway(webapp.RequestHandler, gateway.BaseGateway):
             self.response.out.write(response)
 
             return
+
         if self.logger:
             self.logger.debug("AMF Request: %r" % request)
 
@@ -156,11 +158,13 @@ class WebAppGateway(webapp.RequestHandler, gateway.BaseGateway):
             self.response.out.write(response)
 
             return
-        
+
         response = stream.getvalue()
+
         self.response.headers['Content-Type'] = remoting.CONTENT_TYPE
         self.response.headers['Content-Length'] = str(len(response))
         self.response.headers['Server'] = gateway.SERVER_NAME
+
         self.response.out.write(response)
 
     def __call__(self, *args, **kwargs):

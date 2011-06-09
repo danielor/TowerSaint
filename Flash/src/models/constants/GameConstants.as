@@ -28,6 +28,25 @@ package models.constants
 			return .001;
 		}
 		
+		// Convert a lat lng to away3D coordinate. The away3D view is assumed to be inside the
+		// the map so that the points need to be rescaled.
+		public static function fromMapToAway3D(pos:LatLng, map:Map):Point {
+			// Calculate the transformation
+			var p:Point = map.fromLatLngToViewport(pos);
+			var bounds:LatLngBounds = map.getLatLngBounds();
+			var southeast:LatLng = bounds.getSouthEast();
+			var northwest:LatLng = bounds.getNorthWest();
+			var southEastPoint:Point = map.fromLatLngToViewport(southeast);
+			var northWestPoint:Point = map.fromLatLngToViewport(northwest);
+			var xFraction:Number = Math.abs(p.x - southEastPoint.x)/Math.abs(southEastPoint.x - northWestPoint.x);
+			var yFraction:Number = Math.abs(p.y - southEastPoint.y)/Math.abs(southEastPoint.y - northWestPoint.y);
+			var totalWidth:Number = 2. * (map.width + map.y);
+			var totalHeight:Number = -2. * (map.height + map.y);
+		
+			// Create the point
+			return new Point(Math.abs(totalWidth *(1 - xFraction)), totalHeight * (1 - yFraction));
+		}
+		
 		public static function getAspectRatio(map:Map) : Number {
 			// Get the latitude/longitude
 			var bounds:LatLngBounds = map.getLatLngBounds();

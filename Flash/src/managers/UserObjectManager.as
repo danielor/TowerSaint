@@ -40,7 +40,6 @@ package managers
 		public var serverState:TowerSaintServiceState;
 		public var listOfObjects:ArrayCollection;
 		public var photo:PhotoAssets;
-		public var focusPanelManager:FocusPanelManager;
 		
 		// The list of bounds
 		public var listOfBounds:ArrayCollection;
@@ -51,14 +50,13 @@ package managers
 		/*
 		Constructor - Takes in the map(view), and state constants
 		*/
-		public function UserObjectManager(m:Map, uU:User, sS:TowerSaintServiceState, p:PhotoAssets, fPM:FocusPanelManager, a:Application)
+		public function UserObjectManager(m:Map, uU:User, sS:TowerSaintServiceState, p:PhotoAssets, a:Application)
 		{
 			// The state variables
 			this.map = m;
 			this.user = uU;
 			this.serverState = sS;
 			this.photo = p;
-			this.focusPanelManager = fPM;
 			this.app = a;
 			
 			// The containers
@@ -244,7 +242,6 @@ package managers
 			var tArray:ArrayCollection = event.result as ArrayCollection;
 			for(var i:Number = 0; i < tArray.length; i++){
 				var s:SuperObject = tArray.getItemAt(i) as SuperObject;
-			//	s.draw(false, this.map, this.photo, this.focusPanelManager);
 			}
 			
 			// Save the list of objects
