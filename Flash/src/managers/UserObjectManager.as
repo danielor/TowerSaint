@@ -205,14 +205,14 @@ package managers
 		/*
 		Function finishes builds objects in the game
 		*/
-		public function buildObjectComplete(s:Object, u:User) : void {
+		public function buildObjectComplete(s:Object, u:User, broadcast:Boolean = true) : void {
 			var servicesDictionary:Dictionary = this.serverState.getServices();
 			var _service:RemoteObject = servicesDictionary["towersaint"] as RemoteObject;
 			
 			// The abstract call
 			var operation:AbstractOperation = _service.getOperation("buildObjectComplete");
 			operation.addEventListener(ResultEvent.RESULT, onNull);	
-			operation.send(s, u);
+			operation.send(s, u, broadcast);
 		}
 		
 		/* Function cancels objects in a game */

@@ -216,13 +216,14 @@ package models.states
 			this.currentCapital.user = null;
 			
 			// Save the capital
-			var a:Array = new Array();
-			a.push(this.currentCapital);
-			this.userObjectManager.saveUserObjects(a, this.currentUser, ignoreResult);
+			
+			//this.userObjectManager.saveUserObjects(a, this.currentUser, ignoreResult);
 			
 			// Save the updated production
 			_updateProductionOfUser();
+			this.userObjectManager.buildObject(this.currentCapital, this.currentUser);
 			this.userObjectManager.updateProduction(this.currentUser, true, ignoreResult);
+			this.userObjectManager.buildObjectComplete(this.currentCapital, this.currentUser, false);
 			
 			// Build the tower
 			this.mapEventHandler.RemoveEvents();
