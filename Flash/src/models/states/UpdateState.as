@@ -39,7 +39,10 @@ package models.states
 			this.user = u;
 			this.listOfUserModels = lOfO;
 			this.userObjectManager = uOM;
+			this.app = a;
 			this.isInState = false;
+			
+			// Initialize the data
 			this.arrayOfBounds = new ArrayCollection();
 		}
 		
@@ -68,17 +71,19 @@ package models.states
 		
 		public function enterState():void
 		{
-			Alert.show("Entering update state");
 			this.isInState = true;
 			
 			// Get the current bound
 			var bound:LatLngBounds = this.map.getLatLngBounds();
-			if(this.arrayOfBounds.getItemIndex(bound) != -1){
+	
+			if(this.arrayOfBounds.getItemIndex(bound) == -1){
 				this.userObjectManager.GetUserObjects(this.user, onGetUserObjects);
 			}else{
 				// Dispatch an event to the draw state
 				var dSE:DrawStateEvent = new DrawStateEvent(DrawStateEvent.DRAW_STATE);
+				dSE.attachPreviousState(this);
 				this.app.dispatchEvent(dSE);
+				
 			}
 			
 		}
@@ -106,8 +111,12 @@ package models.states
 						this.listOfUserModels.addItem(sobj);
 					}
 				}
+				
+				// Save the bound
+				this.arrayOfBounds.addItem(bounds);
 			}
 			
+		
 			
 			// Dispatch an event to the draw state
 			var dSE:DrawStateEvent = new DrawStateEvent(DrawStateEvent.DRAW_STATE);

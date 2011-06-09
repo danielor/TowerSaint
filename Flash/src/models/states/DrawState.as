@@ -116,10 +116,10 @@ package models.states
 			// Create a list of draw objects to later draw their boundaries
 			var listOfDrawnObjects:ArrayCollection = new ArrayCollection();
 			
+			Alert.show(this.listOfUserModels.length.toString());
 			for(var i:int = 0; i < this.listOfUserModels.length; i++){
 				var obj:SuperObject = this.listOfUserModels.getItemAt(i) as SuperObject;
 				var pos:LatLng = obj.getPosition(bounds);
-				Alert.show("In drawn");
 				// Check if the object is visbile
 				if(bounds.containsLatLng(pos)){
 					if(!obj.isDrawn()){
