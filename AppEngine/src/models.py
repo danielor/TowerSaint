@@ -123,6 +123,23 @@ class Constants(object):
         return .001                 
     
     @classmethod
+    def getBoundingBoxPerLevel(cls, klass, position):
+        """Return the maximum bounding box around a position"""
+        influence = Constants.maxInfluence(klass)
+        
+        # These offsets are approximate sizes that come from a initial tower's boundary (Level 0)
+        lonOffset = .002 / 2.
+        latOffset = .003 / 2.
+        
+        return Box(position.lat + influence *latOffset, position.lon + influence * lonOffset, 
+                   position.lat - influence *latOffset, position.lon - influence * lonOffset)
+    
+    @classmethod
+    def getGameObjects(cls):
+        """Return the game objects"""
+        return [Tower, Portal, Road]
+    
+    @classmethod
     def lonIndex(cls):
         """The distance between longitude lattice points"""
         return .001
@@ -149,9 +166,24 @@ class Constants(object):
     
     
     @classmethod
-    def maxInfluence(cls):
+    def maxInfluence(cls, klass):
         """The maximum influence(in lattice points) any object can have"""
-        return 10
+        # Tower objects are handled differently because they have a boundary
+        if isinstance(klass, Tower) or isinstance(klass, int):
+            if isinstance(klass, int):
+                level = klass
+            else:
+                level = klass.Level
+            if level == 0:
+                return 1.
+            elif level == 1:
+                return 2.
+            elif level == 2:
+                return 4.
+            elif level == 3:
+                return 8.
+        else:
+            return .2           # The approximate size of the object on the map(.2 *(.002, .003))
     
     @classmethod
     def minInfluence(cls):
@@ -507,6 +539,11 @@ class Tower(GeoModel, BoundsPlugin):
     def getLocationIndex(self):
         """Get the lat/lon indices"""
         return [("latIndex", "lonIndex")]
+    
+    @classmethod
+    def getTowerLevelRange(cls):
+        """Returns the tower level ranges"""
+        return [3, 2, 1, 0]
     
     def toXML(self):
         """Return an xml representation of the google app engine model"""

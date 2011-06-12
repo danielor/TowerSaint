@@ -10,3 +10,23 @@ indexes:
 # automatically uploaded to the admin console when you next deploy
 # your application using appcfg.py.
 
+- kind: GeoModel
+  properties:
+  - name: class
+  - name: location_geocells
+  - name: user
+
+- kind: Portal
+  properties:
+  - name: location_geocells
+  - name: user
+
+- kind: Road
+  properties:
+  - name: location_geocells
+  - name: user
+
+- kind: Tower
+  properties:
+  - name: location_geocells
+  - name: user

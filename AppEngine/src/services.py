@@ -177,7 +177,7 @@ class TowerSaintManager(object):
         # Delete the built object
         obj.delete()            
         
-    def buildObjectComplete(self, oldobj, user):
+    def buildObjectComplete(self, oldobj, user, broadcast):
         """Finish the object building"""
         logging.error("buildObjectComplete")
         u =  User.all().filter('FacebookID =', user.FacebookID).get()
@@ -253,9 +253,10 @@ class TowerSaintManager(object):
         # Put the current user
         u.put()
         
-        # Instantiate the game manager, and build the object                    
-        manager = GameManager(u)
-        manager.build(obj)
+        # Instantiate the game manager, and build the object        
+        if broadcast:            
+            manager = GameManager(u)
+            manager.build(obj)
         return None
     
     def getUserObjects(self, user):
@@ -322,12 +323,18 @@ class TowerSaintManager(object):
     def satisfiesMinimumDistance(self, latlng):
         """If the tower satisfies the minimum distance from other towers, then it is true"""
         pt = db.GeoPt(latlng['latitude'], latlng['longitude'])
-        distance = Constants.minInfluence() * Constants.latIndex() * Constants.latToMiles()
+        
         
         # Find if their is a tower distance away from the pt. If there is even one object, this
         # function will return  a value, and make satisfiesMinimumDistance false.
-        value = Tower.proximity_fetch(Tower.all(), pt, max_results = 1, max_distance = distance)
-        return value is None
+        for level in Tower.getTowerLevelRange():
+            filter = Tower.all().filter('Level =', level)
+            box = Constants.getBoundingBoxPerLevel(level, pt)
+            value = Tower.bounding_box_fetch(filter, box, max_results = 1)
+            logging.error(len(value))
+            if len(value) != 0:
+                return False
+        return True
         
     def deleteAllObjects(self):
         """Remove all objects in the database"""

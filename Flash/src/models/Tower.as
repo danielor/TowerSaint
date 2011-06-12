@@ -191,12 +191,15 @@ package models
 		public function set atValidLocation(iVL:Boolean) : void {
 			// Create a proprety change event
 			if(this._atValidLocation != iVL){
+				// Change the property before sending out the event
+				this._atValidLocation = iVL;
+				
+				// Send out a property change event
 				var event:PropertyChangeEvent = new PropertyChangeEvent(Tower.AT_VALID_LOCATION_CHANGE, false, false, 
 					PropertyChangeEventKind.UPDATE, 'atValidLocation', this._atValidLocation, iVL, this);
 				this.dispatchEvent(event);
 			}
 			
-			this._atValidLocation = iVL;
 		}
 		public function get atValidLocation() : Boolean {
 			return this._atValidLocation;

@@ -137,10 +137,14 @@ package models.states
 			this.mapEventHandler = new EventManager(this.map);
 			this.mapEventHandler.addEventListener(MapMouseEvent.DRAG_START, onMapDragStart);
 			this.mapEventHandler.addEventListener(MapMouseEvent.DRAG_END, onMapDragEnd);
-			this.mapEventHandler.addEventListener(MapMouseEvent.MOUSE_DOWN, this.fpm.onMouseClick);			
+			this.mapEventHandler.addEventListener(MapMouseEvent.MOUSE_DOWN, this.fpm.onMouseClick);
+
 			// Create the address popup associated with the location of the capital
 			this.createAddressPopup();
 		}
+		
+
+		
 		public function exitState() : void {
 			this.isInState = false;
 			this.mapEventHandler.RemoveEvents();
@@ -321,9 +325,10 @@ package models.states
 		private function onSatisfiesMinimumDistance(event:ResultEvent) : void {
 			// Set focus on the capital if one suceeds
 			var b:Boolean = event.result as Boolean;
-			this.currentCapital.setFocusOnObject(b);
-			this.buildButton.enabled = !b;
-			this.currentCapital.atValidLocation = !b;
+			Alert.show(b.toString());
+			this.currentCapital.setFocusOnObject(!b);
+			this.buildButton.enabled = b;
+			this.currentCapital.atValidLocation = b;
 		}
 		
 		public function onGeodesicFailure(event:GeocodingEvent) : void {

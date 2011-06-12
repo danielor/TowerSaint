@@ -62,7 +62,7 @@ package managers
 		When the valid location changes(when an object is moving), the boundary changes
 		*/
 		private function onTowerValidLocationChange(e:PropertyChangeEvent):void {
-			this.initDraw();
+			this.removeAndDraw({} as SuperObject);
 		}
 		private function onTowerDragStart(e:PropertyChangeEvent):void {
 			this.removeAndDraw(e.source as SuperObject);
@@ -252,6 +252,7 @@ package managers
 							var compositePolygon:TowerSaintPolygon = disjointPolygons[key] as TowerSaintPolygon;
 							
 							// Intersect the polygon 
+							Alert.show(p.isValid().toString());
 							if(p.isValid() == compositePolygon.isValid()){
 								var iPoly:Poly = compositePolygon.intersection(p);
 								if(!iPoly.isEmpty()){
