@@ -840,6 +840,11 @@ class Bounds(db.Model):
     def __str__(self):
         return "<Bounds %s, %s>" % (self.southwestLocation, self.northeastLocation)
     
+    def asBox(self):
+        """Return a box(geotypes.Box representation for a bounding_box_fetch"""
+        return Box(self.northeastLocation.latitude, self.northeastLocation.longitude,  
+                   self.southwestLocation.latitude, self.southwestLocation.longitude)
+    
     def createRandomLocationInBounds(self):
         """Create a random location in the bounds"""
         randomLatitude = random.uniform(self.southwestLocation.latitude, self.northeastLocation.latitude)

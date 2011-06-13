@@ -277,7 +277,6 @@ package managers
 			// Start the state machine
 			var initialState:GameState;
 			
-			Alert.show(this.app.currentState.toString() + ":" + this.initState.getViewString());
 			if(this.app.currentState == this.initState.getViewString()){
 				initialState = this.initState;
 			}else{
@@ -306,7 +305,7 @@ package managers
 			if(lastState != null){
 				lastState.exitState();
 			}
-			Alert.show(newState.getStateString());			
+
 			// Change the view
 			if(this.app.currentState != newState.getViewString()){
 				this.app.currentState = newState.getViewString();

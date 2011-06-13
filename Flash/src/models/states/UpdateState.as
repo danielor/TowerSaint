@@ -9,6 +9,7 @@ package models.states
 	import managers.EventManager;
 	import managers.UserObjectManager;
 	
+	import models.Bounds;
 	import models.SuperObject;
 	import models.User;
 	import models.states.events.DrawStateEvent;
@@ -75,9 +76,12 @@ package models.states
 			
 			// Get the current bound
 			var bound:LatLngBounds = this.map.getLatLngBounds();
+			var b:Bounds = new Bounds();
+			b.fromGoogleBounds(bound);
 	
 			if(this.arrayOfBounds.getItemIndex(bound) == -1){
-				this.userObjectManager.GetUserObjects(this.user, onGetUserObjects);
+				//this.userObjectManager.get(this.user, onGetUserObjects);
+				this.userObjectManager.getObjectInBounds(b, this.onGetUserObjects);
 			}else{
 				// Dispatch an event to the draw state
 				var dSE:DrawStateEvent = new DrawStateEvent(DrawStateEvent.DRAW_STATE);
@@ -88,11 +92,11 @@ package models.states
 			
 		}
 		
-		private function onGetUserObjects(event:ResultEvent) : void {
-	
+		public function onGetUserObjects(event:ResultEvent) : void {
 			var arr:ArrayCollection = event.result as ArrayCollection;
 			// Get the first object, and draw it on the map. It should be the capital
 			if(arr.length != 0){
+				Alert.show("Appending");
 				var obj:SuperObject = arr.getItemAt(0) as SuperObject;
 				var bounds:LatLngBounds = this.map.getLatLngBounds();
 				var pos:LatLng = obj.getPosition(this.map.getLatLngBounds());
@@ -120,6 +124,7 @@ package models.states
 			
 			// Dispatch an event to the draw state
 			var dSE:DrawStateEvent = new DrawStateEvent(DrawStateEvent.DRAW_STATE);
+			dSE.attachPreviousState(this);
 			this.app.dispatchEvent(dSE);
 
 		}

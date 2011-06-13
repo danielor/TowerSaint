@@ -325,7 +325,6 @@ package models.states
 		private function onSatisfiesMinimumDistance(event:ResultEvent) : void {
 			// Set focus on the capital if one suceeds
 			var b:Boolean = event.result as Boolean;
-			Alert.show(b.toString());
 			this.currentCapital.setFocusOnObject(!b);
 			this.buildButton.enabled = b;
 			this.currentCapital.atValidLocation = b;

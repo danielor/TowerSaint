@@ -63,7 +63,6 @@ package models.states
 		
 		public function enterState():void
 		{
-			Alert.show("Entering background state");
 			this.mapEventManager = new EventManager(this.map);	
 			this.mapEventManager.addEventListener(MapMouseEvent.DRAG_START, onMapDragStart);
 			this.mapEventManager.addEventListener(MapMouseEvent.DRAG_END, onMapDragEnd);
@@ -73,7 +72,6 @@ package models.states
 		
 		public function exitState():void
 		{
-			Alert.show("Exiting background state");
 			this.mapEventManager.RemoveEvents();			/* Remove all map events in state */
 			this.isInState = false;
 		}

@@ -90,26 +90,27 @@ package models
 		
 		// State variables
 		private var isModified:Boolean;
-		private var hasFocus:Boolean;											/* True if the current object has user focus */
-		private var _atValidLocation:Boolean;									/* Flag true if a valid location is used */
-		private var _isDragging:Boolean;										/* Flag true if the tower is being dragged */
-		private var _isDrawn:Boolean;											/* Flag for when the tower is drawn */
+		private var hasFocus:Boolean;													/* True if the current object has user focus */
+		private var _atValidLocation:Boolean;											/* Flag true if a valid location is used */
+		private var _isDragging:Boolean;												/* Flag true if the tower is being dragged */
+		private var _isDrawn:Boolean;													/* Flag for when the tower is drawn */
+		private var currentPoint:Point;													/* The current position of the 3d model in AWAY3D coordinates */
 		public static const AT_VALID_LOCATION_CHANGE:String = "AtValidLocation";		/* Event string associated with the object */
 		public static const ON_DRAG_START:String = "OnDragStart";						/* Event string for the tower dragging */
 		public static const ON_DRAG_END:String = "OnDragEnd";							/* Event string for the tower dragging */
 		
 		// Keep a reference to the marker
-		private var towerMarker:TowerSaintMarker;								/* The marker to be drawn on the map */
-		private var focusPolygon:Polygon;										/* The polygon used to show focus */
-		private var boundaryPolygon:Polygon;									/* The polygon associated with the boundary */
-		private var tMEventManager:EventManager;								/* Manages events of the tower view */
-		private var towerBounds:LatLngBounds;									/* Get the bounds of the 
+		private var towerMarker:TowerSaintMarker;										/* The marker to be drawn on the map */
+		private var focusPolygon:Polygon;												/* The polygon used to show focus */
+		private var boundaryPolygon:Polygon;											/* The polygon associated with the boundary */
+		private var tMEventManager:EventManager;										/* Manages events of the tower view */
+		private var towerBounds:LatLngBounds;											/* Get the bounds of the 
 		
 		// Item Renderer interface (HUserObjectRenderer)
-		public const alias:String = "Tower";									/* The name of the tower */
-		public var icon:BitmapAsset;											/* The icon associated with the current tower */
-		private var model:Tower3D;												/* The 3D representation */
-		private var modelDispatcher:EventDispatcher;							/* The event dispatcher sends events */
+		public const alias:String = "Tower";											/* The name of the tower */
+		public var icon:BitmapAsset;													/* The icon associated with the current tower */
+		private var model:Tower3D;														/* The 3D representation */
+		private var modelDispatcher:EventDispatcher;									/* The event dispatcher sends events */
 		
 		public function Tower()
 		{
@@ -379,9 +380,9 @@ package models
 			
 			// Map the position to the map
 			var position:LatLng = new LatLng(this.latitude, this.longitude);
-			var p:Point = GameConstants.fromMapToAway3D(position, map);
-			this.model.x = p.x;
-			this.model.y = p.y;
+			currentPoint = GameConstants.fromMapToAway3D(position, map);
+			this.model.x = currentPoint.x;
+			this.model.y = currentPoint.y;
 			this.model.z = 0.;
 			this.model.ownCanvas = true;
 			
@@ -501,9 +502,9 @@ package models
 			// Update the position
 			var m:Map = this.towerMarker.getMap();
 			var v:View3D = this.towerMarker.getView();
-			var p:Point = GameConstants.fromMapToAway3D(l, m);
-			this.model.x = p.x;
-			this.model.y = p.y;
+			currentPoint = GameConstants.fromMapToAway3D(l, m);
+			this.model.x = currentPoint.x;
+			this.model.y = currentPoint.y;
 			
 			// Set the flag
 			this._isDragging = false;
@@ -539,11 +540,14 @@ package models
 		
 		// Hide the 3d model
 		public function hide():void {
-			this.model.alpha = 1.0;
+			var p:Point = GameConstants.hideAWAY3DCoordinate();
+			this.model.x = p.x;
+			this.model.y = p.y;
 		}
 		// View the 3D model
 		public function view():void {
-			this.model.alpha = 0.0;
+			this.model.x = this.currentPoint.x;
+			this.model.y = this.currentPoint.y;
 		}
 		// Flag for the 3D model
 		public function isDrawn():Boolean{

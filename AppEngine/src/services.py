@@ -1,6 +1,11 @@
 '''
 Created on Sep 17, 2010
 
+High level todo list.
+TODO: Implement all of the funtionality in GQL instead of the ORM
+TODO: Add functionality to support MOVE, ATTACK operations.
+
+
 @author: danielo
 '''
 from google.appengine.ext import db 
@@ -15,26 +20,29 @@ from sessions import UserManager, ChatManager, GameManager
     
 class TowerSaintManager(object):
     def __init__(self):
-        self.numberOfObjectsPerBound = 5
+        pass
+        #self.numberOfObjectsPerBound = 5
         # Delete all objects in the database
         #self.deleteAllObjects()
     
     def getObjectInBounds(self, latlng):
-        """Get the object within the latlng bounds of {latlng}"""
-        logging.error(latlng)
-        # Create the objects
+        """
+        TODO: Improve the efficienty of this function
+        Get the object within the latlng bounds of {latlng}
+        """
+        
+        # Get a bounding box for a geosearch.
         b = Bounds.createBoundsFromAMFData(latlng)
+        box = b.asBox()
+        
         # The list of road
         listOfObjects = []
         for obj in [Road, Portal, Tower]:
-            for _ in range(self.numberOfObjectsPerBound):
-                
-                # Create the road
-                o = obj.createRandomObjectInBounds(b)
-                
-                # The proxy
-                listOfObjects.append(o)
-        
+            
+            # Get all of the objects with the bounds
+            o = obj.bounding_box_fetch(obj.all(), box, max_results = 1000)
+            listOfObjects.extend(o)
+        logging.error(str(listOfObjects))
         return ArrayCollection(listOfObjects)
         
     def saveUserObjects(self, objects, user):

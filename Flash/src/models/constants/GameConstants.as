@@ -47,6 +47,12 @@ package models.constants
 			return new Point(Math.abs(totalWidth *(1 - xFraction)), totalHeight * (1 - yFraction));
 		}
 		
+		// TODO: A more robust mechanism is needed to hide objects on the map.
+		// A point far off the viewport, where objects that are rendered can remain.
+		public static function hideAWAY3DCoordinate():Point {
+			return new Point(-5000., 5000.);
+		}
+		
 		public static function getAspectRatio(map:Map) : Number {
 			// Get the latitude/longitude
 			var bounds:LatLngBounds = map.getLatLngBounds();

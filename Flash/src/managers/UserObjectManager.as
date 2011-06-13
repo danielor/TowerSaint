@@ -164,6 +164,19 @@ package managers
 		}
 		
 		/* 
+		Returns all object within bounds
+		*/
+		public function getObjectInBounds(b:Bounds, f:Function) : void {
+			var servicesDictionary:Dictionary = this.serverState.getServices();
+			var _service:RemoteObject = servicesDictionary["towersaint"] as RemoteObject;
+			
+			// The abstract call
+			var operation:AbstractOperation = _service.getOperation("getObjectInBounds");
+			operation.addEventListener(ResultEvent.RESULT, f);	
+			operation.send(b);
+		}
+		
+		/* 
 		Adds a user alias associated with a new user
 		*/
 		public function setUserAlias(u:User, s:String, f:Function) : void {
