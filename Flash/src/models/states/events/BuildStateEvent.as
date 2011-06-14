@@ -17,7 +17,7 @@ package models.states.events
 		public static var BUILD_COMPLETE:String = "BuildComplete";
 		public static var BUILD_START:String = "BuildStart";
 		public static var BUILD_INIT:String = "BuildInit";
-		
+		public static var BUILD_CANCEL:String = "BuildCancel";
 		
 		public function BuildStateEvent(type:String, bubbles:Boolean = false, cancelable:Boolean = false)
 		{
@@ -29,9 +29,16 @@ package models.states.events
 			return new BuildStateEvent(this._type);
 		}
 		
-		// Create a property
+		// Create a property interface to inform the user the build state of the appropriate 
+		// functionality.
 		public function set listOfQueueObjects(arr:ArrayCollection) : void {
 			this._listOfQueueObjects = arr;
+		}
+		public function get listOfQueueObjecs():ArrayCollection {
+			return this._listOfQueueObjects;
+		}
+		override public function get type():String {
+			return this._type;
 		}
 		
 		public function attachPreviousState(g:GameState):void

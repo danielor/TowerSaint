@@ -165,6 +165,7 @@ package managers
 		private var backgroundState:BackgroundState;						/* The background state controls the state information about game existence */
 		private var updateState:UpdateState;								/* Update state handles retrieving the intitial user objects */
 		private var drawState:DrawState;									/* The draw state draws objects on the map */
+		private var buildState:BuildState;									/* The state handles the building/cancelling of objects */
 		private var isRunning:Boolean;										/* True if the game manager is running */
 		
 		// Map variables
@@ -276,7 +277,7 @@ package managers
 			this.updateState = new UpdateState(this.map, this.user, this.listOfUserModels, this.userObjectManager, this.app);
 			this.drawState = new DrawState(this.listOfUserModels, this.map, this.view, this.scene, this.gameFocus, 
 					this.photo, this.user, this.userObjectManager, this.queueManager, this, this.app);
-
+			this.buildState = new BuildState(this.app, this.map);
 			
 			// Start the state machine
 			var initialState:GameState;
@@ -304,7 +305,13 @@ package managers
 			this.changeGameState(this.backgroundState, lastState);
 		}
 		private function onBuildState(event:BuildStateEvent) : void {
+			var lastState:GameState = event.getPreviousState();
 			
+			// Attach the state
+			this.buildState.listOfQueueObjects = event.listOfQueueObjecs;
+			this.buildState.buildStateEventType = event.type;
+			
+			this.changeGameState(this.buildState, lastState);
 		}
 
 		public function changeGameState(newState:GameState, lastState:GameState) : void {
