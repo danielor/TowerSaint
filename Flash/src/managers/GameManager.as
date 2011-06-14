@@ -68,6 +68,7 @@ package managers
 	import models.states.InitState;
 	import models.states.UpdateState;
 	import models.states.events.BackgroundStateEvent;
+	import models.states.events.BuildStateEvent;
 	import models.states.events.DrawStateEvent;
 	import models.states.events.UpdateStateEvent;
 	
@@ -263,6 +264,9 @@ package managers
 			this.app.addEventListener(UpdateStateEvent.UPDATE_STATE, onUpdateState);	
 			this.app.addEventListener(DrawStateEvent.DRAW_STATE, onDrawState);
 			this.app.addEventListener(BackgroundStateEvent.BACKGROUND_STATE, onBackgroundState);
+			this.app.addEventListener(BuildStateEvent.BUILD_COMPLETE, onBuildState);
+			this.app.addEventListener(BuildStateEvent.BUILD_INIT, onBuildState);
+			this.app.addEventListener(BuildStateEvent.BUILD_START, onBuildState);
 
 			// Create the states
 			this.initState = new InitState(this.map, this.locationChanger, this.userObjectManager, this.app,
@@ -298,6 +302,9 @@ package managers
 		private function onBackgroundState(event:BackgroundStateEvent): void {
 			var lastState:GameState = event.getPreviousState();
 			this.changeGameState(this.backgroundState, lastState);
+		}
+		private function onBuildState(event:BuildStateEvent) : void {
+			
 		}
 
 		public function changeGameState(newState:GameState, lastState:GameState) : void {
