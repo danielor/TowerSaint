@@ -22,6 +22,7 @@ package models.states
 	import models.constants.DateConstants;
 	import models.constants.PurchaseConstants;
 	import models.states.events.BackgroundStateEvent;
+	import models.states.events.BuildStateEvent;
 	
 	import mx.collections.ArrayCollection;
 	import mx.controls.Alert;
@@ -158,7 +159,13 @@ package models.states
 			}
 			
 			// REMOVE AWAY3D values
-			
+			if(arrayOfQueueObjects.length){
+				var b:BuildStateEvent = new BuildStateEvent(BuildStateEvent.BUILD_START);
+				b.attachPreviousState(this);
+				b.listOfQueueObjects = arrayOfQueueObjects;
+				this.app.dispatchEvent(b);
+				return;
+			}
 			// Create the polygon empire boundary for the current user
 			/*
 			userBoundary = new PolygonBoundaryManager(this.map, listOfDrawnObjects, this.user);
@@ -213,7 +220,7 @@ package models.states
 			
 			// Change the state if there is nothing left in the queue
 			if(this.queueManager.isEmpty()){
-				this.gameManager.changeState(GameManager.emptyState);
+				this.gameManager.changeState(GameManager._emptyState);
 			}
 		}
 		

@@ -140,9 +140,9 @@ package managers
 	
 		
 		// Constants
-		public static const emptyState:String = "Empty";							/* The constant string associated with the empty state */
-		public static const buildState:String = "Build";							/* Constant string associated with the build state */
-		public static const queueState:String = "Queue";							/* Constant will open a list of queued objects in the game */
+		public static const _emptyState:String = "Empty";							/* The constant string associated with the empty state */
+		public static const _buildState:String = "Build";							/* Constant string associated with the build state */
+		public static const _queueState:String = "Queue";							/* Constant will open a list of queued objects in the game */
 		private var currentTabStateString:String;							/* State string associated with the tabNavigator */
 		// Popups
 		private var popup:TitleWindow;										/* A reference to any popup placed on top of the game manager */
@@ -166,6 +166,7 @@ package managers
 		private var updateState:UpdateState;								/* Update state handles retrieving the intitial user objects */
 		private var drawState:DrawState;									/* The draw state draws objects on the map */
 		private var buildState:BuildState;									/* The state handles the building/cancelling of objects */
+		private var stateList:ArrayCollection;								/* A list that contains all of the current states */
 		private var isRunning:Boolean;										/* True if the game manager is running */
 		
 		// Map variables
@@ -225,7 +226,7 @@ package managers
 			
 			// Setup some state variables
 			//this.buildStateInformation = new BuildState(null, false);
-			this.currentTabStateString = GameManager.emptyState;
+			this.currentTabStateString = GameManager._emptyState;
 		}
 		
 		// Run the game. Intialize active objects, events, and interfaces.
@@ -258,7 +259,6 @@ package managers
 			this.map.setDoubleClickMode(MapAction.ACTION_NOTHING);
 		}
 		
-		
 		// === GAME STATE MACHINE ===
 		public function setupStateMachine():void {
 			// Attach the state events to callback functions
@@ -277,8 +277,9 @@ package managers
 			this.updateState = new UpdateState(this.map, this.user, this.listOfUserModels, this.userObjectManager, this.app);
 			this.drawState = new DrawState(this.listOfUserModels, this.map, this.view, this.scene, this.gameFocus, 
 					this.photo, this.user, this.userObjectManager, this.queueManager, this, this.app);
-			this.buildState = new BuildState(this.app, this.map);
-			
+			this.buildState = new BuildState(this.app, this.map, this.user, this.userObjectManager, this.queueManager, 
+					this.userBoundary, this, this.resourceText);
+			this.stateList = new ArrayCollection([this.initState, this.backgroundState, this.updateState, this.drawState, this.buildState]);
 			// Start the state machine
 			var initialState:GameState;
 			
@@ -311,6 +312,7 @@ package managers
 			this.buildState.listOfQueueObjects = event.listOfQueueObjecs;
 			this.buildState.buildStateEventType = event.type;
 			
+			// Change the game state
 			this.changeGameState(this.buildState, lastState);
 		}
 
@@ -327,6 +329,17 @@ package managers
 			
 			// Enter new state
 			newState.enterState();
+		}
+		
+		// Get the active state
+		private function getActiveState():GameState {
+			for(var i:int = 0; i < this.stateList.length; i++){
+				var g:GameState = this.stateList[i] as GameState;
+				if(g.isActiveState()){
+					return g;
+				}
+			}
+			return this.backgroundState;
 		}
 		
 		// === GAME STATE MACHINE ===
@@ -401,8 +414,8 @@ package managers
 			// Get the queue manager 
 			var qObject:QueueObject = this.queueManager.getQueueObjectAtPosition(pos, this.map);
 			this.queueManager.removeFromQueue(qObject);
-			if(this.queueManager.isEmpty() && this.currentTabStateString == GameManager.queueState){
-				this.changeState(GameManager.emptyState);
+			if(this.queueManager.isEmpty() && this.currentTabStateString == GameManager._queueState){
+				this.changeState(GameManager._emptyState);
 			}
 		}
 		
@@ -574,9 +587,9 @@ package managers
 			
 			// Add to the state dictionary
 			this.aPStateMatchine =  new Dictionary();
-			this.aPStateMatchine[emptyState] = g;
-			this.aPStateMatchine[buildState] = ap;
-			this.aPStateMatchine[queueState] = this.queueManager.realizeActionQueue;
+			this.aPStateMatchine[_emptyState] = g;
+			this.aPStateMatchine[_buildState] = ap;
+			this.aPStateMatchine[_queueState] = this.queueManager.realizeActionQueue;
 			
 			// Add the relevant events.
 			ap.buildButton.addEventListener(MouseEvent.MOUSE_DOWN, onBuildButton);
@@ -584,66 +597,12 @@ package managers
 		}
 		
 		public function onBuildButton(event:MouseEvent):void{
-			// Copy the tower
-			//var s:Object = ObjectUtil.clone(this.newBuildObject) as SuperObject;
-			var d:Date = new Date();
-			
-			if(canPurchase(d)){
-				
-				// Build the object 
-				this.userObjectManager.buildObject(this.newBuildObject, this.user);
-				
-				// Change the build state
-				this.newBuildObject.updateBuildState(0.); // Make the build state transparent
-				
-				// Create a queue object associated with the purchase
-				var b:LatLngBounds = this.map.getLatLngBounds();
-				var buildTime:Date = PurchaseConstants.buildTime(this.newBuildObject, 0);
-				var objectString:String = this.newBuildObject.getNameString();
-				var q:QueueObject = new QueueObject("Building " + objectString + " at" + this.newBuildObject.getPosition(b), buildTime, onBuildEnd,
-					this.newBuildObject.updateBuildState, this.newBuildObject, onBuildCancel );
-				
-				// Subtract the purchase prices from the current user.
-				var woodCost:Number = PurchaseConstants.woodCost(this.newBuildObject, 0);
-				var stoneCost:Number = PurchaseConstants.stoneCost(this.newBuildObject, 0);
-				var manaCost:Number = PurchaseConstants.manaCost(this.newBuildObject, 0);
-				this.user.purchaseObject(woodCost, stoneCost, manaCost);
-				
-				// Add the queue object to the queue manager, and syntheisze the active queue
-				this.queueManager.addQueueObject(q);
-				if(!this.queueManager.isVisible){
-					this.changeState(GameManager.queueState);
-				}
-				
-			}else{
-				// Get the current production
-				var totalWood:Number = this.resourceText.getWoodProduction(d);
-				var totalStone:Number = this.resourceText.getManaProduction(d);
-				var totalMana:Number = this.resourceText.getManaProduction(d);
-				
-				// Find out why the purchase failed, and tell the user
-				var failureString:String = PurchaseConstants.missingResourcesString(this.newBuildObject, 0, totalWood, totalStone, totalMana);
-				
-				// Setup and create a popup to inform the user.
-				var s:SimplePopup = new SimplePopup();
-				popup = s;
-				
-				PopUpManager.addPopUp(s, this.app, true);
-				PopUpManager.centerPopUp(s);
-				
-				// Setup up the events
-				s.addEventListener(CloseEvent.CLOSE, onCloseBuildPopup);
-				s.okButton.addEventListener(MouseEvent.CLICK, onCloseBuildPopup);
-				s.theText.text = failureString;
-				s.title = "You do not have enough resources!";
-				
-				// Remove the current build object from the map
-				this.newBuildObject.eraseFromMap(this.map);
-				
-				// Change the state 
-				this.changeState(GameManager.emptyState);
-			}
-			
+			// Send a build event to go into the build state
+			var e:BuildStateEvent = new BuildStateEvent(BuildStateEvent.BUILD_START);
+ 			var g:GameState = this.getActiveState();
+			e.attachPreviousState(g);
+			this.buildState.newBuildObject = this.newBuildObject;			// Attach the build object
+			this.app.dispatchEvent(e);
 			
 		}
 		
@@ -670,7 +629,7 @@ package managers
 			
 			
 			if(this.queueManager.isEmpty()){
-				this.changeState(GameManager.emptyState);
+				this.changeState(GameManager._emptyState);
 			}
 		}
 		
@@ -691,7 +650,7 @@ package managers
 			
 			// Change the state if there is nothing left in the queue
 			if(this.queueManager.isEmpty()){
-				this.changeState(GameManager.emptyState);
+				this.changeState(GameManager._emptyState);
 			}
 		}
 		
@@ -721,7 +680,7 @@ package managers
 			this.userBoundary.removeAndDraw(this.newBuildObject);
 			
 			// Change the state 
-			this.changeState(GameManager.emptyState);
+			this.changeState(GameManager._emptyState);
 		}
 		
 		public function changeState(state:String) : void{

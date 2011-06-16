@@ -19,14 +19,12 @@ package models
 		// Variables associated with keeping the state
 		private var progressBar:ProgressBar;					/* Tie a progress bar to the queue object for updating */
 		
-		public function QueueObject(dS:String, d:Date, ef:Function, pF:Function, bO:SuperObject, fF:Function)
+		public function QueueObject(dS:String, d:Date, pF:Function, bO:SuperObject)
 		{
 			this.description = dS;
 			this.date = d;
-			this.endFunction = ef;
 			this.periodicFunction = pF;
 			this.buildObject = bO;
-			this.failureFunction = fF;
 		
 			// Setup the state variables
 			this.startDate = new Date();
