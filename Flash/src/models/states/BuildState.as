@@ -1,7 +1,10 @@
 package models.states
 {
+	import assets.PhotoAssets;
+	
 	import com.google.maps.LatLngBounds;
 	import com.google.maps.Map;
+	import com.google.maps.MapMouseEvent;
 	
 	import flash.events.Event;
 	import flash.events.MouseEvent;
@@ -11,9 +14,12 @@ package models.states
 	import managers.QueueManager;
 	import managers.UserObjectManager;
 	
+	import models.Portal;
 	import models.Production;
 	import models.QueueObject;
+	import models.Road;
 	import models.SuperObject;
+	import models.Tower;
 	import models.User;
 	import models.away3D.ResourceProductionText;
 	import models.constants.DateConstants;
@@ -23,6 +29,7 @@ package models.states
 	
 	import mx.collections.ArrayCollection;
 	import mx.events.CloseEvent;
+	import mx.managers.CursorManager;
 	import mx.managers.PopUpManager;
 	import mx.messaging.Producer;
 	
@@ -45,9 +52,11 @@ package models.states
 		private var _newBuildObject:SuperObject;						/* The object that is begin built */
 		private var resourceText:ResourceProductionText;				/* Away3D resource field */
 		private var popup:TitleWindow;									/* A reference to any popup placed on top of the game manager */
-
+		private var photo:PhotoAssets;									/* The photos used in the game */
+		// Constants determine whether the state has the active mouse
+		
 		public function BuildState(a:Application, m:Map, u:User, uOM:UserObjectManager, qM:QueueManager, uB:PolygonBoundaryManager,
-					gm:GameManager, rT:ResourceProductionText)
+					gm:GameManager, rT:ResourceProductionText, p:PhotoAssets)
 		{
 			this.app = a;
 			this.map = m;
@@ -57,6 +66,7 @@ package models.states
 			this.userBoundary = uB;
 			this.gameManager = gm;
 			this.resourceText = rT;
+			this.photo = p;
 			this.isInState = false;
 		}
 		
@@ -276,6 +286,28 @@ package models.states
 				}
 			}
 		}
+		
+		// Deferred events handle map inputs.(Called in background state)
+		public function onMapMouseClick(event:MapMouseEvent):void {
+
+		}
+		public function onMapRollOver(event:MapMouseEvent):void {
+			
+		}
+		public function onMapRollOut(event:MapMouseEvent):void {
+			
+		}
+		
+		private function pictureForObject():Class {
+			if(this._newBuildObject is Tower){
+				return photo.TowerLevel0;
+			}else if(this._newBuildObject is Portal){
+				return photo.ThePortal;
+			}else {
+				return photo.EastRoad;
+			}
+		}
+		
 		public function exitState():void
 		{
 			this.isInState = false;

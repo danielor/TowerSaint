@@ -273,12 +273,13 @@ package managers
 			this.initState = new InitState(this.map, this.locationChanger, this.userObjectManager, this.app,
 				this.user, this.photo, this.gameFocus, this.buildButton, this.scene, this.listOfUserModels,
 				this.view);
-			this.backgroundState = new BackgroundState(this.map, this.app, this.gameFocus);
 			this.updateState = new UpdateState(this.map, this.user, this.listOfUserModels, this.userObjectManager, this.app);
 			this.drawState = new DrawState(this.listOfUserModels, this.map, this.view, this.scene, this.gameFocus, 
 					this.photo, this.user, this.userObjectManager, this.queueManager, this, this.app);
 			this.buildState = new BuildState(this.app, this.map, this.user, this.userObjectManager, this.queueManager, 
-					this.userBoundary, this, this.resourceText);
+					this.userBoundary, this, this.resourceText, this.photo);
+			this.backgroundState = new BackgroundState(this.map, this.app, this.gameFocus, this.buildState);
+
 			this.stateList = new ArrayCollection([this.initState, this.backgroundState, this.updateState, this.drawState, this.buildState]);
 			// Start the state machine
 			var initialState:GameState;
@@ -522,6 +523,9 @@ package managers
 					this.buildObjectPicture = this.photo.EastRoad;
 					break;
 			}
+			
+			// Set the state of the build state
+			this.backgroundState.mouseState = BackgroundState.MOUSE_BUILD;
 			
 			// Remove the previous build object from the map
 			if(this.newBuildObject != null){
@@ -1284,7 +1288,7 @@ package managers
 			}
 		}
 		
-		private function onMapMouseMove(event:MapMouseEvent) : void {
+		private function  (event:MapMouseEvent) : void {
 			if(this.buildStateInformation.isInState()){
 				
 			}

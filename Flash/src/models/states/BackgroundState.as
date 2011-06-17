@@ -25,17 +25,31 @@ package models.states
 		private var isInState:Boolean;									/* Boolean variable which denotes the state */
 		private var initialMapDragMouse:LatLng; 						/* Initial drag position */				
 		private var app:Application;									/* The application running the current state */
-		private var gameFocus:GameFocusManager								/* The focus manager */
+		private var gameFocus:GameFocusManager							/* The focus manager */
+		private var buildState:BuildState;								/* The build state is needed for deferred events */
 		private const viewString:String = "inApp";						/* The view state */
-		public function BackgroundState(m:Map, a:Application, gF:GameFocusManager)
+		
+		// Constants associate a certain type of mouse activity with a certain state.
+		private var _mouseState:String;
+		public static const MOUSE_BUILD:String = "MouseBuild";
+		public static const MOUSE_FOCUS:String = "MouseFocus";
+		public static const MOUSE_ATTACK:String = "MouseAttack";
+		public static const MOUSE_MOVE:String = "MouseMove";
+		
+		public function BackgroundState(m:Map, a:Application, gF:GameFocusManager, bS:BuildState)
 		{
 			// Initialize
 			this.map = m;
 			this.app = a;
 			this.gameFocus= gF;
-			
+			this.buildState = bS;
 			// Set the state
 			this.isInState = false;
+			this._mouseState = BackgroundState.MOUSE_FOCUS;
+		}
+		
+		public function set mouseState(s:String):void{
+			this._mouseState = s;
 		}
 		
 		public function isChatActive():Boolean
@@ -66,7 +80,10 @@ package models.states
 			this.mapEventManager = new EventManager(this.map);	
 			this.mapEventManager.addEventListener(MapMouseEvent.DRAG_START, onMapDragStart);
 			this.mapEventManager.addEventListener(MapMouseEvent.DRAG_END, onMapDragEnd);
-			this.mapEventManager.addEventListener(MapMouseEvent.MOUSE_DOWN, this.gameFocus.onMouseClick);			
+			//this.mapEventManager.addEventListener(MapMouseEvent.MOUSE_DOWN, this.gameFocus.onMouseClick);			
+			this.mapEventManager.addEventListener(MapMouseEvent.MOUSE_DOWN, onMapMouseDown); 
+			this.mapEventManager.addEventListener(MapMouseEvent.ROLL_OVER, onMapRollOver);
+			this.mapEventManager.addEventListener(MapMouseEvent.ROLL_OUT, onMapRollOut);
 			this.isInState = true;
 		}
 		
@@ -74,6 +91,28 @@ package models.states
 		{
 			this.mapEventManager.RemoveEvents();			/* Remove all map events in state */
 			this.isInState = false;
+		}
+		
+		private function onMapMouseDown(event:MapMouseEvent):void {
+			if(this._mouseState == BackgroundState.MOUSE_FOCUS){
+				this.gameFocus.onMouseClick(event);
+			}else if(this._mouseState == BackgroundState.MOUSE_BUILD){
+				// Call the build state hook and return to the previous state
+				this.buildState.onMapMouseClick(event);
+				this.mouseState = BackgroundState.MOUSE_FOCUS;
+			}
+		}
+		
+		private function onMapRollOver(event:MapMouseEvent):void{
+			if(this._mouseState == BackgroundState.MOUSE_BUILD){
+				this.buildState.onMapRollOver(event);
+			}
+		}
+		
+		private function onMapRollOut(event:MapMouseEvent):void {
+			if(this._mouseState == BackgroundState.MOUSE_BUILD){
+				this.buildState.onMapRollOut(event);
+			}
 		}
 		
 		private function onMapDragStart(event:MapMouseEvent) : void {
