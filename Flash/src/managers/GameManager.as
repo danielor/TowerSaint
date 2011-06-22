@@ -49,13 +49,13 @@ package managers
 	import messaging.events.ChannelUserLoginEvent;
 	import messaging.events.ChannelUserLogoutEvent;
 	
-	import models.BoundarySuperObject;
+	import models.interfaces.BoundarySuperObject;
 	import models.GameChannel;
 	import models.Portal;
 	import models.Production;
 	import models.QueueObject;
 	import models.Road;
-	import models.SuperObject;
+	import models.interfaces.SuperObject;
 	import models.Tower;
 	import models.User;
 	import models.away3D.ResourceProductionText;
@@ -66,10 +66,12 @@ package managers
 	import models.states.DrawState;
 	import models.states.GameState;
 	import models.states.InitState;
+	import models.states.MoveState;
 	import models.states.UpdateState;
 	import models.states.events.BackgroundStateEvent;
 	import models.states.events.BuildStateEvent;
 	import models.states.events.DrawStateEvent;
+	import models.states.events.MoveStateEvent;
 	import models.states.events.UpdateStateEvent;
 	
 	import mx.collections.ArrayCollection;
@@ -82,6 +84,7 @@ package managers
 	import mx.events.CollectionEvent;
 	import mx.events.EventListenerRequest;
 	import mx.events.ItemClickEvent;
+	import mx.events.PropertyChangeEvent;
 	import mx.managers.CursorManager;
 	import mx.managers.CursorManagerPriority;
 	import mx.managers.PopUpManager;
@@ -166,6 +169,7 @@ package managers
 		private var updateState:UpdateState;								/* Update state handles retrieving the intitial user objects */
 		private var drawState:DrawState;									/* The draw state draws objects on the map */
 		private var buildState:BuildState;									/* The state handles the building/cancelling of objects */
+		private var moveState:MoveState;									/* The move state controls the movement of objects in the game */
 		private var stateList:ArrayCollection;								/* A list that contains all of the current states */
 		private var isRunning:Boolean;										/* True if the game manager is running */
 		
@@ -223,6 +227,7 @@ package managers
 			// Setup the focus of objects on the map
 			this.gameFocus.map = this.map;
 			this.gameFocus.listOfModels = this.listOfUserModels;
+			this.gameFocus.gameManager = this;
 			
 			// Setup some state variables
 			//this.buildStateInformation = new BuildState(null, false);
@@ -268,6 +273,9 @@ package managers
 			this.app.addEventListener(BuildStateEvent.BUILD_COMPLETE, onBuildState);
 			this.app.addEventListener(BuildStateEvent.BUILD_INIT, onBuildState);
 			this.app.addEventListener(BuildStateEvent.BUILD_START, onBuildState);
+			this.app.addEventListener(MoveStateEvent.MOVE_END, onMoveState);
+			this.app.addEventListener(MoveStateEvent.MOVE_START, onMoveState);
+			this.app.addEventListener(MoveStateEvent.MOVE_STEP, onMoveState);
 
 			// Create the states
 			this.initState = new InitState(this.map, this.locationChanger, this.userObjectManager, this.app,
@@ -277,10 +285,13 @@ package managers
 			this.drawState = new DrawState(this.listOfUserModels, this.map, this.view, this.scene, this.gameFocus, 
 					this.photo, this.user, this.userObjectManager, this.queueManager, this, this.app);
 			this.buildState = new BuildState(this.app, this.map, this.user, this.userObjectManager, this.queueManager, 
-					this.userBoundary, this, this.resourceText, this.photo);
+					this.userBoundary, this, this.resourceText, this.photo, this.listOfUserModels, this.scene,
+					this.view, this.gameFocus);
 			this.backgroundState = new BackgroundState(this.map, this.app, this.gameFocus, this.buildState);
-
-			this.stateList = new ArrayCollection([this.initState, this.backgroundState, this.updateState, this.drawState, this.buildState]);
+			this.moveState = new MoveState(this.map);
+			
+			this.stateList = new ArrayCollection([this.initState, this.backgroundState, this.updateState, this.drawState, this.buildState,
+											this.moveState]);
 			// Start the state machine
 			var initialState:GameState;
 			
@@ -315,6 +326,9 @@ package managers
 			
 			// Change the game state
 			this.changeGameState(this.buildState, lastState);
+		}
+		private function onMoveState(event:MoveStateEvent):void  {
+			var lastState:GameState = event.getPreviousState();
 		}
 
 		public function changeGameState(newState:GameState, lastState:GameState) : void {
@@ -484,6 +498,11 @@ package managers
 			
 		}
 		
+		// Get the action group associated with a state
+		public function getActionGroup(s:String):Object {
+			return this.aPStateMatchine[s];
+		}
+		
 		// ==== CHAT SETUP ===
 		private function setupChat() : void {
 			this.sendButton.addEventListener(MouseEvent.MOUSE_UP, onSendChatButton);	
@@ -525,7 +544,9 @@ package managers
 			}
 			
 			// Set the state of the build state
-			this.backgroundState.mouseState = BackgroundState.MOUSE_BUILD;
+			var p:PropertyChangeEvent = new PropertyChangeEvent(BackgroundState.MOUSE_BUILD);
+			p.newValue = BackgroundState.MOUSE_BUILD;
+			this.app.dispatchEvent(p);
 			
 			// Remove the previous build object from the map
 			if(this.newBuildObject != null){

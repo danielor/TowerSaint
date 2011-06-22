@@ -17,6 +17,8 @@ package models
 	import com.google.maps.styles.StrokeStyle;
 	
 	import flash.display.BitmapData;
+	import flash.events.EventDispatcher;
+	import flash.events.IEventDispatcher;
 	import flash.utils.IDataInput;
 	import flash.utils.IDataOutput;
 	import flash.utils.IExternalizable;
@@ -25,16 +27,18 @@ package models
 	import flashx.textLayout.elements.SpanElement;
 	import flashx.textLayout.elements.TextFlow;
 	
+	import managers.EventManager;
 	import managers.GameFocusManager;
 	
 	import models.constants.GameConstants;
 	import models.map.TowerSaintMarker;
 	
 	import mx.core.BitmapAsset;
+	import models.interfaces.SuperObject;
 
 	[Bindable]
 	[RemoteClass(alias="models.Road")]
-	public class Road  implements SuperObject
+	public class Road  implements SuperObject, IEventDispatcher
 	{
 		// Information
 		public var hitPoints:Number;
@@ -58,9 +62,57 @@ package models
 		private var focusPolygon:Polygon;	
 		private var roadIcon:BitmapAsset;										/* The bitmap associated with the object */
 		
+		// Dispatcher of events
+		private var modelDispatcher:EventDispatcher;							/* Dispatch events associated with roads */
+		private var modelEventManager:EventManager;								/* The event manager associated with the object */
+		
 		public function Road()
 		{
 			super();
+			this.modelDispatcher = new EventDispatcher(this);
+		}
+		
+		/* The dispatcher interface */
+		public function dispatchEvent(evt:Event):Boolean{
+			return modelDispatcher.dispatchEvent(evt);
+		}
+		
+		public function hasEventListener(type:String):Boolean{
+			return modelDispatcher.hasEventListener(type);
+		}
+		
+		public function removeEventListener(type:String, listener:Function, useCapture:Boolean = false):void{
+			modelDispatcher.removeEventListener(type, listener, useCapture);
+		}
+		
+		public function willTrigger(type:String):Boolean {
+			return modelDispatcher.willTrigger(type);
+		}
+		/* Override the event listener to use the marker event manager where appropriate. If not away3D's base class is a displayObject */
+		public function addEventListener(type:String, listener:Function, useCapture:Boolean=false, priority:int=0, useWeakReference:Boolean=false):void{
+			if(this.modelEventManager == null){
+				this.modelDispatcher.addEventListener(type, listener, useCapture, priority, useWeakReference);
+			}else{
+				var mouseEventArray:Array = [MapMouseEvent.CLICK, MapMouseEvent.DOUBLE_CLICK, MapMouseEvent.DRAG_END, MapMouseEvent.DRAG_START, 
+				MapMouseEvent.DRAG_STEP, MapMouseEvent.MOUSE_DOWN, MapMouseEvent.MOUSE_MOVE, MapMouseEvent.MOUSE_UP, MapMouseEvent.ROLL_OUT,
+				MapMouseEvent.ROLL_OVER];
+				if(mouseEventArray.indexOf(type) >= 0 ){
+					this.modelEventManager.addEventListener(type,listener, useCapture, priority, useWeakReference);
+				}else{
+					this.modelDispatcher.addEventListener(type, listener, useCapture, priority, useWeakReference);
+				}
+			}
+		}
+		/* Override towersaitndispatcher fuctions */
+		public function removeAllEvents():void{
+			if(this.modelEventManager != null){
+				this.modelEventManager.RemoveEvents();
+			}
+		}
+		public function removeEvent(s:String, f:Function):void {
+			if(this.modelEventManager != null){
+				this.modelEventManager.removeEventListener(s, f);
+			}
 		}
 		
 		// IExternalizable interface		
@@ -144,10 +196,15 @@ package models
 			markerOptions.radius = 5;
 			markerOptions.draggable = drag;
 			
+
+			
 			// Create the marker
 			roadMarker = new TowerSaintMarker(this, gposition, markerOptions, map, view);
 			roadMarker.addEventListener(MapMouseEvent.CLICK, fpm.onMarkerClick);
 			map.addOverlay(roadMarker);
+			
+			// Create an event manager
+			this.modelEventManager = new EventManager(roadMarker);
 		}
 		public function isReady():Boolean{
 			return true;

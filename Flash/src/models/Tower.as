@@ -53,6 +53,8 @@ package models
 	import mx.core.BitmapAsset;
 	import mx.events.PropertyChangeEvent;
 	import mx.events.PropertyChangeEventKind;
+	import models.interfaces.BoundarySuperObject;
+	import models.interfaces.SuperObject;
 
 	[Bindbale]
 	[RemoteClass(alias="models.Tower")]
@@ -329,7 +331,17 @@ package models
 				}
 			}
 		}
-		
+		/* Override towersaitndispatcher fuctions */
+		public function removeAllEvents():void{
+			if(this.tMEventManager != null){
+				this.tMEventManager.RemoveEvents();
+			}
+		}
+		public function removeEvent(s:String, f:Function):void {
+			if(this.tMEventManager != null){
+				this.tMEventManager.removeEventListener(s, f);
+			}
+		}
 		
 		
 		public function draw(drag:Boolean, map:Map, _photo:PhotoAssets, fpm:GameFocusManager, withBoundary:Boolean, scene:Scene3D, view:View3D) : void {

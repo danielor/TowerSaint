@@ -19,9 +19,9 @@ package managers
 	import flashx.textLayout.elements.SpanElement;
 	import flashx.textLayout.elements.TextFlow;
 	
-	import models.SuperObject;
 	import models.Tower;
 	import models.constants.GameConstants;
+	import models.interfaces.SuperObject;
 	import models.map.TowerSaintMarker;
 	
 	import mx.collections.ArrayCollection;
@@ -56,6 +56,8 @@ package managers
 		private var _map:Map;												/* The google map which runs the game */
 		private var _app:Application;										/* The application running the manager */
 		private var _drag3D:Drag3D;											/* Drag focused objects in a plane */
+		private var _gameManager:GameManager;								/* The game manager */
+		private var _focusObject:SuperObject;								/* The object with focus */ 
 		
 		public function GameFocusManager(fI:Image, bT:RichEditableText, tT:RichEditableText, 
 										  p:PhotoAssets, m:Map, a:Application)
@@ -71,7 +73,7 @@ package managers
 			this.previousTime = null;
 			this.isDragging = false;
 			this._map = m;
-			this._app = a;			
+			this._app = a;		
 			
 		}
 		
@@ -79,8 +81,14 @@ package managers
 		public function set drag3D(d:Drag3D):void {
 			this._drag3D = d;
 		}
+		public function set gameManager(gM:GameManager):void {
+			this._gameManager = gM;
+		}
 		public function get drag3D():Drag3D {
 			return this._drag3D;
+		}
+		public function get focusObject():SuperObject {
+			return this._focusObject;
 		}
 		
 		// Set the map variable
@@ -116,6 +124,7 @@ package managers
 		
 		// Upon pressing down give focus to the event
 		public function onMouseClick(e:MapMouseEvent) : void {
+			var found:Boolean = false;
 			for(var i:int = 0; i < this._listOfModels.length; i++){
 				var s:SuperObject = this._listOfModels[i] as SuperObject;
 				if(s.isVisible(this._map)){
@@ -123,8 +132,14 @@ package managers
 					var bounds:LatLngBounds = s.getBounds();
 					if(bounds.containsLatLng(p)){
 						this.displayModel(s);
+						found = true;
 					}
 				}
+			}
+			
+			if(!found){
+				this.removeFocus();
+				this._focusObject = null;
 			}
 		}
 		
@@ -180,7 +195,7 @@ package managers
 			displayModel(obj as SuperObject);
 			this.hasFocus = true;
 		}
-		public function removeFocus(obj:ObjectContainer3D) : void {
+		public function removeFocus() : void {
 			
 			// Remove the focus
 			this.bodyText.textFlow = null;
@@ -207,6 +222,13 @@ package managers
 			this.titleText.textFlow = title;
 			this.bodyText.textFlow = t;
 			this.focusImage.source = bA;
+			
+			// Change the state of the action group
+			this._gameManager.changeState(GameManager._emptyState);
+			
+			// Save a reference to the focused object
+			this._focusObject = m;
+			
  		}
 		
 	}

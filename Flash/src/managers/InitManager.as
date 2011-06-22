@@ -21,7 +21,7 @@ package managers
 	
 	import managers.EventManager;
 	
-	import models.SuperObject;
+	import models.interfaces.SuperObject;
 	import models.Tower;
 	import models.User;
 	import models.map.TowerSaintMarker;

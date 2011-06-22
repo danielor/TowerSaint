@@ -18,7 +18,7 @@ package managers
 	import flashx.textLayout.elements.TextFlow;
 	
 	import models.QueueObject;
-	import models.SuperObject;
+	import models.interfaces.SuperObject;
 	
 	import mx.collections.ArrayCollection;
 	import mx.containers.TitleWindow;

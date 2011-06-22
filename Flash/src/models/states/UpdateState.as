@@ -10,7 +10,7 @@ package models.states
 	import managers.UserObjectManager;
 	
 	import models.Bounds;
-	import models.SuperObject;
+	import models.interfaces.SuperObject;
 	import models.User;
 	import models.states.events.DrawStateEvent;
 	

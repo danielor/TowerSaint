@@ -1,14 +1,26 @@
 package models.states
 {
+	import action.BuildActionGroup;
+	
 	import assets.PhotoAssets;
 	
+	import away3d.containers.Scene3D;
+	import away3d.containers.View3D;
+	
+	import com.google.maps.LatLng;
 	import com.google.maps.LatLngBounds;
 	import com.google.maps.Map;
 	import com.google.maps.MapMouseEvent;
 	
+	import flash.display.BitmapData;
 	import flash.events.Event;
 	import flash.events.MouseEvent;
 	
+	import flashx.textLayout.elements.ParagraphElement;
+	import flashx.textLayout.elements.SpanElement;
+	import flashx.textLayout.elements.TextFlow;
+	
+	import managers.GameFocusManager;
 	import managers.GameManager;
 	import managers.PolygonBoundaryManager;
 	import managers.QueueManager;
@@ -18,7 +30,7 @@ package models.states
 	import models.Production;
 	import models.QueueObject;
 	import models.Road;
-	import models.SuperObject;
+	import models.interfaces.SuperObject;
 	import models.Tower;
 	import models.User;
 	import models.away3D.ResourceProductionText;
@@ -28,8 +40,11 @@ package models.states
 	import models.states.events.BuildStateEvent;
 	
 	import mx.collections.ArrayCollection;
+	import mx.core.BitmapAsset;
 	import mx.events.CloseEvent;
+	import mx.events.PropertyChangeEvent;
 	import mx.managers.CursorManager;
+	import mx.managers.CursorManagerPriority;
 	import mx.managers.PopUpManager;
 	import mx.messaging.Producer;
 	
@@ -53,10 +68,15 @@ package models.states
 		private var resourceText:ResourceProductionText;				/* Away3D resource field */
 		private var popup:TitleWindow;									/* A reference to any popup placed on top of the game manager */
 		private var photo:PhotoAssets;									/* The photos used in the game */
+		private var listOfUserModels:ArrayCollection;					/* The list of models associated with the game */
+		private var scene:Scene3D										/* The scene where the away3D objects exist */
+		private var view:View3D											/* The view associated with the 3D scene */
+		private var focusPanelManager:GameFocusManager;					/* The focus panel manager handles game object focus */
 		// Constants determine whether the state has the active mouse
 		
 		public function BuildState(a:Application, m:Map, u:User, uOM:UserObjectManager, qM:QueueManager, uB:PolygonBoundaryManager,
-					gm:GameManager, rT:ResourceProductionText, p:PhotoAssets)
+					gm:GameManager, rT:ResourceProductionText, p:PhotoAssets, lOFM:ArrayCollection, s:Scene3D, v:View3D,
+					fPM:GameFocusManager)
 		{
 			this.app = a;
 			this.map = m;
@@ -67,6 +87,10 @@ package models.states
 			this.gameManager = gm;
 			this.resourceText = rT;
 			this.photo = p;
+			this.listOfUserModels = lOFM;
+			this.scene = s;
+			this.view = v;
+			this.focusPanelManager = fPM;
 			this.isInState = false;
 		}
 		
@@ -289,13 +313,95 @@ package models.states
 		
 		// Deferred events handle map inputs.(Called in background state)
 		public function onMapMouseClick(event:MapMouseEvent):void {
-
+			var pos:LatLng = event.latLng;
+			if(this.userBoundary.isInsidePolygon(pos)){
+				if(!this.intersectsCurrentObject(pos)){
+					// Setup the action state
+					var b:BuildActionGroup = this.gameManager.getActionGroup(GameManager._buildState) as BuildActionGroup;
+					var c:Class = this.pictureForObject();
+					b.buildImage.source = new c as BitmapAsset;
+					
+					// Create/Set the text flow object
+					var textFlow:TextFlow = new TextFlow();
+					var pGraph:ParagraphElement = new ParagraphElement();
+					var iSpan:SpanElement = new SpanElement();
+					iSpan.text = getBuildString();
+					pGraph.addChild(iSpan);
+					textFlow.addChild(pGraph);
+					b.buildText.textFlow = textFlow;
+					
+					// Change the state
+					this.gameManager.changeState(GameManager._buildState);;
+					
+					// Create an object from the object picture
+					this._newBuildObject.initialize(this.user);
+					this._newBuildObject.draw(true, this.map, this.photo, this.focusPanelManager, true, this.scene, this.view);
+					
+					// Add the object to the empire boundary
+					this.userBoundary.addAndDraw(_newBuildObject);
+					
+					// Change the cursor manager
+					CursorManager.removeAllCursors();
+					
+					// Change the deferred event
+					var p:PropertyChangeEvent = new PropertyChangeEvent(BackgroundState.MOUSE_FOCUS);
+					p.newValue = BackgroundState.MOUSE_FOCUS;
+					this.app.dispatchEvent(p);
+				}	
+			}
+		}
+		
+		// Returns a build string that populates the textflow in the build action group
+		private function getBuildString():String {
+			var s:String ="\n";
+			
+			// Create a temporary object without fixed position
+			var pos:LatLng =  this.map.getCenter();
+			
+			// Find the cost for that temporary object
+			var woodCost:Number = PurchaseConstants.woodCost(this._newBuildObject, 0);
+			var stoneCost:Number = PurchaseConstants.stoneCost(this._newBuildObject, 0);
+			var magicCost:Number = PurchaseConstants.manaCost(this._newBuildObject, 0);
+			
+			var c:Class = this.pictureForObject();
+			if(c == this.photo.TowerLevel0){
+				s+="Stone  :" + stoneCost.toString() + "\n";
+				s+="Wood  :" + woodCost.toString() + "\n";
+				s+="Magic  :" + magicCost.toString() + "\n";
+			}else if(c == this.photo.ThePortal){
+				s+="Stone :" + stoneCost.toString() + "\n";
+				s+="Wood  :" + woodCost.toString() + "\n";
+				s+="Magic :" + magicCost.toString() + "\n";
+			}else if(c == this.photo.EastRoad){
+				s+="Stone :" + stoneCost.toString() + "\n";
+				s+="Wood  :" + woodCost.toString() + "\n";
+			}
+			
+			return s;
+		
+		}
+		
+		private function intersectsCurrentObject(pos:LatLng):Boolean {
+			for(var i:int = 0; i < this.listOfUserModels.length; i++){
+				var s:SuperObject = this.listOfUserModels[i] as SuperObject;
+				if(! s.isOverLappingBoundsOfObject(pos, this.map, this.photo)){
+					return false;
+				}
+			}
+			return true;
+		}
+		
+		public function onMapRollOut(event:MapMouseEvent):void {
+			// Remove the cursor when one leaves the map
+			CursorManager.removeAllCursors();
 		}
 		public function onMapRollOver(event:MapMouseEvent):void {
-			
-		}
-		public function onMapRollOut(event:MapMouseEvent):void {
-			
+			var buildObjectPicture:Class = this.pictureForObject();
+			var asset:BitmapAsset = new buildObjectPicture() as BitmapAsset;
+			var data:BitmapData = asset.bitmapData;
+			var xShift:Number = data.width / 2.;
+			var yShift:Number = data.height;
+			CursorManager.setCursor(buildObjectPicture, CursorManagerPriority.HIGH, -xShift, -yShift);
 		}
 		
 		private function pictureForObject():Class {

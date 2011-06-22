@@ -11,7 +11,7 @@ package managers
 	import flash.geom.Point;
 	import flash.utils.Dictionary;
 	
-	import models.SuperObject;
+	import models.interfaces.SuperObject;
 	import models.Tower;
 	import models.User;
 	import models.map.TowerSaintPolygon;

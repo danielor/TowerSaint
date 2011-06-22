@@ -11,9 +11,12 @@ package models.states
 	import managers.GameManager;
 	import managers.UserObjectManager;
 	
+	import models.interfaces.SuperObject;
+	import models.states.events.MoveStateEvent;
 	import models.states.events.UpdateStateEvent;
 	
 	import mx.controls.Alert;
+	import mx.events.PropertyChangeEvent;
 	
 	import spark.components.Application;
 
@@ -27,6 +30,7 @@ package models.states
 		private var app:Application;									/* The application running the current state */
 		private var gameFocus:GameFocusManager							/* The focus manager */
 		private var buildState:BuildState;								/* The build state is needed for deferred events */
+		private var isClicked:Boolean;									/* True if the operation is clicked */
 		private const viewString:String = "inApp";						/* The view state */
 		
 		// Constants associate a certain type of mouse activity with a certain state.
@@ -36,20 +40,28 @@ package models.states
 		public static const MOUSE_ATTACK:String = "MouseAttack";
 		public static const MOUSE_MOVE:String = "MouseMove";
 		
-		public function BackgroundState(m:Map, a:Application, gF:GameFocusManager, bS:BuildState)
+		public function BackgroundState(m:Map, a:Application, gF:GameFocusManager, bS:BuildState )
 		{
 			// Initialize
 			this.map = m;
 			this.app = a;
 			this.gameFocus= gF;
 			this.buildState = bS;
+			
 			// Set the state
 			this.isInState = false;
 			this._mouseState = BackgroundState.MOUSE_FOCUS;
+			this.isClicked = false;
+			
+			// Setup the events associated with the mouse deferred events
+			this.app.addEventListener(BackgroundState.MOUSE_BUILD, onMouseState);
+			this.app.addEventListener(BackgroundState.MOUSE_FOCUS, onMouseState);
+			this.app.addEventListener(BackgroundState.MOUSE_ATTACK, onMouseState);
+			this.app.addEventListener(BackgroundState.MOUSE_MOVE, onMouseState);
 		}
 		
-		public function set mouseState(s:String):void{
-			this._mouseState = s;
+		public function  onMouseState(e:PropertyChangeEvent):void{
+			this._mouseState = e.newValue as String;
 		}
 		
 		public function isChatActive():Boolean
@@ -80,8 +92,8 @@ package models.states
 			this.mapEventManager = new EventManager(this.map);	
 			this.mapEventManager.addEventListener(MapMouseEvent.DRAG_START, onMapDragStart);
 			this.mapEventManager.addEventListener(MapMouseEvent.DRAG_END, onMapDragEnd);
-			//this.mapEventManager.addEventListener(MapMouseEvent.MOUSE_DOWN, this.gameFocus.onMouseClick);			
 			this.mapEventManager.addEventListener(MapMouseEvent.MOUSE_DOWN, onMapMouseDown); 
+			this.mapEventManager.addEventListener(MapMouseEvent.MOUSE_UP, onMapMouseUp);
 			this.mapEventManager.addEventListener(MapMouseEvent.ROLL_OVER, onMapRollOver);
 			this.mapEventManager.addEventListener(MapMouseEvent.ROLL_OUT, onMapRollOut);
 			this.isInState = true;
@@ -93,13 +105,37 @@ package models.states
 			this.isInState = false;
 		}
 		
+		private function onMapMouseUp(event:MapMouseEvent):void {
+			this.isClicked = false;
+			if(this._mouseState == BackgroundState.MOUSE_MOVE){
+				var e:MoveStateEvent = new MoveStateEvent(MoveStateEvent.MOVE_END);
+				e.attachPreviousState(this);
+				this.app.dispatchEvent(e);
+			}
+		}
+		
 		private function onMapMouseDown(event:MapMouseEvent):void {
+			this.isClicked = true;
 			if(this._mouseState == BackgroundState.MOUSE_FOCUS){
 				this.gameFocus.onMouseClick(event);
+				
+				// Get the focus object
+				var focusObject:SuperObject = this.gameFocus.focusObject;
+				if(focusObject != null){
+					// Set the internal state
+					this._mouseState = BackgroundState.MOUSE_MOVE;
+					
+					// Send out a move event
+					var e:MoveStateEvent = new MoveStateEvent(MoveStateEvent.MOVE_START);
+					e.attachPreviousState(this);
+					e.moveObject = focusObject;
+					this.app.dispatchEvent(e);
+				}
+				
 			}else if(this._mouseState == BackgroundState.MOUSE_BUILD){
 				// Call the build state hook and return to the previous state
 				this.buildState.onMapMouseClick(event);
-				this.mouseState = BackgroundState.MOUSE_FOCUS;
+				this._mouseState = BackgroundState.MOUSE_FOCUS;
 			}
 		}
 		

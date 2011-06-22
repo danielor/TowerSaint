@@ -7,7 +7,7 @@ package models.map
 	import com.google.maps.overlays.Marker;
 	import com.google.maps.overlays.MarkerOptions;
 	
-	import models.SuperObject;
+	import models.interfaces.SuperObject;
 	
 	import spark.effects.Scale3D;
 	

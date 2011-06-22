@@ -13,7 +13,7 @@ package managers
 	
 	import models.Bounds;
 	import models.Location;
-	import models.SuperObject;
+	import models.interfaces.SuperObject;
 	import models.User;
 	
 	import mx.collections.ArrayCollection;

@@ -17,7 +17,7 @@ package models.states
 	import managers.UserObjectManager;
 	
 	import models.Production;
-	import models.SuperObject;
+	import models.interfaces.SuperObject;
 	import models.User;
 	import models.constants.DateConstants;
 	import models.constants.PurchaseConstants;

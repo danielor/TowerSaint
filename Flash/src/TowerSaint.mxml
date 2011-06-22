@@ -40,7 +40,7 @@
 			import models.Location;
 			import models.Portal;
 			import models.Road;
-			import models.SuperObject;
+			import models.interfaces.SuperObject;
 			import models.Tower;
 			import models.User;
 			import models.states.ImageState;

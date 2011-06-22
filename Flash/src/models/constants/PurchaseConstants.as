@@ -2,7 +2,7 @@ package models.constants
 {
 	import models.Portal;
 	import models.Road;
-	import models.SuperObject;
+	import models.interfaces.SuperObject;
 	import models.Tower;
 	
 	import mx.controls.Alert;
