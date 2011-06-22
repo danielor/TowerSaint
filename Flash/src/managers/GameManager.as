@@ -49,18 +49,18 @@ package managers
 	import messaging.events.ChannelUserLoginEvent;
 	import messaging.events.ChannelUserLogoutEvent;
 	
-	import models.interfaces.BoundarySuperObject;
 	import models.GameChannel;
 	import models.Portal;
 	import models.Production;
 	import models.QueueObject;
 	import models.Road;
-	import models.interfaces.SuperObject;
 	import models.Tower;
 	import models.User;
 	import models.away3D.ResourceProductionText;
 	import models.constants.DateConstants;
 	import models.constants.PurchaseConstants;
+	import models.interfaces.BoundarySuperObject;
+	import models.interfaces.SuperObject;
 	import models.states.BackgroundState;
 	import models.states.BuildState;
 	import models.states.DrawState;
@@ -534,12 +534,15 @@ package managers
 			switch(itemIndex){
 				case 0:
 					this.buildObjectPicture = this.photo.TowerLevel0;
+					this.buildState.newBuildObject = new Tower();
 					break;
 				case 1:
 					this.buildObjectPicture = this.photo.ThePortal;
+					this.buildState.newBuildObject = new Portal();
 					break;
 				case 2:
 					this.buildObjectPicture = this.photo.EastRoad;
+					this.buildState.newBuildObject = new Road();
 					break;
 			}
 			
@@ -547,6 +550,7 @@ package managers
 			var p:PropertyChangeEvent = new PropertyChangeEvent(BackgroundState.MOUSE_BUILD);
 			p.newValue = BackgroundState.MOUSE_BUILD;
 			this.app.dispatchEvent(p);
+			
 			
 			// Remove the previous build object from the map
 			if(this.newBuildObject != null){
