@@ -366,7 +366,6 @@ package models
 			// Create the marker
 			towerMarker = new TowerSaintMarker(this, gposition, markerOptions, map, view);
 
-			
 			// Create an event manager associated with the marker
 			this.tMEventManager = new EventManager(towerMarker);
 			this.tMEventManager.addEventListener(MapMouseEvent.CLICK, onMarkerClick);

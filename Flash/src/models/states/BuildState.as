@@ -30,16 +30,17 @@ package models.states
 	import models.Production;
 	import models.QueueObject;
 	import models.Road;
-	import models.interfaces.SuperObject;
 	import models.Tower;
 	import models.User;
 	import models.away3D.ResourceProductionText;
 	import models.constants.DateConstants;
 	import models.constants.PurchaseConstants;
+	import models.interfaces.SuperObject;
 	import models.states.events.BackgroundStateEvent;
 	import models.states.events.BuildStateEvent;
 	
 	import mx.collections.ArrayCollection;
+	import mx.controls.Alert;
 	import mx.core.BitmapAsset;
 	import mx.events.CloseEvent;
 	import mx.events.PropertyChangeEvent;
@@ -335,6 +336,7 @@ package models.states
 					
 					// Create an object from the object picture
 					this._newBuildObject.initialize(this.user);
+					this._newBuildObject.setPosition(pos);
 					this._newBuildObject.draw(true, this.map, this.photo, this.focusPanelManager, true, this.scene, this.view);
 					
 					// Add the object to the empire boundary
