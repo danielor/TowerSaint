@@ -17,10 +17,10 @@ package models.interfaces
 	import managers.GameFocusManager;
 	
 	import models.Bounds;
-	
-	import mx.core.BitmapAsset;
 	import models.Production;
 	import models.User;
+	
+	import mx.core.BitmapAsset;
 
 	public interface SuperObject extends TowerSaintDispatcher
 	{
@@ -33,6 +33,7 @@ package models.interfaces
 		function hide():void;											/* Hide the 3d model */
 		function view():void;											/* Redisplay the 3d model */
 		function isDrawn():Boolean;										/* Flag for whether the object is drawn */
+		function setValid(valid:Boolean, intern:Boolean):void;			/* Set the valid location flag. intern - Should I tell others? */
 		
 		// Flag deterimens whether is the object is valid(not dragged, at a valid location)
 		function isReady() : Boolean;

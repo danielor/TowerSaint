@@ -11,9 +11,9 @@ package managers
 	import flash.geom.Point;
 	import flash.utils.Dictionary;
 	
-	import models.interfaces.SuperObject;
 	import models.Tower;
 	import models.User;
+	import models.interfaces.SuperObject;
 	import models.map.TowerSaintPolygon;
 	
 	import mx.collections.ArrayCollection;
@@ -58,6 +58,15 @@ package managers
 			
 		}
 		
+		/* Get the current boundary */
+		public function get DrawnPolygons():ArrayCollection {
+			var arr:ArrayCollection = new ArrayCollection();
+			for(var i:int = 0; i < this.drawnPolygons.length; i++){
+				arr.addItem(ObjectUtil.clone(this.drawnPolygons[i]));
+			}
+			return arr;
+		}
+		
 		/* 
 		When the valid location changes(when an object is moving), the boundary changes
 		*/
@@ -85,12 +94,24 @@ package managers
 		
 			// Draw the dijsoint polygons
 			for(var o:Object in this.disjointPolygons){
+				
 				var poly:TowerSaintPolygon = this.disjointPolygons[o] as TowerSaintPolygon;
 				var tPolygon:Polygon = _drawPoly(poly);
 				this.drawnPolygons.addItem(tPolygon);
 			}
 			this.currentPolygons = arrayOfPolygons;
 		//	Alert.show("Length:" + this.drawnPolygons.length.toString());
+		}
+		
+		/*
+		Get the size of the disjoint polygons
+		*/
+		private function getSizeOfDisjointPolygons():Number {
+			var n:int = 0;
+			for (var key:* in this.disjointPolygons) {
+				n++;
+			}
+			return n;
 		}
 		
 		/* 
@@ -171,6 +192,7 @@ package managers
 		}
 		
 		/* 
+		NOTE: In the build state, it is assumed that this does not contain the built object
 		Check if the latlng is iniside a visible polygon
 		*/
 		public function isInsidePolygon(pos:LatLng) : Boolean {
@@ -197,6 +219,16 @@ package managers
 			return false;
 			*/
 		}
+		
+		/*
+		Referesh and draw the empire boundary
+		*/
+		public function refreshAndDraw(s:SuperObject):void {
+			// Remove temporray polygons
+			this.removeAndDraw(s);
+			this.addAndDraw(s);
+		}
+		
 		/*
 		Remove and draw, removes a superobject from the boundary,
 		an updates the boundary
@@ -222,8 +254,7 @@ package managers
 			if(arrayOfPolygons.length == 0){
 				return;
 			}
-			
-			if(this.firstDraw){
+			if(this.firstDraw || this.getSizeOfDisjointPolygons() == 0){
 				disjointPolygons[numberOfPoly] = arrayOfPolygons.getItemAt(0);
 				arrayOfPolygons.removeItemAt(0);
 				this.firstDraw = false;
@@ -252,7 +283,6 @@ package managers
 							var compositePolygon:TowerSaintPolygon = disjointPolygons[key] as TowerSaintPolygon;
 							
 							// Intersect the polygon 
-							Alert.show(p.isValid().toString());
 							if(p.isValid() == compositePolygon.isValid()){
 								var iPoly:Poly = compositePolygon.intersection(p);
 								if(!iPoly.isEmpty()){
@@ -278,7 +308,7 @@ package managers
 		
 		private function _drawPoly(poly:TowerSaintPolygon) : Polygon {
 			var arr:Array = poly.getPoints();
-			
+
 			// An array of lat lng points for a boundary
 			var arrayOfLatLng:Array = new Array();
 			

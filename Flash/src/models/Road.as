@@ -135,6 +135,10 @@ package models
 			this.longitude = input.readFloat();
 		}
 		
+		public function setValid(valid:Boolean, intern:Boolean):void {
+			
+		}
+		
 		public function initialize(u:User) : void {
 			this.user = user;
 			this.hitPoints = 50;

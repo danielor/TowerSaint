@@ -73,6 +73,7 @@ package models.states
 		private var scene:Scene3D										/* The scene where the away3D objects exist */
 		private var view:View3D											/* The view associated with the 3D scene */
 		private var focusPanelManager:GameFocusManager;					/* The focus panel manager handles game object focus */
+		private var currentPolygons:ArrayCollection;					/* The polygons that make up the current boundary */
 		// Constants determine whether the state has the active mouse
 		
 		public function BuildState(a:Application, m:Map, u:User, uOM:UserObjectManager, qM:QueueManager, uB:PolygonBoundaryManager,
@@ -338,6 +339,7 @@ package models.states
 					this._newBuildObject.initialize(this.user);
 					this._newBuildObject.setPosition(pos);
 					this._newBuildObject.draw(true, this.map, this.photo, this.focusPanelManager, true, this.scene, this.view);
+					this._newBuildObject.addEventListener(MapMouseEvent.DRAG_END, onDragEnd);
 					
 					// Add the object to the empire boundary
 					this.userBoundary.addAndDraw(_newBuildObject);
@@ -351,6 +353,13 @@ package models.states
 					this.app.dispatchEvent(p);
 				}	
 			}
+		}
+	
+		// If the build object check if it is a valid location.
+		private function onDragEnd(e:MapMouseEvent):void {
+			var b:Boolean = userBoundary.isInsidePolygon(e.latLng);
+			this._newBuildObject.setValid(b, true);
+			this.userBoundary.refreshAndDraw(this._newBuildObject);
 		}
 		
 		// Returns a build string that populates the textflow in the build action group

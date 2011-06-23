@@ -29,10 +29,10 @@ package models
 	import managers.GameFocusManager;
 	
 	import models.constants.GameConstants;
+	import models.interfaces.SuperObject;
 	import models.map.TowerSaintMarker;
 	
 	import mx.core.BitmapAsset;
-	import models.interfaces.SuperObject;
 
 	[Bindable]
 	[RemoteClass(alias="models.Portal")]
@@ -234,6 +234,10 @@ package models
 		
 		public function isAtValidLocation():Boolean {
 			return true;
+		}
+		
+		public function setValid(valid:Boolean, intern:Boolean):void {
+			
 		}
 		
 		private function _drawPortal(pos:LatLng, photo:PhotoAssets, map:Map, drag:Boolean, fpm:GameFocusManager, view:View3D) : void {

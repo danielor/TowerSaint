@@ -437,6 +437,14 @@ package models
 			return this._atValidLocation;
 		}
 		
+		public function setValid(valid:Boolean, internalValid:Boolean):void {
+			if(internalValid){
+				this._atValidLocation = valid;
+			}else{
+				this.atValidLocation = valid;
+			}
+		}
+		
 		
 		// Generate the boundary around the objects
 		private function generateBoundaryPolygon(m:Map) : void {
