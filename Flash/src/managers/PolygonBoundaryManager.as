@@ -100,7 +100,6 @@ package managers
 				this.drawnPolygons.addItem(tPolygon);
 			}
 			this.currentPolygons = arrayOfPolygons;
-		//	Alert.show("Length:" + this.drawnPolygons.length.toString());
 		}
 		
 		/*

@@ -152,53 +152,56 @@ package models.states
 		}
 		
 		private function onMapDragStart(event:MapMouseEvent) : void {
-			initialMapDragMouse = event.latLng;
+			if(this._mouseState == BackgroundState.MOUSE_FOCUS){
+				initialMapDragMouse = event.latLng;
+			}
 		}
 		
 		private function onMapDragEnd(event:MapMouseEvent) : void {
-			var finalDragPosition:LatLng = event.latLng;
-			
-			// The center of the map, and bounds
-			var centerOfMap:LatLng = this.map.getCenter();
-			var bounds:LatLngBounds = this.map.getLatLngBounds();
-			var mapDimension:LatLng = new LatLng(bounds.getNorth() - bounds.getSouth(), bounds.getWest() - bounds.getEast());
-			
-			
-			// The net distance
-			var netDragLongitude:Number = finalDragPosition.lng() - initialMapDragMouse.lng();
-			var netDragLatitude:Number = finalDragPosition.lat() - initialMapDragMouse.lat();
-			
-			// The new center position
-			var newCenterLatitude:Number;
-			var newCenterLongitude:Number;
-			
-			if(Math.abs(netDragLongitude) > Math.abs(netDragLatitude)) {
-				if(netDragLongitude > 0.0){
-					newCenterLatitude = centerOfMap.lat();
-					newCenterLongitude = centerOfMap.lng() +  mapDimension.lng();
+			if(this._mouseState == BackgroundState.MOUSE_FOCUS){
+				var finalDragPosition:LatLng = event.latLng;
+				
+				// The center of the map, and bounds
+				var centerOfMap:LatLng = this.map.getCenter();
+				var bounds:LatLngBounds = this.map.getLatLngBounds();
+				var mapDimension:LatLng = new LatLng(bounds.getNorth() - bounds.getSouth(), bounds.getWest() - bounds.getEast());
+				
+				
+				// The net distance
+				var netDragLongitude:Number = finalDragPosition.lng() - initialMapDragMouse.lng();
+				var netDragLatitude:Number = finalDragPosition.lat() - initialMapDragMouse.lat();
+				
+				// The new center position
+				var newCenterLatitude:Number;
+				var newCenterLongitude:Number;
+				
+				if(Math.abs(netDragLongitude) > Math.abs(netDragLatitude)) {
+					if(netDragLongitude > 0.0){
+						newCenterLatitude = centerOfMap.lat();
+						newCenterLongitude = centerOfMap.lng() +  mapDimension.lng();
+					}else{
+						newCenterLatitude = centerOfMap.lat();
+						newCenterLongitude = centerOfMap.lng() - mapDimension.lng();	
+					}
 				}else{
-					newCenterLatitude = centerOfMap.lat();
-					newCenterLongitude = centerOfMap.lng() - mapDimension.lng();	
+					if(netDragLatitude > 0.0){
+						newCenterLatitude = centerOfMap.lat() + mapDimension.lat();
+						newCenterLongitude = centerOfMap.lng();
+					}else{
+						newCenterLatitude = centerOfMap.lat() - mapDimension.lat();
+						newCenterLongitude = centerOfMap.lng();
+					}
 				}
-			}else{
-				if(netDragLatitude > 0.0){
-					newCenterLatitude = centerOfMap.lat() + mapDimension.lat();
-					newCenterLongitude = centerOfMap.lng();
-				}else{
-					newCenterLatitude = centerOfMap.lat() - mapDimension.lat();
-					newCenterLongitude = centerOfMap.lng();
-				}
+				
+				// Create the new position, and pan to the new position
+				centerOfMap = new LatLng(newCenterLatitude, newCenterLongitude);
+				this.map.panTo(centerOfMap);
+				
+				// Change to the update state
+				var updateStateEvent:UpdateStateEvent = new UpdateStateEvent();
+				updateStateEvent.attachPreviousState(this);
+				this.app.dispatchEvent(updateStateEvent);
 			}
-			
-			// Create the new position, and pan to the new position
-			centerOfMap = new LatLng(newCenterLatitude, newCenterLongitude);
-			this.map.panTo(centerOfMap);
-			
-			// Change to the update state
-			var updateStateEvent:UpdateStateEvent = new UpdateStateEvent();
-			updateStateEvent.attachPreviousState(this);
-			this.app.dispatchEvent(updateStateEvent);
-			
 		}
 		
 	
