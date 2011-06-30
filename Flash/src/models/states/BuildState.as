@@ -113,7 +113,18 @@ package models.states
 					
 				}
 			}
+			// Remove all cursors
+			CursorManager.removeAllCursors();
 			this._newBuildObject = s;
+		}
+		
+		// Event interfaces
+		public function onBuildButton(event:MouseEvent):void {
+			Alert.show("onBuild");
+		}
+		
+		public function onCancelBuildButton(event:MouseEvent):void {
+			Alert.show("onCancel");
 		}
 		
 		// GameState interface
@@ -275,6 +286,7 @@ package models.states
 				
 				// Remove the current build object from the map
 				this._newBuildObject.eraseFromMap(this.map, this.scene);
+				this.userBoundary.removeAndDraw(this._newBuildObject);
 				
 				// Change the state 
 				this.gameManager.changeState(GameManager._emptyState);

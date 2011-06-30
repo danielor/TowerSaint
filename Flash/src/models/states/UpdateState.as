@@ -141,7 +141,7 @@ package models.states
 		
 		public function hasView():Boolean
 		{
-			return false;
+			return true;
 		}
 		
 		public function getViewString():String

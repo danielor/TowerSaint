@@ -64,6 +64,7 @@ package managers
 	import models.states.BackgroundState;
 	import models.states.BuildState;
 	import models.states.DrawState;
+	import models.states.GameStartState;
 	import models.states.GameState;
 	import models.states.InitState;
 	import models.states.MoveState;
@@ -170,6 +171,7 @@ package managers
 		private var drawState:DrawState;									/* The draw state draws objects on the map */
 		private var buildState:BuildState;									/* The state handles the building/cancelling of objects */
 		private var moveState:MoveState;									/* The move state controls the movement of objects in the game */
+		private var gameStartState:GameStartState;							/* The state that starts the game */
 		private var stateList:ArrayCollection;								/* A list that contains all of the current states */
 		private var isRunning:Boolean;										/* True if the game manager is running */
 		
@@ -289,9 +291,10 @@ package managers
 					this.view, this.gameFocus);
 			this.backgroundState = new BackgroundState(this.map, this.app, this.gameFocus, this.buildState);
 			this.moveState = new MoveState(this.map);
+			this.gameStartState = new GameStartState(this, this.app);
 			
 			this.stateList = new ArrayCollection([this.initState, this.backgroundState, this.updateState, this.drawState, this.buildState,
-											this.moveState]);
+											this.moveState, this.gameStartState]);
 			// Start the state machine
 			var initialState:GameState;
 			
@@ -359,6 +362,28 @@ package managers
 		
 		// === GAME STATE MACHINE ===
 		
+		// ==== INIT GAME ===
+		public function initGame() : void {
+			this.userObjectManager.initGame(this.user, onInitGame);	
+		}
+		
+		private function onInitGame(event:ResultEvent) : void {
+			// Get the token.
+			var token:String = event.result.token.toString();
+			
+			// Create the game channel
+			this.gameChannel = new GameChannel();
+			this.gameChannel.token = token;
+			
+			// Setup the javascript game channel
+			this.channelBridge.initGameChannel(this.gameChannel);
+			
+			// Login in the user
+			this.userObjectManager.loginUserToGame(this.user, onNull);
+			
+		}
+		
+		// ==== INIT GAME ===
 		
 		// ==== CHANNEL INTERFACE =====
 		public function setupGameChannels() : void {
@@ -627,10 +652,9 @@ package managers
 		
 		public function onBuildButton(event:MouseEvent):void{
 			// Send a build event to go into the build state
-			var e:BuildStateEvent = new BuildStateEvent(BuildStateEvent.BUILD_START);
+			var e:BuildStateEvent = new BuildStateEvent(BuildStateEvent.BUILD_INIT);
  			var g:GameState = this.getActiveState();
 			e.attachPreviousState(g);
-			this.buildState.newBuildObject = this.newBuildObject;			// Attach the build object
 			this.app.dispatchEvent(e);
 			
 		}
