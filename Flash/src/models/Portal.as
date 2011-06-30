@@ -260,7 +260,7 @@ package models
 		}
 		
 		// Erase the marker
-		public function eraseFromMap(map:Map) : void {
+		public function eraseFromMap(map:Map, s:Scene3D) : void {
 			map.removeOverlay(portalMarker);
 		}
 		

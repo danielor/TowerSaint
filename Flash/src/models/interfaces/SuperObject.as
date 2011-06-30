@@ -8,6 +8,7 @@ package models.interfaces
 	import com.google.maps.LatLng;
 	import com.google.maps.LatLngBounds;
 	import com.google.maps.Map;
+	import com.google.maps.View;
 	import com.google.maps.overlays.Polygon;
 	
 	import flash.events.IEventDispatcher;
@@ -43,8 +44,8 @@ package models.interfaces
 		// Initialize the information for a new build object
 		function initialize(u:User) : void;
 		
-		// Remove the marker from the map
-		function eraseFromMap(map:Map) : void;
+		function eraseFromMap(map:Map, s:Scene3D) : void;							/*Remove the marker/3D object from the map  */
+
 		
 		// Set focus on the object
 		function setFocusOnObject(error:Boolean) : void;

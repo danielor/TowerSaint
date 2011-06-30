@@ -421,7 +421,7 @@ package managers
 				
 				// Remove the currently drawn object
 				if(this.newBuildObject != null){
-					this.newBuildObject.eraseFromMap(this.map);
+					this.newBuildObject.eraseFromMap(this.map, this.scene);
 				}
 				
 			}
@@ -556,7 +556,7 @@ package managers
 			if(this.newBuildObject != null){
 				
 				if(!this.queueManager.isInQueue(this.newBuildObject)){
-					this.newBuildObject.eraseFromMap(this.map);
+					this.newBuildObject.eraseFromMap(this.map, this.scene);
 				}
 				
 			}
@@ -650,7 +650,7 @@ package managers
 			this.userObjectManager.buildObjectCancel(s, this.user);
 			
 			// Change the state
-			s.eraseFromMap(this.map);
+			s.eraseFromMap(this.map, this.scene);
 			
 			// Remove the superobject from the boundary
 			
@@ -703,7 +703,7 @@ package managers
 		
 		public function onCancelBuildButton(event:MouseEvent) : void {
 			// Remove the newest tower
-			newBuildObject.eraseFromMap(this.map);
+			newBuildObject.eraseFromMap(this.map, this.scene);
 			
 			// Remove from the boundary
 			this.userBoundary.removeAndDraw(this.newBuildObject);

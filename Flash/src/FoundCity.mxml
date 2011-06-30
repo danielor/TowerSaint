@@ -5,7 +5,6 @@
 			   enabled="true">
 	<fx:Script>
 		<![CDATA[
-			import managers.InitManager;
 			
 			
 			public function getLocationButton() : Button {

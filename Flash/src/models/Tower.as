@@ -46,6 +46,8 @@ package models
 	
 	import models.away3D.Tower3D;
 	import models.constants.GameConstants;
+	import models.interfaces.BoundarySuperObject;
+	import models.interfaces.SuperObject;
 	import models.map.TowerSaintMarker;
 	
 	import mx.controls.Alert;
@@ -53,8 +55,6 @@ package models
 	import mx.core.BitmapAsset;
 	import mx.events.PropertyChangeEvent;
 	import mx.events.PropertyChangeEventKind;
-	import models.interfaces.BoundarySuperObject;
-	import models.interfaces.SuperObject;
 
 	[Bindbale]
 	[RemoteClass(alias="models.Tower")]
@@ -547,9 +547,12 @@ package models
 		}
 		
 		// Erase the marker
-		public function eraseFromMap(map:Map) : void {
+		public function eraseFromMap(map:Map, s:Scene3D) : void {
 			if(towerMarker != null){
 				map.removeOverlay(towerMarker);
+			}
+			if(this.model != null){
+				s.removeChild(this.model);
 			}
 			
 			if(this.boundaryPolygon != null){

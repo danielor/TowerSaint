@@ -157,7 +157,7 @@ package models.states
 		
 		private function createAddressPopup() : void {
 			// Remove the marker from the address popup
-			this.currentCapital.eraseFromMap(this.map);
+			this.currentCapital.eraseFromMap(this.map, this.scence);
 			
 			// Setup the events for the popup
 			var fc:FoundCity = new FoundCity();

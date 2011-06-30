@@ -32,7 +32,6 @@
 			
 			import managers.GameFocusManager;
 			import managers.GameManager;
-			import managers.InitManager;
 			import managers.UserObjectManager;
 			import managers.states.TowerSaintServiceState;
 			
@@ -78,7 +77,6 @@
 			[Bindable] public var _serverState:TowerSaintServiceState;
 			[Bindable] public var _userObjectManager:UserObjectManager;
 			[Bindable] public var _focusPanelManager:GameFocusManager;
-			[Bindable] public var _initManager:InitManager;
 			[Bindable] public var _gameManager:GameManager;
 			
 			

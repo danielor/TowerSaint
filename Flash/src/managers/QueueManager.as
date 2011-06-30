@@ -129,6 +129,17 @@ package managers
 		
 		}
 		
+		// Check if it has a superobject in queue
+		public function hasSuperObject(s:SuperObject):Boolean {
+			for(var j:int = 0; j < this.listOfQueueObjects.length; j++){
+				var q:QueueObject = this.listOfQueueObjects[j] as QueueObject;
+				if(ObjectUtil.compare(q.buildObject, s) == 0){
+					return true;
+				}
+			}
+			return false;
+		}
+		
 		// Check if it has active members
 		private function hasActiveQueueObjects():Boolean {
 			for(var i:int = 0; i < this.listOfQueueObjects.length; i++){

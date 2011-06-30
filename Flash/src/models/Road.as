@@ -31,10 +31,10 @@ package models
 	import managers.GameFocusManager;
 	
 	import models.constants.GameConstants;
+	import models.interfaces.SuperObject;
 	import models.map.TowerSaintMarker;
 	
 	import mx.core.BitmapAsset;
-	import models.interfaces.SuperObject;
 
 	[Bindable]
 	[RemoteClass(alias="models.Road")]
@@ -219,7 +219,7 @@ package models
 		}
 		
 		// Erase the marker
-		public function eraseFromMap(map:Map) : void {
+		public function eraseFromMap(map:Map, s:Scene3D) : void {
 			map.removeOverlay(roadMarker);
 		}
 		

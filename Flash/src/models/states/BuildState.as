@@ -104,6 +104,15 @@ package models.states
 			this._buildStateEventType = type;
 		}
 		public function set newBuildObject(s:SuperObject):void {
+			// Check if an object needs to be removes from the map
+			if(this._newBuildObject != null){
+				if(!this.queueManager.hasSuperObject(this._newBuildObject)){
+					// Erase object and boundary
+					this._newBuildObject.eraseFromMap(this.map, this.scene);
+					this.userBoundary.removeAndDraw(this._newBuildObject);
+					
+				}
+			}
 			this._newBuildObject = s;
 		}
 		
@@ -176,7 +185,7 @@ package models.states
 				this.userObjectManager.buildObjectCancel(s, this.user);
 				
 				// Change the state
-				s.eraseFromMap(this.map);
+				s.eraseFromMap(this.map, this.scene);
 				
 				// Remove the superobject from the boundary
 				this.userBoundary.removeAndDraw(s);
@@ -265,7 +274,7 @@ package models.states
 				s.title = "You do not have enough resources!";
 				
 				// Remove the current build object from the map
-				this._newBuildObject.eraseFromMap(this.map);
+				this._newBuildObject.eraseFromMap(this.map, this.scene);
 				
 				// Change the state 
 				this.gameManager.changeState(GameManager._emptyState);
