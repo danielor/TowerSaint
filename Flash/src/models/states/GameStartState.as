@@ -12,6 +12,7 @@ package models.states
 		public var isInState:Boolean;								/* True if the function is in the state */
 		public var gameManager:GameManager;							/* The game manager */
 		public var app:Application;									/* The application that runs the game */
+		public var isInitialized:Boolean;							/* True if the state is called */
 		private const viewString:String = 'inApp';					/* The view associated with the state */
 
 		public function GameStartState(gm:GameManager, a:Application)
@@ -19,6 +20,7 @@ package models.states
 			this.gameManager = gm;
 			this.app = a;
 			this.isInState = false;
+			this.isInitialized = false;
 		}
 		
 		public function isChatActive():Boolean
@@ -38,12 +40,13 @@ package models.states
 		
 		public function isGameActive():Boolean
 		{
-			return true;
+			return this.isInitialized;
 		}
 		
 		public function enterState():void
 		{
 			this.isInState = true;
+			this.isInitialized = true;
 			this.gameManager.initGame();
 			
 			// Send the update state

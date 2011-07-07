@@ -30,6 +30,7 @@ package models.states
 	import models.map.TowerSaintMarker;
 	import models.states.events.BackgroundStateEvent;
 	import models.states.events.DrawStateEvent;
+	import models.states.events.GameStartEvent;
 	
 	import mx.collections.ArrayCollection;
 	import mx.controls.Alert;
@@ -243,9 +244,14 @@ package models.states
 			//this.currentCapital.eraseFromMap(this.map);
 			
 			// Go into the draw state
+			var e:GameStartEvent = new GameStartEvent(GameStartEvent.GAME_START);
+			e.attachPreviousState(this);
+			this.app.dispatchEvent(e);
+			/*
 			var e:BackgroundStateEvent = new BackgroundStateEvent(BackgroundStateEvent.BACKGROUND_STATE);
 			e.attachPreviousState(this);
 			this.app.dispatchEvent(e);
+			*/
 			//this.app.currentState = "inApp";
 		}
 		

@@ -117,8 +117,12 @@ package models.states
 			CursorManager.removeAllCursors();
 			this._newBuildObject = s;
 		}
+		public function get newBuildObject():SuperObject {
+			return this._newBuildObject;
+		}
 		
 		// Event interfaces
+		/*
 		public function onBuildButton(event:MouseEvent):void {
 			Alert.show("onBuild");
 		}
@@ -126,7 +130,7 @@ package models.states
 		public function onCancelBuildButton(event:MouseEvent):void {
 			Alert.show("onCancel");
 		}
-		
+		*/
 		// GameState interface
 		public function isChatActive():Boolean
 		{

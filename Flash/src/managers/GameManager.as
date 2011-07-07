@@ -72,6 +72,7 @@ package managers
 	import models.states.events.BackgroundStateEvent;
 	import models.states.events.BuildStateEvent;
 	import models.states.events.DrawStateEvent;
+	import models.states.events.GameStartEvent;
 	import models.states.events.MoveStateEvent;
 	import models.states.events.UpdateStateEvent;
 	
@@ -278,6 +279,7 @@ package managers
 			this.app.addEventListener(MoveStateEvent.MOVE_END, onMoveState);
 			this.app.addEventListener(MoveStateEvent.MOVE_START, onMoveState);
 			this.app.addEventListener(MoveStateEvent.MOVE_STEP, onMoveState);
+			this.app.addEventListener(GameStartEvent.GAME_START, onGameStartState);
 
 			// Create the states
 			this.initState = new InitState(this.map, this.locationChanger, this.userObjectManager, this.app,
@@ -289,7 +291,7 @@ package managers
 			this.buildState = new BuildState(this.app, this.map, this.user, this.userObjectManager, this.queueManager, 
 					this.userBoundary, this, this.resourceText, this.photo, this.listOfUserModels, this.scene,
 					this.view, this.gameFocus);
-			this.backgroundState = new BackgroundState(this.map, this.app, this.gameFocus, this.buildState);
+			this.backgroundState = new BackgroundState(this.map, this.app, this.gameFocus, this.buildState, this);
 			this.moveState = new MoveState(this.map);
 			this.gameStartState = new GameStartState(this, this.app);
 			
@@ -306,6 +308,15 @@ package managers
 			
 			// Start the game loop
 			this.changeGameState(initialState, null);
+		}
+		
+		public function isGameActive():Boolean {
+			return this.gameStartState.isGameActive();
+		}
+		
+		private function onGameStartState(event:GameStartEvent): void {
+			var lastState:GameState = event.getPreviousState();
+			this.changeGameState(this.gameStartState, lastState);
 		}
 		
 		private function onUpdateState(event:UpdateStateEvent) : void {
@@ -535,6 +546,7 @@ package managers
 		
 		private function onSendChatButton(event:MouseEvent) : void {
 			var s:String = this.chatTextInput.text;
+			this.chatTextInput.text = "";
 			this.userObjectManager.sendMessage(this.user,s);
 		}
 		
@@ -727,10 +739,11 @@ package managers
 		
 		public function onCancelBuildButton(event:MouseEvent) : void {
 			// Remove the newest tower
-			newBuildObject.eraseFromMap(this.map, this.scene);
+			var s:SuperObject = this.buildState.newBuildObject;
+			s.eraseFromMap(this.map, this.scene);
 			
 			// Remove from the boundary
-			this.userBoundary.removeAndDraw(this.newBuildObject);
+			this.userBoundary.removeAndDraw(s);
 			
 			// Change the state 
 			this.changeState(GameManager._emptyState);

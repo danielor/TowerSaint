@@ -12,6 +12,7 @@ package models.states
 	import managers.UserObjectManager;
 	
 	import models.interfaces.SuperObject;
+	import models.states.events.GameStartEvent;
 	import models.states.events.MoveStateEvent;
 	import models.states.events.UpdateStateEvent;
 	
@@ -31,6 +32,7 @@ package models.states
 		private var gameFocus:GameFocusManager							/* The focus manager */
 		private var buildState:BuildState;								/* The build state is needed for deferred events */
 		private var isClicked:Boolean;									/* True if the operation is clicked */
+		private var gameManager:GameManager;							/* The game manager running the state */
 		private const viewString:String = "inApp";						/* The view state */
 		
 		// Constants associate a certain type of mouse activity with a certain state.
@@ -40,13 +42,15 @@ package models.states
 		public static const MOUSE_ATTACK:String = "MouseAttack";
 		public static const MOUSE_MOVE:String = "MouseMove";
 		
-		public function BackgroundState(m:Map, a:Application, gF:GameFocusManager, bS:BuildState )
+		public function BackgroundState(m:Map, a:Application, gF:GameFocusManager, bS:BuildState,
+								gm:GameManager)
 		{
 			// Initialize
 			this.map = m;
 			this.app = a;
 			this.gameFocus= gF;
 			this.buildState = bS;
+			this.gameManager = gm;
 			
 			// Set the state
 			this.isInState = false;
@@ -89,6 +93,13 @@ package models.states
 		
 		public function enterState():void
 		{
+			if(!this.gameManager.isGameActive()){
+				var e:GameStartEvent = new GameStartEvent(GameStartEvent.GAME_START);
+				e.attachPreviousState(this);
+				this.app.dispatchEvent(e);
+				return;
+			}
+			
 			this.mapEventManager = new EventManager(this.map);	
 			this.mapEventManager.addEventListener(MapMouseEvent.DRAG_START, onMapDragStart);
 			this.mapEventManager.addEventListener(MapMouseEvent.DRAG_END, onMapDragEnd);

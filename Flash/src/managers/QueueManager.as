@@ -19,6 +19,7 @@ package managers
 	
 	import models.QueueObject;
 	import models.interfaces.SuperObject;
+	import models.states.events.BuildStateEvent;
 	
 	import mx.collections.ArrayCollection;
 	import mx.containers.TitleWindow;
@@ -87,10 +88,15 @@ package managers
 						// Update the state
 						obj.updateState(d);
 					}else{
-						// Call the end function
+						// Change to the build state to finish building the object
+						var b:BuildStateEvent = new BuildStateEvent(BuildStateEvent.BUILD_COMPLETE);
+						b.listOfQueueObjects = new ArrayCollection([obj]);
+						this.app.dispatchEvent(b);
+						/*
 						if(obj.endFunction != null){
 							obj.endFunction(obj.buildObject);
 						}
+						*/
 						
 						// Remove the item at the index
 						obj.isActive = false;
@@ -117,8 +123,8 @@ package managers
 				// If the popup is open update it!
 				if(this.popup != null){
 					// Get the progress bar from the current popup
-					var b:BuildInspectPopup = this.popup as BuildInspectPopup;
-					var p:ProgressBar = b.progress;
+					var bIP:BuildInspectPopup = this.popup as BuildInspectPopup;
+					var p:ProgressBar = bIP.progress;
 					
 					// Update manually the progress bar.
 					var tieIndex:int = vec[this.selectedIndex];
@@ -288,7 +294,11 @@ package managers
 			
 			// Call the queue object
 			this.listOfQueueObjects.removeItemAt(tieIndex);
-			tq.failureFunction(tq.buildObject, tq.percentComplete);
+			
+			var b:BuildStateEvent = new BuildStateEvent(BuildStateEvent.BUILD_CANCEL);
+			b.listOfQueueObjects = new ArrayCollection([tq]);
+			this.app.dispatchEvent(b);
+			//tq.failureFunction(tq.buildObject, tq.percentComplete);
 			
 		}
 		

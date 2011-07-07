@@ -9,13 +9,11 @@ package models
 	{
 		public var description:String; 						/* Describe the operation */
 		public var date:Date;								/* When will I be done? */
-		public var endFunction:Function;					/* What will I call when I am done? */
 		public var periodicFunction:Function;				/* What should I call while calling? */
 		public var startDate:Date;							/* When did I start? */
 		public var percentComplete:Number;					/* The percentage of the operation that is complete */
 		public var buildObject:SuperObject;					/* The object that needs to be built */
 		public var isActive:Boolean;						/* The queue object can be in active or passive mode */
-		public var failureFunction:Function;				/* What do if the process is interrupted or fails? */
 		
 		// Variables associated with keeping the state
 		private var progressBar:ProgressBar;					/* Tie a progress bar to the queue object for updating */
