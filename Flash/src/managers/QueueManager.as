@@ -51,17 +51,19 @@ package managers
 		public var currentQueue:ActionQueue;						/* The current queue of objects */
 		public var app:Application;									/* The application that runs me */
 		public var photo:PhotoAssets;								/* The  visual game objects */
+		public var gameManager:GameManager;							/* The manager of all the game states */
 		
 		// State information
 		private var currentList:List;								/* The current list of the view */
 		private var popup:BuildInspectPopup;						/* Reference to the inpsect popup */
 	    private var selectedIndex:int;								/* The index selected from the queue */
 		
-		public function QueueManager(a:Application, p:PhotoAssets)
+		public function QueueManager(a:Application, p:PhotoAssets, gm:GameManager)
 		{
 			// Save a reference to the application
 			this.app = a;
 			this.photo = p;
+			this.gameManager = gm;
 			
 			// Initialize state/structures
 			this.listOfQueueObjects = new ArrayCollection();
@@ -91,6 +93,7 @@ package managers
 						// Change to the build state to finish building the object
 						var b:BuildStateEvent = new BuildStateEvent(BuildStateEvent.BUILD_COMPLETE);
 						b.listOfQueueObjects = new ArrayCollection([obj]);
+						b.attachPreviousState(this.gameManager.getActiveState());
 						this.app.dispatchEvent(b);
 						/*
 						if(obj.endFunction != null){
@@ -297,6 +300,7 @@ package managers
 			
 			var b:BuildStateEvent = new BuildStateEvent(BuildStateEvent.BUILD_CANCEL);
 			b.listOfQueueObjects = new ArrayCollection([tq]);
+			b.attachPreviousState(this.gameManager.getActiveState());
 			this.app.dispatchEvent(b);
 			//tq.failureFunction(tq.buildObject, tq.percentComplete);
 			

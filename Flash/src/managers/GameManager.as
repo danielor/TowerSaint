@@ -213,7 +213,7 @@ package managers
 			// Initialize objects
 			this.listOfUserModels = new ArrayCollection();
 			this.listOfLoggedInUsers = new ArrayCollection();
-			this.queueManager = new QueueManager(this.app, this.photo);
+			this.queueManager = new QueueManager(this.app, this.photo, this);
 			
 			// Setup the game channels
 			this.channelBridge = new ChannelJavascriptBridge(this.app);
@@ -276,6 +276,7 @@ package managers
 			this.app.addEventListener(BuildStateEvent.BUILD_COMPLETE, onBuildState);
 			this.app.addEventListener(BuildStateEvent.BUILD_INIT, onBuildState);
 			this.app.addEventListener(BuildStateEvent.BUILD_START, onBuildState);
+			this.app.addEventListener(BuildStateEvent.BUILD_CANCEL, onBuildState);
 			this.app.addEventListener(MoveStateEvent.MOVE_END, onMoveState);
 			this.app.addEventListener(MoveStateEvent.MOVE_START, onMoveState);
 			this.app.addEventListener(MoveStateEvent.MOVE_STEP, onMoveState);
@@ -361,7 +362,7 @@ package managers
 		}
 		
 		// Get the active state
-		private function getActiveState():GameState {
+		public function getActiveState():GameState {
 			for(var i:int = 0; i < this.stateList.length; i++){
 				var g:GameState = this.stateList[i] as GameState;
 				if(g.isActiveState()){
