@@ -159,9 +159,9 @@ package models
 			t.isCapital = true;
 			t.hasRuler = true;
 			t.user = u;
-			t.manaProduction = 500 + Math.floor( Math.random() * 50);
-			t.stoneProduction = 500 + Math.floor( Math.random() * 50);
-			t.woodProduction = 500 + Math.floor( Math.random() * 50);
+			t.manaProduction = 5000 + Math.floor( Math.random() * 50);
+			t.stoneProduction = 5000 + Math.floor( Math.random() * 50);
+			t.woodProduction = 5000 + Math.floor( Math.random() * 50);
 			t.Level = 0;
 			t.latitude = loc.lat();
 			t.longitude = loc.lng();

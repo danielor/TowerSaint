@@ -204,10 +204,19 @@ package models.states
 				
 				// Remove the superobject from the boundary
 				this.userBoundary.removeAndDraw(s);
+				this.queueManager.removeFromQueue(q);
 				
 				if(this.queueManager.isEmpty()){
 					this.gameManager.changeState(GameManager._emptyState);
 				}
+			}
+			
+			// Recreate the boundaries of the partially created objets
+			var arr:ArrayCollection = this.queueManager.getListOfSuperObjects();
+		
+			for(var j:int = 0; j < arr.length; j++){
+				var js:SuperObject = arr[j] as SuperObject;
+				this.userBoundary.addAndDraw(js);
 			}
 		}
 		
