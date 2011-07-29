@@ -434,7 +434,6 @@ package managers
 					return;
 				}
 				// The two lists can be fundamentally different
-				this.listOfUserObjects.dataProvider.addItem(s);		// Add to the display list 
 				this.listOfUserModels.addItem(s);					// Add to the list of user models 
 				
 			}else{
@@ -557,13 +556,22 @@ package managers
 		public function setupUIEvents() : void {
 			// Master events
 			this.buildObjectList.addEventListener(ItemClickEvent.ITEM_CLICK, onBuildItemClick);
-
+			this.listOfUserObjects.addEventListener(ItemClickEvent.ITEM_CLICK, onListSuperItemClick);
+			
 			// Tie array collections
 			this.listOfUserObjects.dataProvider = this.listOfUserModels;
 
 			// User Dependent Events
 			this.setupActionPanelState();
 
+		}
+		
+		private function onListSuperItemClick(event:ItemClickEvent) : void {
+			Alert.show("Here");
+			var s:SuperObject = this.listOfUserModels[event.index] as SuperObject;
+			var b:LatLngBounds = this.map.getLatLngBounds();
+			var l:LatLng = s.getPosition(b);
+			this.map.setCenter(l);
 		}
 		
 		private function onBuildItemClick(event:ItemClickEvent) : void {
