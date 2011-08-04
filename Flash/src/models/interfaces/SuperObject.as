@@ -27,6 +27,7 @@ package models.interfaces
 	{
 		// Draw the object on the map
 		function draw(drag:Boolean, map:Map, photo:PhotoAssets, fpm:GameFocusManager, withBoundary:Boolean, scence:Scene3D, view:View3D) : void;
+		function redrawModelInShiftedFrame(): void;
 		//function initializeIcon(photo:PhotoAssets):void;
 		
 		// Display information associated with object in text
@@ -35,6 +36,7 @@ package models.interfaces
 		function view():void;											/* Redisplay the 3d model */
 		function isDrawn():Boolean;										/* Flag for whether the object is drawn */
 		function setValid(valid:Boolean, intern:Boolean):void;			/* Set the valid location flag. intern - Should I tell others? */
+		function statelessEqual(s:SuperObject):Boolean;					/* Function returns true if the state is equal to the state on the server */
 		
 		// Flag deterimens whether is the object is valid(not dragged, at a valid location)
 		function isReady() : Boolean;

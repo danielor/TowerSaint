@@ -115,6 +115,11 @@ package models
 			}
 		}
 		
+		// Returns a stateful equal
+		public function statelessEqual(s:SuperObject):Boolean {
+			return true;
+		}
+		
 		// IExternalizable interface		
 		public function writeExternal(output:IDataOutput) : void {
 			output.writeInt(this.hitPoints);
@@ -152,6 +157,11 @@ package models
 		public function getProduction():Production {
 			return new Production(0., 0., 0.);
 		}
+		
+		public function redrawModelInShiftedFrame():void {
+			
+		}
+		
 		
 		// Hide the 3d model
 		public function hide():void {

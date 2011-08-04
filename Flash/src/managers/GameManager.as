@@ -567,11 +567,16 @@ package managers
 		}
 		
 		private function onListSuperItemClick(event:ItemClickEvent) : void {
-			Alert.show("Here");
 			var s:SuperObject = this.listOfUserModels[event.index] as SuperObject;
 			var b:LatLngBounds = this.map.getLatLngBounds();
 			var l:LatLng = s.getPosition(b);
-			this.map.setCenter(l);
+			this.map.panTo(l);
+			
+			// We need to update the objects in the new bounds.
+			var g:GameState = this.getActiveState();
+			var uSE:UpdateStateEvent = new UpdateStateEvent();
+			uSE.attachPreviousState(g);
+			this.app.dispatchEvent(uSE);
 		}
 		
 		private function onBuildItemClick(event:ItemClickEvent) : void {

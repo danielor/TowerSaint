@@ -117,6 +117,11 @@ package models
 			}
 		}
 		
+		// Returns a stateful equal
+		public function statelessEqual(s:SuperObject):Boolean {
+			return true;
+		}
+		
 		// IExternalizable interface		
 		public function writeExternal(output:IDataOutput) : void {
 			output.writeInt(this.hitPoints);
@@ -190,6 +195,10 @@ package models
 		
 		public function getNameString():String {
 			return "Portal";
+		}
+		
+		public function redrawModelInShiftedFrame():void {
+			
 		}
 		
 		public function getProduction():Production {

@@ -107,6 +107,7 @@ package models.states
 			this.mapEventManager.addEventListener(MapMouseEvent.MOUSE_UP, onMapMouseUp);
 			this.mapEventManager.addEventListener(MapMouseEvent.ROLL_OVER, onMapRollOver);
 			this.mapEventManager.addEventListener(MapMouseEvent.ROLL_OUT, onMapRollOut);
+			this.mapEventManager.addEventListener(MapMoveEvent.MOVE_END, onMapMoveEnd);
 			this.isInState = true;
 		}
 		
@@ -123,6 +124,10 @@ package models.states
 				e.attachPreviousState(this);
 				this.app.dispatchEvent(e);
 			}
+		}
+		
+		private function onMapMoveEnd(event:MapMoveEvent):void {
+			Alert.show("Map move over");
 		}
 		
 		private function onMapMouseDown(event:MapMouseEvent):void {

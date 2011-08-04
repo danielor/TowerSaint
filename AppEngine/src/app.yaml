@@ -8,6 +8,9 @@ handlers:
   static_dir: static
 - url: .*
   script: main.py
+  
+inbound_services:
+- channel_presence
 
 
 

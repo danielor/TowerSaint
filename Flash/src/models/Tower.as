@@ -168,6 +168,30 @@ package models
 			return t;
 		}
 		
+		// Returns a stateful equal
+		public function statelessEqual(s:SuperObject):Boolean {
+			if(s is Tower){
+				var t:Tower = s as Tower;
+				var l:LatLng = new LatLng(this.latitude, this.longitude);
+				var o:LatLng = new LatLng(t.latitude, t.longitude);
+				return l.equals(o);
+				/*
+				var t:Tower = s as Tower;
+				var l:LatLng = new LatLng(this.latitude, this.longitude);
+				var o:LatLng = new LatLng(t.latitude, t.longitude);
+				Alert.show(l.toString() + ":" + o.toString());
+				return t.Experience == this.Experience && t.Speed == this.Speed && t.Power == this.Power && 
+					t.Armor == this.Armor && t.Range == this.Range && t.Accuracy == this.Accuracy &&
+					t.HitPoints == this.HitPoints && t.isIsolated == this.isIsolated &&
+					t.isCapital == this.isCapital && t.hasRuler == this.hasRuler &&
+					t.manaProduction == this.manaProduction && t.stoneProduction == this.stoneProduction &&
+					t.woodProduction == this.woodProduction && t.Level == this.Level && l.equals(o);
+				*/
+			}else{
+				return false;
+			}
+		}
+		
 		public static function createUserTowerFromJSON(buildObject:Object, u:User) : Tower {
 			var t:Tower = new Tower();
 			t.Experience = buildObject.experience;
@@ -501,6 +525,15 @@ package models
 		
 		public function setUser(u:User):void {
 			this.user = u;
+		}
+		
+		// Upon update of the particles. This will shift the 3D model and the empire
+		// boundary on the map
+		public function redrawModelInShiftedFrame():void {
+			var l:LatLng = new LatLng(this.latitude, this.longitude);
+			var e:MapMouseEvent = new MapMouseEvent(MapMouseEvent.DRAG_START, this, l);
+			this.onTowerDragStart(e);
+			this.onTowerDragEnd(e);
 		}
 		
 		// Events associated with the dragging of a marker

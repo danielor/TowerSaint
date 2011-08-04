@@ -10,8 +10,8 @@ package models.states
 	import managers.UserObjectManager;
 	
 	import models.Bounds;
-	import models.interfaces.SuperObject;
 	import models.User;
+	import models.interfaces.SuperObject;
 	import models.states.events.DrawStateEvent;
 	
 	import mx.collections.ArrayCollection;
@@ -96,22 +96,36 @@ package models.states
 			var arr:ArrayCollection = event.result as ArrayCollection;
 			// Get the first object, and draw it on the map. It should be the capital
 			if(arr.length != 0){
-				Alert.show("Appending");
 				var obj:SuperObject = arr.getItemAt(0) as SuperObject;
 				var bounds:LatLngBounds = this.map.getLatLngBounds();
 				var pos:LatLng = obj.getPosition(this.map.getLatLngBounds());
-				this.map.setCenter(pos);
-				
+				if(this.listOfUserModels.length == 0){
+					this.map.setCenter(pos);
+				}
 				// Get the new bounds after recentering the position.
 				bounds = this.map.getLatLngBounds();
 				
 				// Dereference the user
 				this.user = this.user.cloneUser();
+				var found:Boolean;
 				for(var i:int = 0; i < arr.length; i++){
 					var sobj:SuperObject = arr.getItemAt(i) as SuperObject;
 					sobj.setUser(null);
 					
-					if(this.listOfUserModels.getItemIndex(sobj) == -1){
+					// A specialized comparison needs to be performed because the current object
+					// is an indeterminate state. So, when comparing an incoming object with an
+					// existing object it is *essential* to only compare the information that is
+					// stored on the server.
+					found = false;
+					for(var j:int = 0; j < this.listOfUserModels.length; j++){
+						var s:SuperObject = this.listOfUserModels[j] as SuperObject;
+						//Alert.show(s.display().getText() + ":\n" + sobj.display().getText());
+						if(s.statelessEqual(sobj)){
+							found = true;
+							break;
+						}
+					}
+					if(!found){
 						this.listOfUserModels.addItem(sobj);
 					}
 				}

@@ -151,7 +151,11 @@ package models.states
 							listOfDrawnObjects.addItem(obj);
 						}
 					}else{
-						obj.view();
+						if(obj.isVisible(this.map)){
+							obj.redrawModelInShiftedFrame();
+						}else{
+							obj.view();
+						}
 					}
 				}else{
 					obj.hide();
