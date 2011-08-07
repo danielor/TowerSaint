@@ -82,8 +82,9 @@ package models.constants
 		public static function getTowerBuildTime(level:Number) : Date {
 			var d:Date = new Date();
 			if(level == 0){
+				//d.setSeconds(d.setSeconds() + 10);
+				//d.setMinutes(d.getMinutes() + 5);
 				d.setMinutes(d.getMinutes() + 1);
-				//d.setMinutes(d.getMinutes() + 1);
 			}else if(level == 1){
 				d.setHours(d.getHours() + 5);
 			}else if(level == 2){

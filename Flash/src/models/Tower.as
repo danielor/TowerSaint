@@ -238,7 +238,20 @@ package models
 			t.Level = buildObject.level;
 			t.latitude = buildObject.latitude;
 			t.longitude = buildObject.longitude;
+			t.isCapital = buildObject.iscapital;
+			t.stoneProduction = buildObject.stoneproduction;
+			t.Power = buildObject.power;
+			t.Level = buildObject.level;
+			t.Armor = buildObject.armor;
+			t.hasRuler = buildObject.hasruler;
+			t.Experience = buildObject.experience;
+			t.woodProduction = buildObject.woodproduction;
+			t.Range = buildObject.range;
+			t.isIsolated = buildObject.isisolated;
 			t.user = User.createUserFromJSON(buildObject.user);
+			t.HitPoints = buildObject.hitpoints;
+			t.Speed = buildObject.speed;
+			t.Accuracy = buildObject.accuracy;
 			return t;
 		}
 		
@@ -534,12 +547,15 @@ package models
 			var e:MapMouseEvent = new MapMouseEvent(MapMouseEvent.DRAG_START, this, l);
 			this.onTowerDragStart(e);
 			this.onTowerDragEnd(e);
+
 		}
 		
 		// Events associated with the dragging of a marker
 		public function onTowerDragStart(event:MapMouseEvent) : void {
 			var m:Map = towerMarker.getMap();
-			m.removeOverlay(this.focusPolygon);
+			if(this.focusPolygon != null){
+				m.removeOverlay(this.focusPolygon);
+			}
 			this._isDragging = true;
 
 			// Dispatch that we have begun dragging the tower

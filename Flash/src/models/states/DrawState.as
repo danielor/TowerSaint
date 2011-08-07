@@ -118,7 +118,7 @@ package models.states
 			var listOfDrawnObjects:ArrayCollection = new ArrayCollection();
 			
 			for(var i:int = 0; i < this.listOfUserModels.length; i++){
-				var obj:SuperObject = this.listOfUserModels.getItemAt(i) as SuperObject;
+				var obj:SuperObject = this.listOfUserModels[i] as SuperObject;
 				var pos:LatLng = obj.getPosition(bounds);
 				
 				// Check if the object is visbile

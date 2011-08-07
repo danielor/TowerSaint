@@ -81,7 +81,7 @@ package managers
 		// as to update the queue objects. If the date expires, the queue objects
 		// are removed from the list.
 		public function update(d:Date) : void{
-			
+	
 			for(var i:int = 0; i < this.listOfQueueObjects.length; i++){
 				var obj:QueueObject = this.listOfQueueObjects[i] as QueueObject;
 				if(obj.isActive){
@@ -100,7 +100,6 @@ package managers
 							obj.endFunction(obj.buildObject);
 						}
 						*/
-						
 						// Remove the item at the index
 						obj.isActive = false;
 					}
@@ -186,6 +185,7 @@ package managers
 			for(var i:int = 0; i < this.listOfQueueObjects.length; i++){
 				var tempQ:QueueObject = this.listOfQueueObjects[i] as QueueObject;
 				var buildObject:SuperObject = tempQ.buildObject;
+		
 				var cPos:LatLng = buildObject.getPosition(bounds);
 				if(cPos.equals(pos)){
 					q = tempQ;

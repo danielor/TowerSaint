@@ -415,10 +415,12 @@ package managers
 		}
 		
 		public function onChannelBuild(event:ChannelBuildEvent) : void {
+			 Alert.show("onChannelBuild");
+
+			
 			// Get the build string
-			Alert.show("onChannelBuild");
 			var buildUser:String = event.buildUser;
-			var buildObject:Object = event.buildObject;
+			var buildObject:Object = event.buildObject;	
 			
 			// Extract the built object
 			var s:SuperObject;
@@ -434,7 +436,7 @@ package managers
 					return;
 				}
 				// The two lists can be fundamentally different
-				this.listOfUserModels.addItem(s);					// Add to the list of user models 
+				this.listOfUserModels.addItem(s);
 				
 			}else{
 				if(buildObject.Class == "Tower"){
@@ -449,24 +451,21 @@ package managers
 				
 				// TODO: Get the object for other user
 			}
+			
+			
+			// Get the queue manager. Remove the object from the map/queue
 			// Add the user object to the list of relevant user objects
 			var bounds:LatLngBounds = this.map.getLatLngBounds();
 			var pos:LatLng = s.getPosition(bounds);
-			if(bounds.containsLatLng(pos)){
-				s.draw(true, this.map, this.photo, this.gameFocus, true, this.scene, this.view);	
-				
-				// Remove the currently drawn object
-				if(this.newBuildObject != null){
-					this.newBuildObject.eraseFromMap(this.map, this.scene);
-				}
-				
-			}
-			
-			// Get the queue manager 
 			var qObject:QueueObject = this.queueManager.getQueueObjectAtPosition(pos, this.map);
+			qObject.buildObject.eraseFromMap(this.map, this.scene);
 			this.queueManager.removeFromQueue(qObject);
 			if(this.queueManager.isEmpty() && this.currentTabStateString == GameManager._queueState){
 				this.changeState(GameManager._emptyState);
+			}
+			
+			if(bounds.containsLatLng(pos)){
+				s.draw(true, this.map, this.photo, this.gameFocus, true, this.scene, this.view);	
 			}
 		}
 		

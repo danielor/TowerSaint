@@ -226,6 +226,7 @@ package models.states
 		private function _buildComplete():void {
 			// Get the production associated with the superobject
 			for(var i:int = 0; this._listOfQueueObjects.length; i++){
+				var b:LatLngBounds = this.map.getLatLngBounds();
 				var q:QueueObject = this._listOfQueueObjects[i] as QueueObject;
 				var s:SuperObject = q.buildObject;
 				var production:Production = s.getProduction();
@@ -240,9 +241,11 @@ package models.states
 				this.userObjectManager.buildObjectComplete(s, this.user);
 				
 				// Change the state if there is nothing left in the queue
+				/*
 				if(this.queueManager.isEmpty()){
 					this.gameManager.changeState(GameManager._emptyState);
 				}
+				*/
 			}
 		}
 		private function _buildInit():void {
@@ -380,6 +383,7 @@ package models.states
 					
 					// Change the cursor manager
 					CursorManager.removeAllCursors();
+					
 					
 					// Change the deferred event
 					var p:PropertyChangeEvent = new PropertyChangeEvent(BackgroundState.MOUSE_FOCUS);
