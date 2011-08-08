@@ -167,7 +167,6 @@ package models.states
 			}else if(this._buildStateEventType == BuildStateEvent.BUILD_START){
 				this._buildStart();
 			}
-			
 			// Return to the background state
 			var e:BackgroundStateEvent = new BackgroundStateEvent(BackgroundStateEvent.BACKGROUND_STATE);
 			e.attachPreviousState(this);
@@ -220,10 +219,18 @@ package models.states
 			}
 		}
 		
-
+		// Internal function used to flush to the background state even if the 
+		// operation is very expensive
+		private function _flushToBackground():void{
+			// Return to the background state
+			var e:BackgroundStateEvent = new BackgroundStateEvent(BackgroundStateEvent.BACKGROUND_STATE);
+			e.attachPreviousState(this);
+			this.app.dispatchEvent(e);
+		}
 		
 		// Internal function used to handle build Complete
 		private function _buildComplete():void {
+			_flushToBackground();
 			// Get the production associated with the superobject
 			for(var i:int = 0; this._listOfQueueObjects.length; i++){
 				var b:LatLngBounds = this.map.getLatLngBounds();

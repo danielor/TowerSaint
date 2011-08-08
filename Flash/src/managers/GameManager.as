@@ -595,7 +595,6 @@ package managers
 					this.buildState.newBuildObject = new Road();
 					break;
 			}
-			
 			// Set the state of the build state
 			var p:PropertyChangeEvent = new PropertyChangeEvent(BackgroundState.MOUSE_BUILD);
 			p.newValue = BackgroundState.MOUSE_BUILD;
