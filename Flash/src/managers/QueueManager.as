@@ -164,12 +164,13 @@ package managers
 			for(var i:int = 0; i < this.listOfQueueObjects.length; i++){
 				var obj:QueueObject = this.listOfQueueObjects[i] as QueueObject;
 				var sObj:SuperObject = obj.buildObject;
-				if(ObjectUtil.compare(s, sObj) == 0){
+				if(s.statelessEqual(sObj)){
 					return true;
 				}
 			}
 			return false;
 		}
+		
 		
 		// Returns true if the queue is empty
 		public function isEmpty():Boolean {

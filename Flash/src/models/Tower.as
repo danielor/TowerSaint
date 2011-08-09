@@ -204,6 +204,7 @@ package models
 			t.isIsolated = buildObject.isisolated;
 			t.isCapital = buildObject.iscapital;
 			t.hasRuler = buildObject.hasRuler;
+			t.isComplete = buildObject.iscomplete;
 			t.user = u;
 			t.manaProduction = buildObject.manaproduction;
 			t.stoneProduction = buildObject.stoneproduction;

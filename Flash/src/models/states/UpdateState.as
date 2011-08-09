@@ -7,6 +7,7 @@ package models.states
 	import flash.utils.Dictionary;
 	
 	import managers.EventManager;
+	import managers.QueueManager;
 	import managers.UserObjectManager;
 	
 	import models.Bounds;
@@ -34,13 +35,16 @@ package models.states
 		private var app:Application;								/* The application that runs this state */
 		private var arrayOfBounds:ArrayCollection;					/* Array of bounds */
 		private var modelDictionary:Dictionary;						/* Dictionary stores the objects on the map */
-		public function UpdateState(m:Map, u:User, lOfO:ArrayCollection, uOM:UserObjectManager, a:Application)
+		private var queueManager:QueueManager;						/* The queue manager for building objects */
+		public function UpdateState(m:Map, u:User, lOfO:ArrayCollection, uOM:UserObjectManager, a:Application,
+						qm:QueueManager)
 		{
 			this.map = m;
 			this.user = u;
 			this.listOfUserModels = lOfO;
 			this.userObjectManager = uOM;
 			this.app = a;
+			this.queueManager = qm;
 			this.isInState = false;
 			
 			// Initialize the data
@@ -112,21 +116,26 @@ package models.states
 					var sobj:SuperObject = arr.getItemAt(i) as SuperObject;
 					sobj.setUser(null);
 					
-					// A specialized comparison needs to be performed because the current object
-					// is an indeterminate state. So, when comparing an incoming object with an
-					// existing object it is *essential* to only compare the information that is
-					// stored on the server.
-					found = false;
-					for(var j:int = 0; j < this.listOfUserModels.length; j++){
-						var s:SuperObject = this.listOfUserModels[j] as SuperObject;
-						//Alert.show(s.display().getText() + ":\n" + sobj.display().getText());
-						if(s.statelessEqual(sobj)){
-							found = true;
-							break;
+					// Check if the object has *not* completed building. If it has not,
+					// and exists in the queue. There is no need to add it.
+					if(!this.queueManager.isInQueue(sobj)){
+						
+						// A specialized comparison needs to be performed because the current object
+						// is an indeterminate state. So, when comparing an incoming object with an
+						// existing object it is *essential* to only compare the information that is
+						// stored on the server.
+						found = false;
+						for(var j:int = 0; j < this.listOfUserModels.length; j++){
+							var s:SuperObject = this.listOfUserModels[j] as SuperObject;
+							//Alert.show(s.display().getText() + ":\n" + sobj.display().getText());
+							if(s.statelessEqual(sobj)){
+								found = true;
+								break;
+							}
 						}
-					}
-					if(!found){
-						this.listOfUserModels.addItem(sobj);
+						if(!found){
+							this.listOfUserModels.addItem(sobj);
+						}
 					}
 				}
 				

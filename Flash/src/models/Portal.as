@@ -165,6 +165,7 @@ package models
 			p.startLocationLongitude = buildObject.startlocationlongitude;
 			p.endLocationLatitude = buildObject.endlocationlatitude;
 			p.endLocationLongitude = buildObject.endlocationlongitude;
+			p.isComplete = buildObject.iscomplete;
 			return p;
 		}
 		

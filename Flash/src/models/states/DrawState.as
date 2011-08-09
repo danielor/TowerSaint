@@ -13,14 +13,15 @@ package models.states
 	
 	import managers.GameFocusManager;
 	import managers.GameManager;
+	import managers.PolygonBoundaryManager;
 	import managers.QueueManager;
 	import managers.UserObjectManager;
 	
 	import models.Production;
-	import models.interfaces.SuperObject;
 	import models.User;
 	import models.constants.DateConstants;
 	import models.constants.PurchaseConstants;
+	import models.interfaces.SuperObject;
 	import models.states.events.BackgroundStateEvent;
 	import models.states.events.BuildStateEvent;
 	
@@ -44,8 +45,9 @@ package models.states
 		public var queueManager:QueueManager;							/* Manages the queue */
 		public var gameManager:GameManager;								/* Manages the entirety of the game */
 		public var app:Application;										/* The flex application running everything */
+		public var userBoundary:PolygonBoundaryManager;					/* The manager of the boundary */
 		public function DrawState(lOuM:ArrayCollection, m:Map, v:View3D, s:Scene3D, gF:GameFocusManager, p:PhotoAssets, u:User,
-					uOM:UserObjectManager, qM:QueueManager, gm:GameManager, a:Application)
+					uOM:UserObjectManager, qM:QueueManager, gm:GameManager, a:Application, uB:PolygonBoundaryManager)
 		{
 			this.listOfUserModels = lOuM;
 			this.map = m;
@@ -58,6 +60,7 @@ package models.states
 			this.queueManager = qM;
 			this.gameManager = gm;
 			this.app = a;
+			this.userBoundary = uB;
 			this.isInState = false;
 		}
 		
@@ -161,6 +164,21 @@ package models.states
 					obj.hide();
 				}
 			}
+			
+			// If there are active queue objects redraw them if necessary
+			var arr:ArrayCollection = this.queueManager.getListOfSuperObjects();
+			for(var j:int = 0; j < arr.length; j++){
+				var s:SuperObject = arr[j] as SuperObject;
+				var spos:LatLng = s.getPosition(bounds);
+				if(bounds.containsLatLng(spos)){
+					// Redraw and draw
+					s.redrawModelInShiftedFrame();
+					this.userBoundary.addAndDraw(s);
+				}else{
+					s.hide()
+				}
+			}
+			
 			
 			// REMOVE AWAY3D values
 			if(arrayOfQueueObjects.length){

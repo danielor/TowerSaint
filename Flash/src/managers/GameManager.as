@@ -286,9 +286,10 @@ package managers
 			this.initState = new InitState(this.map, this.locationChanger, this.userObjectManager, this.app,
 				this.user, this.photo, this.gameFocus, this.buildButton, this.scene, this.listOfUserModels,
 				this.view);
-			this.updateState = new UpdateState(this.map, this.user, this.listOfUserModels, this.userObjectManager, this.app);
+			this.updateState = new UpdateState(this.map, this.user, this.listOfUserModels, this.userObjectManager, this.app,
+				this.queueManager);
 			this.drawState = new DrawState(this.listOfUserModels, this.map, this.view, this.scene, this.gameFocus, 
-					this.photo, this.user, this.userObjectManager, this.queueManager, this, this.app);
+					this.photo, this.user, this.userObjectManager, this.queueManager, this, this.app, this.userBoundary);
 			this.buildState = new BuildState(this.app, this.map, this.user, this.userObjectManager, this.queueManager, 
 					this.userBoundary, this, this.resourceText, this.photo, this.listOfUserModels, this.scene,
 					this.view, this.gameFocus);

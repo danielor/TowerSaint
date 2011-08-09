@@ -183,6 +183,7 @@ package models
 			r.level = buildObject.level;
 			r.latitude = buildObject.latitude;
 			r.longitude = buildObject.longitude;
+			r.isComplete = buildObject.iscomplete;
 			return r;
 		}
 		
