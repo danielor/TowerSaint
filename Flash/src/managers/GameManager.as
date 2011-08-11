@@ -289,11 +289,13 @@ package managers
 				this.view);
 			this.updateState = new UpdateState(this.map, this.user, this.listOfUserModels, this.userObjectManager, this.app,
 				this.queueManager);
-			this.drawState = new DrawState(this.listOfUserModels, this.map, this.view, this.scene, this.gameFocus, 
-					this.photo, this.user, this.userObjectManager, this.queueManager, this, this.app, this.userBoundary);
 			this.buildState = new BuildState(this.app, this.map, this.user, this.userObjectManager, this.queueManager, 
-					this.userBoundary, this, this.resourceText, this.photo, this.listOfUserModels, this.scene,
-					this.view, this.gameFocus);
+				this.userBoundary, this, this.resourceText, this.photo, this.listOfUserModels, this.scene,
+				this.view, this.gameFocus);
+			this.drawState = new DrawState(this.listOfUserModels, this.map, this.view, this.scene, this.gameFocus, 
+					this.photo, this.user, this.userObjectManager, this.queueManager, this, this.app, this.userBoundary,
+					this.buildState);
+			
 			this.backgroundState = new BackgroundState(this.map, this.app, this.gameFocus, this.buildState, this);
 			this.moveState = new MoveState(this.map);
 			this.gameStartState = new GameStartState(this, this.app);

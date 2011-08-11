@@ -117,6 +117,15 @@ package models.states
 			CursorManager.removeAllCursors();
 			this._newBuildObject = s;
 		}
+		
+		public function hasUnitializedBuildObject():Boolean {
+			if(this._newBuildObject == null){
+				return false;
+			}else{
+				return this._newBuildObject.hasInit();
+			}
+		}
+		
 		public function get newBuildObject():SuperObject {
 			return this._newBuildObject;
 		}

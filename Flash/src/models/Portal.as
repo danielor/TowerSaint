@@ -180,6 +180,12 @@ package models
 			return p;
 		}
 		
+		// Function is true if initialized
+		public function hasInit():Boolean{
+			return true;
+		}
+
+		
 		// Hide the 3d model
 		public function hide():void {
 			// TODO

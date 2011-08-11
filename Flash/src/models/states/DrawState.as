@@ -18,6 +18,7 @@ package models.states
 	import managers.UserObjectManager;
 	
 	import models.Production;
+	import models.QueueObject;
 	import models.User;
 	import models.constants.DateConstants;
 	import models.constants.PurchaseConstants;
@@ -46,8 +47,10 @@ package models.states
 		public var gameManager:GameManager;								/* Manages the entirety of the game */
 		public var app:Application;										/* The flex application running everything */
 		public var userBoundary:PolygonBoundaryManager;					/* The manager of the boundary */
+		public var buildState:BuildState;								/* The build state */
 		public function DrawState(lOuM:ArrayCollection, m:Map, v:View3D, s:Scene3D, gF:GameFocusManager, p:PhotoAssets, u:User,
-					uOM:UserObjectManager, qM:QueueManager, gm:GameManager, a:Application, uB:PolygonBoundaryManager)
+					uOM:UserObjectManager, qM:QueueManager, gm:GameManager, a:Application, uB:PolygonBoundaryManager,
+					bS:BuildState)
 		{
 			this.listOfUserModels = lOuM;
 			this.map = m;
@@ -62,6 +65,7 @@ package models.states
 			this.app = a;
 			this.userBoundary = uB;
 			this.isInState = false;
+			this.buildState = bS;
 		}
 		
 		public function isChatActive():Boolean
@@ -180,6 +184,8 @@ package models.states
 			}
 			
 			
+			
+			
 			// REMOVE AWAY3D values
 			if(arrayOfQueueObjects.length){
 				var b:BuildStateEvent = new BuildStateEvent(BuildStateEvent.BUILD_START);
@@ -188,36 +194,18 @@ package models.states
 				this.app.dispatchEvent(b);
 				return;
 			}
-			// Create the polygon empire boundary for the current user
-			/*
-			userBoundary = new PolygonBoundaryManager(this.map, listOfDrawnObjects, this.user);
-			userBoundary.initDraw()
 			
-			
-		
-			for(var j:int = 0; j < arrayOfQueueObjects.length; j++){
-				var nobj:SuperObject = arrayOfQueueObjects[j] as SuperObject;
-				
-				// Add time to the production date
-				var maxDate:Date = PurchaseConstants.buildTime(nobj, 0);
-				var fDate:Date = nobj.getFoundingDate();
-				var netMinutes:Number = DateConstants.numberOfMinutes(maxDate, d) - DateConstants.numberOfMinutes(d, fDate);
-				var netSeconds:Number = DateConstants.numberOfSeconds(maxDate, d) - DateConstants.numberOfSeconds(d, fDate);
-				var effectiveBuildTime:Date = new Date();
-				DateConstants.addTimeToDate(effectiveBuildTime, netMinutes, netSeconds);
-				
-				// Create a new queue object
-				var objectString:String = nobj.getNameString();
-				var q:QueueObject = new QueueObject("Building " + objectString + " at" + nobj.getPosition(b),
-					effectiveBuildTime, onBuildEnd, nobj.updateBuildState, nobj, onBuildCancel);
-				
-				// Add the queue object to the manager
-				this.queueManager.addQueueObject(q);
-				if(!this.queueManager.isVisible){
-					this.changeState(this.queueState);
-				}
+			// Cancel the build object if we leave the current map pane.
+			if(this.buildState.hasUnitializedBuildObject()){
+				var ts:SuperObject = this.buildState.newBuildObject;
+				var tq:QueueObject = new QueueObject(null, null, null, ts);
+				var bS:BuildStateEvent = new BuildStateEvent(BuildStateEvent.BUILD_CANCEL);
+				bS.listOfQueueObjects = new ArrayCollection([tq]);
+				bS.attachPreviousState(this);
+				this.app.dispatchEvent(bS);
+				return;
 			}
-			*/
+		
 			
 			// After completeting the drawing return to the background state
 			var e:BackgroundStateEvent = new BackgroundStateEvent(BackgroundStateEvent.BACKGROUND_STATE);

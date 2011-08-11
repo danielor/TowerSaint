@@ -222,6 +222,7 @@ package managers
 			
 			// Remove the focus
 			this.bodyText.textFlow = null;
+			this.titleText.textFlow = null;
 			this.focusImage.source = null;
 			this.hasFocus = false;
 		}

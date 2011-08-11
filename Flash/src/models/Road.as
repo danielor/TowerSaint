@@ -221,6 +221,12 @@ package models
 			// Create an event manager
 			this.modelEventManager = new EventManager(roadMarker);
 		}
+		
+		// Function is true if initialized
+		public function hasInit():Boolean{
+			return true;
+		}
+		
 		public function isReady():Boolean{
 			return true;
 		}

@@ -93,6 +93,7 @@ package models
 		// State variables
 		private var isModified:Boolean;
 		private var hasFocus:Boolean;													/* True if the current object has user focus */
+		private var isInitialized:Boolean;												/* Flag true if initialized */
 		private var _atValidLocation:Boolean;											/* Flag true if a valid location is used */
 		private var _isDragging:Boolean;												/* Flag true if the tower is being dragged */
 		private var _isDrawn:Boolean;													/* Flag for when the tower is drawn */
@@ -123,6 +124,7 @@ package models
 			this.hasFocus = false;
 			this._isDragging = false;
 			this._isDrawn = false;
+			this.isInitialized = false;
 			this.modelDispatcher = new EventDispatcher(this);						/* Create the event dispatcher */
 			this.model = new Tower3D(.1);											/* Create the view */
 			///this.modelEventManager = new EventManager(this.model);
@@ -245,6 +247,7 @@ package models
 			t.Level = buildObject.level;
 			t.latitude = buildObject.latitude;
 			t.longitude = buildObject.longitude;
+			t.isInitialized = true;
 			return t;
 		}
 		
@@ -300,12 +303,18 @@ package models
 			this.isIsolated = false;
 			this.isCapital = false;
 			this.hasRuler = true;
+			this.isInitialized = true;
 			//this.user = u;
 			this.manaProduction = 50 + Math.floor( Math.random() * 50);
 			this.stoneProduction = 50 + Math.floor( Math.random() * 50);
 			this.woodProduction = 50 + Math.floor( Math.random() * 50);
 			this.Level = 0;
 
+		}
+		
+		// Function is true if initialized
+		public function hasInit():Boolean{
+			return this.isInitialized;
 		}
 
 		// Update the position of the tower

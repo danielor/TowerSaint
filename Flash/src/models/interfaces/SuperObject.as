@@ -35,6 +35,7 @@ package models.interfaces
 		function hide():void;											/* Hide the 3d model */
 		function view():void;											/* Redisplay the 3d model */
 		function isDrawn():Boolean;										/* Flag for whether the object is drawn */
+		function hasInit():Boolean;										/* Flag is true if the object is initialized */		
 		function setValid(valid:Boolean, intern:Boolean):void;			/* Set the valid location flag. intern - Should I tell others? */
 		function statelessEqual(s:SuperObject):Boolean;					/* Function returns true if the state is equal to the state on the server */
 		
