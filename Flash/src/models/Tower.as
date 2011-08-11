@@ -106,6 +106,7 @@ package models
 		private var focusPolygon:Polygon;												/* The polygon used to show focus */
 		private var boundaryPolygon:Polygon;											/* The polygon associated with the boundary */
 		private var tMEventManager:EventManager;										/* Manages events of the tower view */
+		private var modelEventManager:EventManager;										/* The event manager associated with the 3d model */
 		private var towerBounds:LatLngBounds;											/* Get the bounds of the 
 		
 		// Item Renderer interface (HUserObjectRenderer)
@@ -122,8 +123,40 @@ package models
 			this.hasFocus = false;
 			this._isDragging = false;
 			this._isDrawn = false;
-			this.modelDispatcher = new EventDispatcher(this);					/* Create the event dispatcher */
-			this.model = new Tower3D(.1);										/* Create the view */
+			this.modelDispatcher = new EventDispatcher(this);						/* Create the event dispatcher */
+			this.model = new Tower3D(.1);											/* Create the view */
+			///this.modelEventManager = new EventManager(this.model);
+			//this.modelEventManager.addEventListener(MouseEvent3D.MOUSE_DOWN, on3DMouseDown);	/* Setup th events in the 3d model */
+			//this.modelEventManager.addEventListener(MouseEvent3D.MOUSE_UP, on3DMouseUp);		/* Setup the events in the 3d model */
+		}
+		
+		/* 3D Model interface */
+		private function on3DMouseDown(evt:MouseEvent3D):void {
+			this.modelEventManager.addEventListener(MouseEvent3D.MOUSE_MOVE, on3DMouseMove);
+		}
+		private function on3DMouseUp(evt:MouseEvent3D):void {
+			this.modelEventManager.removeEventListener(MouseEvent3D.MOUSE_MOVE, on3DMouseMove);
+			
+			// Finish the drag
+			if(this._isDragging){
+				var p:Point = new Point(evt.sceneX, evt.sceneY);
+				if(this.towerMarker != null){
+					var m:Map = this.towerMarker.getMap();
+					var l:LatLng = GameConstants.fromAway3DtoMap(p, m);
+					var e:MapMouseEvent = new MapMouseEvent(MapMouseEvent.DRAG_END, this, l);
+					this.onTowerDragEnd(e);
+				}
+			}
+		}
+		private function on3DMouseMove(evt:MouseEvent3D):void {
+			
+			// Start the drag
+			if(!this._isDragging){
+				//Alert.show("Move");
+				var l:LatLng = new LatLng(this.latitude, this.longitude);
+				var e:MapMouseEvent = new MapMouseEvent(MapMouseEvent.DRAG_START, this, l);
+				this.onTowerDragStart(e);
+			}
 		}
 		
 		/* The dispatcher interface */
@@ -386,7 +419,8 @@ package models
 			
 			// TODO: Make this more robust
 			// Create a bounding box. 2~ is an estimation of a bounding box
-			var bitmapData:BitmapData = new BitmapData(this.model.objectWidth / 2., this.model.objectHeight / 2., true, 0x00FFFFFF);
+			var i:Number = 1.9;
+			var bitmapData:BitmapData = new BitmapData(this.model.objectWidth /i, this.model.objectHeight / i, true, 0x00FFFFFF);
 			var asset:BitmapAsset = new BitmapAsset(bitmapData);
 			
 			// Extract the position associated with remoteObject(Tower)			
@@ -404,17 +438,6 @@ package models
 			// Create the marker
 			towerMarker = new TowerSaintMarker(this, gposition, markerOptions, map, view);
 
-			// Create an event manager associated with the marker
-			this.tMEventManager = new EventManager(towerMarker);
-			this.tMEventManager.addEventListener(MapMouseEvent.CLICK, onMarkerClick);
-			if(drag){
-				// Add events associated with the dragging of the marker on the screen
-				this.tMEventManager.addEventListener(MapMouseEvent.DRAG_START, this.onTowerDragStart);
-				this.tMEventManager.addEventListener(MapMouseEvent.DRAG_END, this.onTowerDragEnd);
-			}
-			
-			// Add the marker to the map
-			map.addOverlay(towerMarker);
 			
 			// Copy over the icon data
 			icon = _getImage(_photo);
@@ -437,6 +460,19 @@ package models
 			
 			// Add the container to the scene
 			scene.addChild(this.model);
+			
+			
+			// Create an event manager associated with the marker
+			this.tMEventManager = new EventManager(towerMarker);
+			this.tMEventManager.addEventListener(MapMouseEvent.CLICK, onMarkerClick);
+			if(drag){
+				// Add events associated with the dragging of the marker on the screen
+				this.tMEventManager.addEventListener(MapMouseEvent.DRAG_START, this.onTowerDragStart);
+				this.tMEventManager.addEventListener(MapMouseEvent.DRAG_END, this.onTowerDragEnd);
+			}
+			
+			// Add the marker to the map
+			map.addOverlay(towerMarker);
 			
 			// Create the bounds around the point
 			this.createBoundsAroundPoint(gposition, map, view);
@@ -548,7 +584,6 @@ package models
 			var e:MapMouseEvent = new MapMouseEvent(MapMouseEvent.DRAG_START, this, l);
 			this.onTowerDragStart(e);
 			this.onTowerDragEnd(e);
-
 		}
 		
 		// Events associated with the dragging of a marker

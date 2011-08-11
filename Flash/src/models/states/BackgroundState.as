@@ -123,6 +123,7 @@ package models.states
 				var e:MoveStateEvent = new MoveStateEvent(MoveStateEvent.MOVE_END);
 				e.attachPreviousState(this);
 				this.app.dispatchEvent(e);
+				this._mouseState = BackgroundState.MOUSE_FOCUS;
 			}
 		}
 		
@@ -134,7 +135,7 @@ package models.states
 			this.isClicked = true;
 			if(this._mouseState == BackgroundState.MOUSE_FOCUS){
 				this.gameFocus.onMouseClick(event);
-				
+
 				// Get the focus object
 				var focusObject:SuperObject = this.gameFocus.focusObject;
 				if(focusObject != null){

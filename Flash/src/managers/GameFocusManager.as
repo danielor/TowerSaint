@@ -30,6 +30,7 @@ package managers
 	import mx.core.BitmapAsset;
 	import mx.events.CollectionEvent;
 	import mx.events.CollectionEventKind;
+	import mx.events.ItemClickEvent;
 	import mx.utils.ObjectUtil;
 	
 	import spark.components.Application;
@@ -58,6 +59,7 @@ package managers
 		private var _drag3D:Drag3D;											/* Drag focused objects in a plane */
 		private var _gameManager:GameManager;								/* The game manager */
 		private var _focusObject:SuperObject;								/* The object with focus */ 
+		private var _queueManager:QueueManager;								/* Manager partially created objects */
 		
 		public function GameFocusManager(fI:Image, bT:RichEditableText, tT:RichEditableText, 
 										  p:PhotoAssets, m:Map, a:Application)
@@ -89,6 +91,9 @@ package managers
 		}
 		public function get focusObject():SuperObject {
 			return this._focusObject;
+		}
+		public function set queueManager(qM:QueueManager):void{
+			this._queueManager = qM;
 		}
 		
 		// Set the map variable
@@ -136,8 +141,26 @@ package managers
 					}
 				}
 			}
+			var queueFound:Boolean = false;
+			if(!this._queueManager.isEmpty() && !found){
+				var arr:ArrayCollection = this._queueManager.getListOfSuperObjects();
+				for(var j:int = 0; j < arr.length; j++){
+					var sl:SuperObject = arr[j] as SuperObject;
+					if(sl.isVisible(this._map)){
+						var p2:LatLng = e.latLng;
+						var bbounds:LatLngBounds = sl.getBounds();
+						if(bbounds.containsLatLng(p2)){
+
+							//this._queueManager.
+							var iEv:ItemClickEvent = new ItemClickEvent(ItemClickEvent.ITEM_CLICK, false, false, "Focus", j, null, null);
+							this._queueManager.onQueueItemClick(iEv);
+							queueFound = true;
+						}
+					}
+				}
+			}
 			
-			if(!found){
+			if(!found && !queueFound){
 				this.removeFocus();
 				this._focusObject = null;
 			}
@@ -224,7 +247,7 @@ package managers
 			this.focusImage.source = bA;
 			
 			// Change the state of the action group
-			this._gameManager.changeState(GameManager._emptyState);
+			///this._gameManager.changeState(GameManager._emptyState);
 			
 			// Save a reference to the focused object
 			this._focusObject = m;

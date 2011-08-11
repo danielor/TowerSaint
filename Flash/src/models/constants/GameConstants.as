@@ -47,6 +47,19 @@ package models.constants
 			return new Point(Math.abs(totalWidth *(1 - xFraction)), totalHeight * (1 - yFraction));
 		}
 		
+		// Convert a away3D coordinate to lat lng
+		public static function fromAway3DtoMap(p:Point, map:Map):LatLng {
+			var bounds:LatLngBounds = map.getLatLngBounds();
+			var southeast:LatLng = bounds.getSouthEast();
+			var northwest:LatLng = bounds.getNorthWest();
+			var totalWidth:Number = 2. * (map.width + map.y);
+			var totalHeight:Number = -2. * (map.height + map.y);
+			var xFraction:Number = p.x / totalWidth;
+			var yFraction:Number = p.y / totalHeight;
+			return new LatLng(northwest.lat() + yFraction * (Math.abs(bounds.getNorth() - bounds.getSouth())),
+							 northwest.lng() + xFraction * (Math.abs(bounds.getEast() - bounds.getWest())));
+		}
+		
 		// TODO: A more robust mechanism is needed to hide objects on the map.
 		// A point far off the viewport, where objects that are rendered can remain.
 		public static function hideAWAY3DCoordinate():Point {
