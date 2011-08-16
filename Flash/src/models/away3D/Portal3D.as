@@ -16,7 +16,7 @@ package
 
 	public class Portal3D extends Mesh
 	{
-		[Embed(source="images/aw_0.jpg")]
+		[Embed(source="assets/pictures/aw_0.jpg")]
 		private var Aw_0_Bitmap_Bitmap:Class;
 
 		private var objs:Object = {};

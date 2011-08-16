@@ -103,6 +103,14 @@ package models
 				}
 			}
 		}
+		public function isObject(s:SuperObject):Boolean{
+			return true;
+		}
+		
+		public function getMarker():TowerSaintMarker{
+			return this.roadMarker;
+		}
+		
 		/* Override towersaitndispatcher fuctions */
 		public function removeAllEvents():void{
 			if(this.modelEventManager != null){

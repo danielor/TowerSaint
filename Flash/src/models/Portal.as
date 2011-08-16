@@ -116,6 +116,13 @@ package models
 				this.modelEventManager.removeEventListener(s, f);
 			}
 		}
+		public function isObject(s:SuperObject):Boolean{
+			return true;
+		}
+		
+		public function getMarker():TowerSaintMarker{
+			return this.portalMarker;
+		}
 		
 		// Returns a stateful equal
 		public function statelessEqual(s:SuperObject):Boolean {

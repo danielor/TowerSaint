@@ -20,6 +20,7 @@ package models.interfaces
 	import models.Bounds;
 	import models.Production;
 	import models.User;
+	import models.map.TowerSaintMarker;
 	
 	import mx.core.BitmapAsset;
 
@@ -46,9 +47,7 @@ package models.interfaces
 		
 		// Initialize the information for a new build object
 		function initialize(u:User) : void;
-		
-		function eraseFromMap(map:Map, s:Scene3D) : void;							/*Remove the marker/3D object from the map  */
-
+		function eraseFromMap(map:Map, s:Scene3D) : void;							/*Remove the marker/3D object from the map  */		
 		
 		// Set focus on the object
 		function setFocusOnObject(error:Boolean) : void;
@@ -69,12 +68,16 @@ package models.interfaces
 		// While building a superobject, this function will change the appearacnce of the
 		// object, and/or change the state of the object
 		function updateBuildState(i:Number) : void;
+		function updatePosition(l:LatLng) : void;
 		
 		// Get the image representation
 		function getImage(photo:PhotoAssets):BitmapAsset;
 		
 		// Returns true if the object is current visible on the map
 		function isVisible(map:Map):Boolean;
+		function getBoundaryPolygon():Polygon
+		function isObject(s:SuperObject):Boolean;
+		function getMarker():TowerSaintMarker;				/* Get marker associated with object */
 		
 		// Build State interface
 		function isIncompleteState():Boolean;				/* Has the objects finished building */
@@ -84,7 +87,6 @@ package models.interfaces
 		
 		// Boundary interface
 		function getMaxInfluence():Number;					/* Get the number of tower units in pixels */
-		function getBoundaryPolygon():Polygon;				/* Return the polygon associate with the bounds of influence */
 		
 		// Get the string associated with object
 		function getNameString():String;

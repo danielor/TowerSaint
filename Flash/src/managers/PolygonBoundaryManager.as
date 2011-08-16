@@ -11,6 +11,7 @@ package managers
 	import flash.geom.Point;
 	import flash.utils.Dictionary;
 	
+	import models.BaseObject;
 	import models.Tower;
 	import models.User;
 	import models.interfaces.SuperObject;
@@ -182,10 +183,10 @@ package managers
 			if(obj.hasBoundary()){
 				// Tie in some events
 				if(obj is Tower){
-					var t:Tower = obj as Tower;
-					t.addEventListener(Tower.AT_VALID_LOCATION_CHANGE, onTowerValidLocationChange);
-					t.addEventListener(Tower.ON_DRAG_START, onTowerDragStart);
-					t.addEventListener(Tower.ON_DRAG_END, onTowerDragEnd);
+					var t:BaseObject = obj as BaseObject;
+					t.addEventListener(BaseObject.AT_VALID_LOCATION_CHANGE, onTowerValidLocationChange);
+					t.addEventListener(BaseObject.ON_DRAG_START, onTowerDragStart);
+					t.addEventListener(BaseObject.ON_DRAG_END, onTowerDragEnd);
 				}
 			}
 		}
