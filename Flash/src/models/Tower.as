@@ -204,32 +204,7 @@ package models
 				this.marker.setLatLng(loc);
 			}	
 		}
-		
-		/*
-		public function toString() : String {
-			var s:String = "";
-			s = s + this.Experience.toString() + ":";
-			s = s + this.Speed.toString() + ":";
-			s = s + this.Power.toString() + ":";
-			s = s + this.Armor.toString() + ":";
-			s = s + this.Range.toString() + ":";
-			s = s + this.HitPoints.toString() + ":";
-			s = s + this.isIsolated.toString() + ":";
-			s = s + this.isCapital.toString() + ":";
-			s = s + this.hasRuler.toString() + "\n";
-			s = s + this.manaProduction.toString() + ":";
-			s = s + this.stoneProduction.toString() + ":";
-			s = s + this.woodProduction.toString() + ":";
-			s = s + this.Level.toString() + ":";
-			s = s + this.latIndex.toString() + ":";
-			s = s + this.lonIndex.toString() + ":";
-			s = s + this.latitude.toString() + ":";
-			s = s + this.longitude.toString() + ":";
-			return s;
-		}
-		*/
 	
-		
 		override public function getNameString():String {
 			return "Tower";
 		}
@@ -272,29 +247,7 @@ package models
 			return new Production(this.woodProduction, this.stoneProduction, this.manaProduction);
 		}
 		
-		/*
-		public function removeFocusOnObject() : void {
-			// Change focus state
-			hasFocus = false;
-			
-			// Remove from the map
-			var m:Map = towerMarker.getMap();
-			if(m != null){
-				m.removeOverlay(this.focusPolygon);
-			}
-		}
-		*/
-		
 
-		/*
-		public function getMarker():TowerSaintMarker {
-			return towerMarker;
-		}
-		
-		public function getMarkerEventManager():EventManager {
-			return tMEventManager;
-		}
-		*/
 		override public function getImage(_photo:PhotoAssets):BitmapAsset {
 			var towerIcon:BitmapAsset;
 			switch(Level){
@@ -370,7 +323,6 @@ package models
 		}
 
 		// Interface to the isModified flag, which is true when an object has been create.
-
 		override public function getMaxInfluence():Number {
 			switch(this.Level){
 				case 0:
@@ -389,11 +341,5 @@ package models
 			return new LatLng(this.latitude, this.longitude);
 		}
 		
-		
-		override public function isOverLappingBoundsOfObject(pos:LatLng, m:Map, photo:PhotoAssets) : Boolean {
-			var iPos:LatLng = this.marker.getLatLng();
-			var bounds:LatLngBounds = GameConstants.getBaseLatticeBounds(iPos, m, photo);
-			return bounds.containsLatLng(pos);
-		}
 	}
 }

@@ -6,6 +6,7 @@ package models
 	import away3d.containers.ObjectContainer3D;
 	import away3d.containers.Scene3D;
 	import away3d.containers.View3D;
+	import away3d.core.base.Object3D;
 	import away3d.events.MouseEvent3D;
 	import away3d.loaders.Collada;
 	
@@ -61,7 +62,7 @@ package models
 		// State information representative of all objects
 		private var isModified:Boolean;
 		private var hasFocus:Boolean;													/* True if the current object has user focus */
-		protected var isInitialized:Boolean;												/* Flag true if initialized */
+		protected var isInitialized:Boolean;											/* Flag true if initialized */
 		private var _atValidLocation:Boolean;											/* Flag true if a valid location is used */
 		private var _isDragging:Boolean;												/* Flag true if the tower is being dragged */
 		private var _isDrawn:Boolean;													/* Flag for when the tower is drawn */
@@ -72,10 +73,10 @@ package models
 		protected var marker:TowerSaintMarker;											/* The marker to be drawn on the map */
 		private var focusPolygon:Polygon;												/* The polygon used to show focus */
 		private var boundaryPolygon:Polygon;											/* The polygon associated with the boundary */
-		private var markerEventManager:EventManager;										/* Manages events of the tower view */
+		private var markerEventManager:EventManager;									/* Manages events of the tower view */
 		private var modelEventManager:EventManager;										/* The event manager associated with the 3d model */
 		private var modelBounds:LatLngBounds;											/* Get the bounds of the object */
-		protected var model:ObjectContainer3D;											/* The 3D model of the object */
+		protected var model:Object3D;													/* The 3D model of the object */
 		private var modelDispatcher:EventDispatcher;									/* The event dispatcher sends events */
 		public var icon:BitmapAsset;													/* The icon associated with the current tower */
 
@@ -268,13 +269,9 @@ package models
 		
 		public function statelessEqual(s:SuperObject):Boolean
 		{
-			Alert.show("Before stateless");
 			if(this.isObject(s)){
-				Alert.show("After stateless");
 				var m:Map = marker.getMap();
-				Alert.show("Map");
 				var b:LatLngBounds = m.getLatLngBounds();
-				Alert.show("Position");
 				var pos:LatLng = s.getPosition(b);
 				var ipos:LatLng = this.getPosition(b);
 				return pos.equals(ipos);
@@ -574,7 +571,9 @@ package models
 		
 		public function isOverLappingBoundsOfObject(pos:LatLng, map:Map, photo:PhotoAssets):Boolean
 		{
-			return false;
+			var iPos:LatLng = this.marker.getLatLng();
+			var bounds:LatLngBounds = GameConstants.getBaseLatticeBounds(iPos, map, photo);
+			return bounds.containsLatLng(pos)
 		}		
 		
 		public function getMarker():TowerSaintMarker{

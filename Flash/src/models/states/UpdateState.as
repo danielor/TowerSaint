@@ -125,7 +125,6 @@ package models.states
 						// existing object it is *essential* to only compare the information that is
 						// stored on the server.
 						found = false;
-						Alert.show(this.listOfUserModels.length.toString());
 						for(var j:int = 0; j < this.listOfUserModels.length; j++){
 							var s:SuperObject = this.listOfUserModels[j] as SuperObject;
 							//Alert.show(s.display().getText() + ":\n" + sobj.display().getText());
