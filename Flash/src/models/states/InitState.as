@@ -306,7 +306,7 @@ package models.states
 				if(this.firstLocation){
 					this.currentCapital.draw(true, this.map, this.photo, this.fpm, true, this.scence, this.view);
 					this.listOfUserModels.addItem(this.currentCapital);
-					this.pEBoundary.addAndDraw(this.currentCapital);
+					//this.pEBoundary.addAndDraw(this.currentCapital);
 					this.currentCapital.addEventListener(MapMouseEvent.DRAG_END, this.onDragEnd);
 					this.firstLocation = false;
 				}else{

@@ -164,7 +164,7 @@ package managers
 			for(var i:int = 0; i < this.listOfQueueObjects.length; i++){
 				var obj:QueueObject = this.listOfQueueObjects[i] as QueueObject;
 				var sObj:SuperObject = obj.buildObject;
-				if(s.statelessEqual(sObj)){
+				if(sObj.statelessEqual(s)){
 					return true;
 				}
 			}

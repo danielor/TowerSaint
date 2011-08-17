@@ -183,7 +183,7 @@ package managers
 			if(obj.hasBoundary()){
 				// Tie in some events
 				if(obj is Tower){
-					var t:BaseObject = obj as BaseObject;
+					var t:Tower = obj as Tower;
 					t.addEventListener(BaseObject.AT_VALID_LOCATION_CHANGE, onTowerValidLocationChange);
 					t.addEventListener(BaseObject.ON_DRAG_START, onTowerDragStart);
 					t.addEventListener(BaseObject.ON_DRAG_END, onTowerDragEnd);

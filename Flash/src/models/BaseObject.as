@@ -227,6 +227,7 @@ package models
 		// View the 3d model
 		public function view():void
 		{
+			Alert.show("View");
 			this.model.x = this.currentPoint.x;
 			this.model.y = this.currentPoint.y;
 		}
@@ -267,9 +268,13 @@ package models
 		
 		public function statelessEqual(s:SuperObject):Boolean
 		{
+			Alert.show("Before stateless");
 			if(this.isObject(s)){
+				Alert.show("After stateless");
 				var m:Map = marker.getMap();
+				Alert.show("Map");
 				var b:LatLngBounds = m.getLatLngBounds();
+				Alert.show("Position");
 				var pos:LatLng = s.getPosition(b);
 				var ipos:LatLng = this.getPosition(b);
 				return pos.equals(ipos);
