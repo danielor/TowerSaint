@@ -417,6 +417,7 @@ class Road(GeoModel, BoundsPlugin):
                                              'hitpoints' : self.hitPoints,
                                              'latitude' : self.latitude,
                                              'longitude' : self.longitude,
+                                             'iscomplete' : self.isComplete,
                                              'user' : self.user.toJSON()}}
 
     def setRandomlyInBounds(self, bounds):
@@ -595,7 +596,7 @@ class Tower(GeoModel, BoundsPlugin):
                                              "level" : self.Level, "manaproduction" : self.manaProduction,
                                              "stoneproduction" : self.stoneProduction, 'woodproduction' : self.woodProduction,
                                              'latitude' : self.latitude,'longitude' : self.longitude,
-                                             'user' : self.user.toJSON()}}
+                                             'iscomplete': self.isComplete,  'user' : self.user.toJSON()}}
 
     def setRandomlyInBounds(self, bounds):
         """
@@ -638,37 +639,7 @@ class Tower(GeoModel, BoundsPlugin):
 
 class Portal(GeoModel, BoundsPlugin):
     """The portal objects integrates with AMF"""
-#    class __amf__:
-#        external = True
-#        amf3 = True
-#        
-#    def __writeamf__(self, output):
-#        """Encoding of the information"""
-#        output.writeInt(self.hitPoints)
-#        output.writeInt(self.level)
-#        output.writeObject(self.user)
-#        output.writeFloat(self.startLocationLatitude)
-#        output.writeFloat(self.startLocationLongitude)
-#        output.writeInt(self.startLocationLatitudeIndex)
-#        output.writeInt(self.startLocationLongitudeIndex)
-#        output.writeFloat(self.endLocationLatitude)
-#        output.writeFloat(self.endLocationLongitude)
-#        output.writeInt(self.endLocationLatitudeIndex)
-#        output.writeInt(self.endLocationLongitudeIndex)
-#    
-#    def __readamf__(self, input):
-#        """Decoding of the information"""
-#        self.hitPoints = input.readInt()
-#        self.level = input.readInt()
-#        self.user = input.readObject()
-#        self.startLocationLatitude = input.readFloat()
-#        self.startLocationLongitude = input.readFloat()
-#        self.startLocationLatitudeIndex = input.readInt()
-#        self.startLocationLongitudeIndex = input.readInt()
-#        self.endLocationLatitude = input.readFloat()
-#        self.endLocationLongitude = input.readFloat()
-#        self.endLocationLatitudeIndex = input.readInt()
-#        self.endLocationLongitudeIndex = input.readInt()
+
     # Descriptive
     hitPoints = db.IntegerProperty()
     level = db.IntegerProperty()
@@ -679,63 +650,35 @@ class Portal(GeoModel, BoundsPlugin):
     user = db.ReferenceProperty(User)
     
     # The start/end location of the portal
-    startLocationLatitude = db.FloatProperty()
-    startLocationLongitude = db.FloatProperty()
-    startLocationLatitudeIndex = db.IntegerProperty()
-    startLocationLongitudeIndex = db.IntegerProperty()
-    endLocationLatitude = db.FloatProperty()
-    endLocationLongitude = db.FloatProperty()
-    endLocationLatitudeIndex = db.IntegerProperty()
-    endLocationLongitudeIndex = db.IntegerProperty()
-    
+    latitude = db.FloatProperty()
+    longitude = db.FloatProperty()
     
     def setRandomlyInBounds(self, bounds):
         """
         Setup an object randomly in some model.Bounds
         """
         location = bounds.createRandomLocationInBounds()
-
-        if random.randint(0, 1) == 0:
-            self.startLocationLatitude = location.latitude
-            self.startLocationLongitude = location.longitude
-            self.startLocationLatitudeIndex = int(self.startLocationLatitude / Constants.latIndex())
-            self.startLocationLongitudeIndex = int(self.startLocationLongitude / Constants.lonIndex())
-            self.endLocationLatitude = 0.0
-            self.endLocationLongitude = 0.0
-            self.endLocationLatitudeIndex = 0
-            self.endLocationLongitudeIndex = 0
-            self.location = db.GeoPt(self.startLocationLatitude, self.startLocationLongitude)
-            self.update_location()
-        else:
-            self.endLocationLatitude = location.latitude
-            self.endLocationLongitude = location.longitude
-            self.endLocationLatitudeIndex = int(self.endLocationLatitude / Constants.latIndex())
-            self.endLocationLongitudeIndex = int(self.endLocationLongitude / Constants.lonIndex())
-            self.startLocationLatitude = 0.0
-            self.startLocationLongitude = 0.0
-            self.startLocationLatitudeIndex = 0
-            self.startLocationLongitudeIndex = 0
-            self.location = db.GeoPt(self.endLocationLatitude, self.endLocationLongitude)
-            self.update_location()
+        self.latitude = location.latitude
+        self.longitude = location.longitude
+        self.location = db.GeoPt(self.latitude, self.longitude)
+        self.update_location()
+   
             
     def toJSON(self):
         """Get the json equivalent of the model. The JSON should be consistent throughout
         all of the models"""
         return {"Class" : "Portal", "Value" : {'level' : self.level,
-                                             'startLocationLatitude' : self.startLocationLatitude,
-                                             'startLocationLongitude' : self.startLocationLongitude,
-                                             'endLocationLatitude' : self.endLocationLatitude,
-                                             'endLocationLatitude' : self.endLocationLatitude,
+                                             'latitude' : self.latitude,
+                                             'longitude' : self.longitude,
                                              'user' : self.user.toJSON()}}
     def toCompleteJSON(self):
         """Get the complete json equivalent of the model. This object is sent only to the users
         that own the object"""
         return {"Class" : "Portal", "Value" : {'level' : self.level,
                                              "hitpoints" : self.hitPoints,
-                                             'startLocationLatitude' : self.startLocationLatitude,
-                                             'startLocationLongitude' : self.startLocationLongitude,
-                                             'endLocationLatitude' : self.endLocationLatitude,
-                                             'endLocationLatitude' : self.endLocationLatitude,
+                                             'latitude' : self.latitude,
+                                             'longitude' : self.longitude,
+                                             'iscomplete' : self.isComplete,
                                              'user' : self.user.toJSON()}}
     
     @classmethod
@@ -753,15 +696,12 @@ class Portal(GeoModel, BoundsPlugin):
         return """<Portal>
                     <hitpoints>%s</hitpoints>
                     <level>%s</level>
-                    <startlatitude>%s</startlatitude>
-                    <startlongitude>%s</startlongitude>
-                    <endlatitude>%s</endlatitude>
-                    <endlongitude>%s</endlongitude>
+                    <latitude>%s</latitude>
+                    <longitude>%s</longitude>
                     <isComplete>%s</isComplete>
                     %s
-                  </Portal>""" %(self.hitPoints, self.level, self.startLocationLatitude,
-                                 self.startLocationLongitude, self.endLocationLatitude,
-                                 self.endLocationLongitude,self.isComplete, userString)
+                  </Portal>""" %(self.hitPoints, self.level, self.latitude,
+                                 self.longitude,self.isComplete, userString)
 
     @classmethod
     def createRandomObject(cls):
@@ -776,8 +716,8 @@ class Portal(GeoModel, BoundsPlugin):
     
     def getPosition(self):
         """Returns a list of positions associated with this object"""
-        return [db.GeoPt(self.startLocationLatitude, self.startLocationLongitude), 
-                db.GeoPt(self.endLocationLatitude, self.endLocationLongitude )]
+        return [db.GeoPt(self.latitude, self.longitude)]
+    
 class Location(db.Model):
     """The location object integrates with AMF"""
 #    class __amf__:

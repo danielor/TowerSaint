@@ -33,6 +33,7 @@ package models
 	import models.interfaces.SuperObject;
 	import models.map.TowerSaintMarker;
 	
+	import mx.controls.Alert;
 	import mx.core.BitmapAsset;
 
 	[Bindable]
@@ -48,16 +49,8 @@ package models
 		public var user:User;
 		
 		// The Start location.
-		public var startLocationLatitude:Number;
-		public var startLocationLongitude:Number;
-		public var startLocationLatitudeIndex:int;
-		public var startLocationLongitudeIndex:int;
-		
-		// The End location
-		public var endLocationLatitude:Number;
-		public var endLocationLongitude:Number;
-		public var endLocationLatitudeIndex:int;
-		public var endLocationLongitudeIndex:int;
+		public var latitude:Number;												/* The latitiude of the portal */
+		public var longitude:Number;											/* The longitude of the portal */
 		public var foundingDate:Date;											/* The date the tower was begun */
 		
 		public function Portal()
@@ -82,21 +75,18 @@ package models
 			p.hitPoints = buildObject.hitpoints;
 			p.level = buildObject.level;
 			p.user = u;
-			p.startLocationLatitude = buildObject.startlocationlatitude;
-			p.startLocationLongitude = buildObject.startlocationlongitude;
-			p.endLocationLatitude = buildObject.endlocationlatitude;
-			p.endLocationLongitude = buildObject.endlocationlongitude;
-			p.isComplete = buildObject.iscomplete;
+			p.latitude = buildObject.latitude;
+			p.longitude = buildObject.longitude;
+			p.isComplete = buildObject.isComplete;
 			return p;
 		}
 		
 		public static function createPortalFromJSON(buildObject:Object) : Portal {
 			var p:Portal = new Portal();
 			p.hitPoints = buildObject.hitpoints;
-			p.endLocationLatitude = buildObject.endLocationLatitude;
-			p.endLocationLongitude = buildObject.endLocationLongitude;
-			p.startLocationLatitude = buildObject.startLocationLatitude;
-			p.startLocationLongitude = buildObject.startLocationLongitude;
+			p.latitude = buildObject.latitude;
+			p.longitude = buildObject.longitude;
+			p.isComplete = buildObject.isComplete;
 			p.user = User.createUserFromJSON(buildObject.user);
 			return p;
 		}
@@ -136,11 +126,9 @@ package models
 				var p:Portal = s as Portal;
 				
 				// Create the positions
-				var thisStart:LatLng = new LatLng(this.startLocationLatitude, this.startLocationLongitude);
-				var thisEnd:LatLng = new LatLng(this.endLocationLatitude, this.endLocationLongitude);
-				var cStart:LatLng = new LatLng(p.startLocationLatitude, p.startLocationLongitude);
-				var cEnd:LatLng = new LatLng(p.endLocationLatitude, p.endLocationLongitude);
-				if(thisStart.equals(cStart) && thisEnd.equals(cEnd) && this.hitPoints == p.hitPoints && 
+				var thisStart:LatLng = new LatLng(this.latitude, this.longitude);
+				var cStart:LatLng = new LatLng(p.latitude, p.longitude);
+				if(thisStart.equals(cStart)  && this.hitPoints == p.hitPoints && 
 					this.level == level && this.user.isEqual(p.user)){
 					return true;
 				}else{
@@ -153,8 +141,8 @@ package models
 		
 		// Update the position of the tower
 		override public function updatePosition(loc:LatLng): void{
-			this.startLocationLatitude = loc.lat();
-			this.startLocationLongitude = loc.lng();
+			this.latitude = loc.lat();
+			this.longitude = loc.lng();
 			
 			if(this.marker != null){
 				this.marker.setLatLng(loc);
@@ -188,16 +176,14 @@ package models
 			var s:String = "";
 			s += "HitPoints\t" + hitPoints.toString() + "\n";
 			s += "Level\t\t" + level.toString() + "\n";
-			s += "StartLatitude\t" + startLocationLatitude.toPrecision(5) + "\n";
-			s += "StartLongitude\t" + startLocationLongitude.toPrecision(5) + "\n";
-			s += "EndLatitude\t" + endLocationLatitude.toPrecision(5) + "\n";
-			s += "EndLongitude\t" + endLocationLongitude.toPrecision(5) + "\n";
+			s += "Latitude\t" + this.latitude.toPrecision(5) + "\n";
+			s += "Longitude\t" + this.longitude.toPrecision(5) + "\n";
 			return s;
 		}
 		
 		override public function setPosition(pos:LatLng) : void {
-			startLocationLatitude = pos.lat();
-			startLocationLongitude = pos.lng();
+			this.latitude = pos.lat();
+			this.longitude = pos.lng();
 		}
 
 		
@@ -221,13 +207,7 @@ package models
 		}
 		
 		override public function getPosition(b:LatLngBounds):LatLng{
-			var sL:LatLng = new LatLng(this.startLocationLatitude, this.startLocationLongitude);
-			var eL:LatLng = new LatLng(this.endLocationLatitude, this.endLocationLongitude);
-			if(b.containsLatLng(sL)){
-				return sL;
-			}else{
-				return eL;
-			}
+			return new LatLng(this.latitude, this.longitude);
 		}
 		
 

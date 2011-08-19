@@ -49,6 +49,8 @@ package assets
 		// The portal
 		[Embed(source="assets/pictures/Portal.png")]
 		[Bindbale] public var ThePortal:Class;
+		[Embed(source="assets/pictures/PortalMouse.png")]
+		[Bindable] public var ThePortalMouse:Class;
 		
 		// The cannonball texture
 		[Embed(source="assets/pictures/Cannon_Material.png")]

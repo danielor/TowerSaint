@@ -114,6 +114,7 @@ package models.states
 				}
 			}
 			// Remove all cursors
+			
 			CursorManager.removeAllCursors();
 			this._newBuildObject = s;
 		}
@@ -473,7 +474,7 @@ package models.states
 			if(this._newBuildObject is Tower){
 				return photo.TowerLevel0;
 			}else if(this._newBuildObject is Portal){
-				return photo.ThePortal;
+				return photo.ThePortalMouse;
 			}else {
 				return photo.EastRoad;
 			}

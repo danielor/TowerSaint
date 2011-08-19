@@ -76,7 +76,7 @@ package models
 		private var markerEventManager:EventManager;									/* Manages events of the tower view */
 		private var modelEventManager:EventManager;										/* The event manager associated with the 3d model */
 		private var modelBounds:LatLngBounds;											/* Get the bounds of the object */
-		protected var model:Object3D;													/* The 3D model of the object */
+		protected var model:ObjectContainer3D;													/* The 3D model of the object */
 		private var modelDispatcher:EventDispatcher;									/* The event dispatcher sends events */
 		public var icon:BitmapAsset;													/* The icon associated with the current tower */
 
@@ -139,6 +139,7 @@ package models
 		public function draw(drag:Boolean, map:Map, photo:PhotoAssets, fpm:GameFocusManager, withBoundary:Boolean, scene:Scene3D, view:View3D):void
 		{
 			var i:Number = 1.9;
+	
 			var bitmapData:BitmapData = new BitmapData(this.model.objectWidth /i, this.model.objectHeight / i, true, 0x00FFFFFF);
 			var asset:BitmapAsset = new BitmapAsset(bitmapData);
 			
