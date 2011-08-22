@@ -1,18 +1,17 @@
 package models.away3D
 {
 	import away3d.containers.Scene3D;
-	
-	import models.Road;
+	import away3d.core.geom.Path;
+	import away3d.extrusions.PathExtrusion;
+
 
 	/* 
 	Road path uses away3D to draw a path on google maps. 
 	*/
-	public class RoadPath
+	public class RoadPath extends PathExtrusion
 	{
-		private var scene:Scene3D;				/* The scene to draw the path */
-		private var road:Road;					/* The road associated with the path */
-		
-		public function RoadPath(r:Road, s:Scene3D, withLinks:Boolean = false)
+		private var scene:Scene3D;								/* The scene where the road path will be draw */
+		public function RoadPath()
 		{
 			
 		}

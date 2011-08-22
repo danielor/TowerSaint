@@ -300,6 +300,10 @@ package managers
 			this.moveState = new MoveState(this.map);
 			this.gameStartState = new GameStartState(this, this.app);
 			
+			// Setup up some interestate property events
+			this.app.addEventListener(BackgroundState.MAP_READY, this.drawState.onMapReady);
+			
+			// Create the state list
 			this.stateList = new ArrayCollection([this.initState, this.backgroundState, this.updateState, this.drawState, this.buildState,
 											this.moveState, this.gameStartState]);
 			// Start the state machine

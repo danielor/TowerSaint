@@ -131,16 +131,7 @@ package models.states
 			return this._newBuildObject;
 		}
 		
-		// Event interfaces
-		/*
-		public function onBuildButton(event:MouseEvent):void {
-			Alert.show("onBuild");
-		}
-		
-		public function onCancelBuildButton(event:MouseEvent):void {
-			Alert.show("onCancel");
-		}
-		*/
+
 		// GameState interface
 		public function isChatActive():Boolean
 		{
@@ -434,7 +425,7 @@ package models.states
 				s+="Stone  :" + stoneCost.toString() + "\n";
 				s+="Wood  :" + woodCost.toString() + "\n";
 				s+="Magic  :" + magicCost.toString() + "\n";
-			}else if(c == this.photo.ThePortal){
+			}else if(c == this.photo.ThePortalMouse){
 				s+="Stone :" + stoneCost.toString() + "\n";
 				s+="Wood  :" + woodCost.toString() + "\n";
 				s+="Magic :" + magicCost.toString() + "\n";

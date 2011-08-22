@@ -3,6 +3,7 @@ package models.states
 	import com.google.maps.LatLng;
 	import com.google.maps.LatLngBounds;
 	import com.google.maps.Map;
+	import com.google.maps.MapEvent;
 	import com.google.maps.MapMouseEvent;
 	import com.google.maps.MapMoveEvent;
 	
@@ -18,6 +19,7 @@ package models.states
 	
 	import mx.controls.Alert;
 	import mx.events.PropertyChangeEvent;
+	import mx.events.PropertyChangeEventKind;
 	
 	import spark.components.Application;
 
@@ -41,6 +43,10 @@ package models.states
 		public static const MOUSE_FOCUS:String = "MouseFocus";
 		public static const MOUSE_ATTACK:String = "MouseAttack";
 		public static const MOUSE_MOVE:String = "MouseMove";
+		
+		// Map state constants
+		private var _mapReady:Boolean;
+		public static const MAP_READY:String = "MapMoveOver";
 		
 		public function BackgroundState(m:Map, a:Application, gF:GameFocusManager, bS:BuildState,
 								gm:GameManager)
@@ -108,6 +114,7 @@ package models.states
 			this.mapEventManager.addEventListener(MapMouseEvent.ROLL_OVER, onMapRollOver);
 			this.mapEventManager.addEventListener(MapMouseEvent.ROLL_OUT, onMapRollOut);
 			this.mapEventManager.addEventListener(MapMoveEvent.MOVE_END, onMapMoveEnd);
+			this.mapEventManager.addEventListener(MapMoveEvent.MOVE_START, onMapMoveStart);
 			this.isInState = true;
 		}
 		
@@ -128,7 +135,17 @@ package models.states
 		}
 		
 		private function onMapMoveEnd(event:MapMoveEvent):void {
-			Alert.show("Map move over");
+			this._mapReady = true;
+			var e:PropertyChangeEvent = new PropertyChangeEvent(BackgroundState.MAP_READY, false, false,
+				PropertyChangeEventKind.UPDATE, 'mapReady', this._mapReady, this._mapReady, this);
+			this.app.dispatchEvent(e);
+		}
+		
+		private function onMapMoveStart(event:MapMoveEvent):void {
+			this._mapReady = false;
+			var e:PropertyChangeEvent = new PropertyChangeEvent(BackgroundState.MAP_READY, false, false,
+				PropertyChangeEventKind.UPDATE, 'mapReady', this._mapReady, this._mapReady, this);
+			this.app.dispatchEvent(e);
 		}
 		
 		private function onMapMouseDown(event:MapMouseEvent):void {

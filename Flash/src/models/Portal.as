@@ -65,9 +65,10 @@ package models
 		
 		
 		override public function initialize(u:User):void {
-			this.user = u;
+			//this.user = u;
 			this.hitPoints = 10;
 			this.level = 0;
+			this.isInitialized = true;
 		}
 
 		public static function createUserPortalFromJSON(buildObject:Object, u:User) : Portal {
