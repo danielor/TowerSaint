@@ -139,6 +139,11 @@ package models.states
 			var e:PropertyChangeEvent = new PropertyChangeEvent(BackgroundState.MAP_READY, false, false,
 				PropertyChangeEventKind.UPDATE, 'mapReady', this._mapReady, this._mapReady, this);
 			this.app.dispatchEvent(e);
+			
+			// Change to the update state
+			var updateStateEvent:UpdateStateEvent = new UpdateStateEvent();
+			updateStateEvent.attachPreviousState(this);
+			this.app.dispatchEvent(updateStateEvent);
 		}
 		
 		private function onMapMoveStart(event:MapMoveEvent):void {
@@ -231,10 +236,7 @@ package models.states
 				centerOfMap = new LatLng(newCenterLatitude, newCenterLongitude);
 				this.map.panTo(centerOfMap);
 				
-				// Change to the update state
-				var updateStateEvent:UpdateStateEvent = new UpdateStateEvent();
-				updateStateEvent.attachPreviousState(this);
-				this.app.dispatchEvent(updateStateEvent);
+
 			}
 		}
 		

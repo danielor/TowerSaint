@@ -100,13 +100,13 @@ package models.states
 			this.draw();
 			
 			// Create the event manager
-			this.mapEventManager = new EventManager(this.map);
-			this.mapEventManager.addEventListener(MapMoveEvent.MOVE_END, onMapMoveEnd);
+			//this.mapEventManager = new EventManager(this.map);
+			//this.mapEventManager.addEventListener(MapMoveEvent.MOVE_END, onMapMoveEnd);
 		}
 		
 		public function exitState():void
 		{
-			this.mapEventManager.RemoveEvents();
+			//this.mapEventManager.RemoveEvents();
 			this.isInState = false;
 		}
 		
@@ -133,109 +133,107 @@ package models.states
 		public function draw() : void {
 			// Defer drawing until the map is ready... it could be that the
 			// server is faster then the map.
-			if(this.isMapReady){
-				// Set the array of queue objects
-				var arrayOfQueueObjects:ArrayCollection = new ArrayCollection();
-				// We need to dereference the user object from all of the user objects
-				// in the game objects, so that the game objects users' can be dereferenced
-				// without affecting the global user object. 
-				//xwthis.user = this.user.cloneUser();
+			// Set the array of queue objects
+			var arrayOfQueueObjects:ArrayCollection = new ArrayCollection();
+			// We need to dereference the user object from all of the user objects
+			// in the game objects, so that the game objects users' can be dereferenced
+			// without affecting the global user object. 
+			//xwthis.user = this.user.cloneUser();
+			
+			// Get dates
+			var d:Date = new Date();
+			var bounds:LatLngBounds = this.map.getLatLngBounds();
+			
+			// Create a list of draw objects to later draw their boundaries
+			var listOfDrawnObjects:ArrayCollection = new ArrayCollection();
+			for(var i:int = 0; i < this.listOfUserModels.length; i++){
+				var obj:SuperObject = this.listOfUserModels[i] as SuperObject;
+				var pos:LatLng = obj.getPosition(bounds);
 				
-				// Get dates
-				var d:Date = new Date();
-				var bounds:LatLngBounds = this.map.getLatLngBounds();
-				
-				// Create a list of draw objects to later draw their boundaries
-				var listOfDrawnObjects:ArrayCollection = new ArrayCollection();
-				
-				for(var i:int = 0; i < this.listOfUserModels.length; i++){
-					var obj:SuperObject = this.listOfUserModels[i] as SuperObject;
-					var pos:LatLng = obj.getPosition(bounds);
-					
-					// Check if the object is visbile
-					if(bounds.containsLatLng(pos)){
-						if(!obj.isDrawn()){
-							// Check if the object has finished building
-							if(!obj.isIncompleteState()){
-								var mDate:Date = PurchaseConstants.buildTime(obj, 0);
-								var foundingDate:Date = obj.getFoundingDate();
-								var productionTime:Number = DateConstants.numberOfMinutes(mDate, d);
-								var timeAlive:Number = DateConstants.numberOfMinutes(d, foundingDate);
-								if(productionTime < timeAlive){
-									// Draw the object
-									obj.draw(true, this.map, this.photo, this.gameFocus, true, this.scene, this.view);
-									
-									// Finish the building of the object. The code must be here because no users
-									// could be logged in the association graph of the user.
-									//obj.setUser(null); // Dereferencing is necessary since the Key is not active in GAE
-									updateUserState(obj);
-									//this.userObjectManager.buildObjectComplete(obj, this.user);
-									//obj.setUser(this.user);
-									
-									// Append the list of draw objects
-									listOfDrawnObjects.addItem(obj);
-								}else{
-									arrayOfQueueObjects.addItem(obj);
-								}
-							}else{
+				// Check if the object is visbile
+				if(bounds.containsLatLng(pos)){
+					if(!obj.isDrawn()){
+						// Check if the object has finished building
+						if(!obj.isIncompleteState()){
+							var mDate:Date = PurchaseConstants.buildTime(obj, 0);
+							var foundingDate:Date = obj.getFoundingDate();
+							var productionTime:Number = DateConstants.numberOfMinutes(mDate, d);
+							var timeAlive:Number = DateConstants.numberOfMinutes(d, foundingDate);
+							if(productionTime < timeAlive){
+								// Draw the object
 								obj.draw(true, this.map, this.photo, this.gameFocus, true, this.scene, this.view);
+								
+								// Finish the building of the object. The code must be here because no users
+								// could be logged in the association graph of the user.
+								//obj.setUser(null); // Dereferencing is necessary since the Key is not active in GAE
+								updateUserState(obj);
+								//this.userObjectManager.buildObjectComplete(obj, this.user);
+								//obj.setUser(this.user);
+								
+								// Append the list of draw objects
 								listOfDrawnObjects.addItem(obj);
+							}else{
+								arrayOfQueueObjects.addItem(obj);
 							}
 						}else{
-							if(obj.isVisible(this.map)){
-								obj.redrawModelInShiftedFrame();
-							}else{
-								obj.view();
-							}
+							obj.draw(true, this.map, this.photo, this.gameFocus, true, this.scene, this.view);
+							listOfDrawnObjects.addItem(obj);
 						}
 					}else{
-						obj.hide();
+						if(obj.isVisible(this.map)){
+							obj.redrawModelInShiftedFrame();
+						}else{
+							obj.view();
+						}
 					}
+				}else{
+					obj.hide();
 				}
-				
-				// If there are active queue objects redraw them if necessary
-				var arr:ArrayCollection = this.queueManager.getListOfSuperObjects();
-				for(var j:int = 0; j < arr.length; j++){
-					var s:SuperObject = arr[j] as SuperObject;
-					var spos:LatLng = s.getPosition(bounds);
-					if(bounds.containsLatLng(spos)){
-						// Redraw and draw
-						s.redrawModelInShiftedFrame();
-						this.userBoundary.addAndDraw(s);
-					}else{
-						s.hide()
-					}
-				}
-				
-				
-				
-				
-				// REMOVE AWAY3D values
-				if(arrayOfQueueObjects.length){
-					var b:BuildStateEvent = new BuildStateEvent(BuildStateEvent.BUILD_START);
-					b.attachPreviousState(this);
-					b.listOfQueueObjects = arrayOfQueueObjects;
-					this.app.dispatchEvent(b);
-					return;
-				}
-				
-				// Cancel the build object if we leave the current map pane.
-				if(this.buildState.hasUnitializedBuildObject()){
-					var ts:SuperObject = this.buildState.newBuildObject;
-					var tq:QueueObject = new QueueObject(null, null, null, ts);
-					var bS:BuildStateEvent = new BuildStateEvent(BuildStateEvent.BUILD_CANCEL);
-					bS.listOfQueueObjects = new ArrayCollection([tq]);
-					bS.attachPreviousState(this);
-					this.app.dispatchEvent(bS);
-					return;
-				}
-			
-				
-				// After completeting the drawing return to the background state
-				var e:BackgroundStateEvent = new BackgroundStateEvent(BackgroundStateEvent.BACKGROUND_STATE);
-				e.attachPreviousState(this);
-				this.app.dispatchEvent(e);
 			}
+			
+			// If there are active queue objects redraw them if necessary
+			var arr:ArrayCollection = this.queueManager.getListOfSuperObjects();
+			for(var j:int = 0; j < arr.length; j++){
+				var s:SuperObject = arr[j] as SuperObject;
+				var spos:LatLng = s.getPosition(bounds);
+				if(bounds.containsLatLng(spos)){
+					// Redraw and draw
+					s.redrawModelInShiftedFrame();
+					this.userBoundary.addAndDraw(s);
+				}else{
+					s.hide()
+				}
+			}
+			
+			
+			
+			
+			// REMOVE AWAY3D values
+			if(arrayOfQueueObjects.length){
+				var b:BuildStateEvent = new BuildStateEvent(BuildStateEvent.BUILD_START);
+				b.attachPreviousState(this);
+				b.listOfQueueObjects = arrayOfQueueObjects;
+				this.app.dispatchEvent(b);
+				return;
+			}
+			
+			// Cancel the build object if we leave the current map pane.
+			if(this.buildState.hasUnitializedBuildObject()){
+				var ts:SuperObject = this.buildState.newBuildObject;
+				var tq:QueueObject = new QueueObject(null, null, null, ts);
+				var bS:BuildStateEvent = new BuildStateEvent(BuildStateEvent.BUILD_CANCEL);
+				bS.listOfQueueObjects = new ArrayCollection([tq]);
+				bS.attachPreviousState(this);
+				this.app.dispatchEvent(bS);
+				return;
+			}
+		
+			
+			// After completeting the drawing return to the background state
+			var e:BackgroundStateEvent = new BackgroundStateEvent(BackgroundStateEvent.BACKGROUND_STATE);
+			e.attachPreviousState(this);
+			this.app.dispatchEvent(e);
+			
 		}
 		
 		// Update build information after the build state is finished

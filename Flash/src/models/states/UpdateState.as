@@ -13,6 +13,7 @@ package models.states
 	import models.Bounds;
 	import models.User;
 	import models.interfaces.SuperObject;
+	import models.states.events.BackgroundStateEvent;
 	import models.states.events.DrawStateEvent;
 	
 	import mx.collections.ArrayCollection;
@@ -36,6 +37,7 @@ package models.states
 		private var arrayOfBounds:ArrayCollection;					/* Array of bounds */
 		private var modelDictionary:Dictionary;						/* Dictionary stores the objects on the map */
 		private var queueManager:QueueManager;						/* The queue manager for building objects */
+		private var currentPosition:LatLng;							/* The current position at update */
 		public function UpdateState(m:Map, u:User, lOfO:ArrayCollection, uOM:UserObjectManager, a:Application,
 						qm:QueueManager)
 		{
@@ -49,6 +51,7 @@ package models.states
 			
 			// Initialize the data
 			this.arrayOfBounds = new ArrayCollection();
+			this.currentPosition = new LatLng(0., 0.);
 		}
 		
 		public function isChatActive():Boolean
@@ -80,18 +83,25 @@ package models.states
 			
 			// Get the current bound
 			var bound:LatLngBounds = this.map.getLatLngBounds();
+			var pos:LatLng = this.map.getCenter();
 			var b:Bounds = new Bounds();
 			b.fromGoogleBounds(bound);
 	
-			if(this.arrayOfBounds.getItemIndex(bound) == -1){
-				//this.userObjectManager.get(this.user, onGetUserObjects);
-				this.userObjectManager.getObjectInBounds(b, this.onGetUserObjects);
+			if(pos.equals(currentPosition)){
+				var bs:BackgroundStateEvent = new BackgroundStateEvent(BackgroundStateEvent.BACKGROUND_STATE);
+				bs.attachPreviousState(this);
+				this.app.dispatchEvent(bs);
 			}else{
-				// Dispatch an event to the draw state
-				var dSE:DrawStateEvent = new DrawStateEvent(DrawStateEvent.DRAW_STATE);
-				dSE.attachPreviousState(this);
-				this.app.dispatchEvent(dSE);
-				
+				if(this.arrayOfBounds.getItemIndex(bound) == -1){
+					//this.userObjectManager.get(this.user, onGetUserObjects);
+					this.userObjectManager.getObjectInBounds(b, this.onGetUserObjects);
+				}else{
+					// Dispatch an event to the draw state
+					var dSE:DrawStateEvent = new DrawStateEvent(DrawStateEvent.DRAW_STATE);
+					dSE.attachPreviousState(this);
+					this.app.dispatchEvent(dSE);
+					
+				}
 			}
 			
 		}
@@ -143,7 +153,8 @@ package models.states
 				this.arrayOfBounds.addItem(bounds);
 			}
 			
-		
+			// Save the current position
+			this.currentPosition = this.map.getCenter();
 			
 			// Dispatch an event to the draw state
 			var dSE:DrawStateEvent = new DrawStateEvent(DrawStateEvent.DRAW_STATE);

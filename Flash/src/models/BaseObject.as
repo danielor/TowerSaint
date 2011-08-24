@@ -183,8 +183,8 @@ package models
 			this.markerEventManager.addEventListener(MapMouseEvent.CLICK, onMarkerClick);
 			if(drag){
 				// Add events associated with the dragging of the marker on the screen
-				this.markerEventManager.addEventListener(MapMouseEvent.DRAG_START, this.onTowerDragStart);
-				this.markerEventManager.addEventListener(MapMouseEvent.DRAG_END, this.onTowerDragEnd);
+				this.markerEventManager.addEventListener(MapMouseEvent.DRAG_START, this.onDragStart);
+				this.markerEventManager.addEventListener(MapMouseEvent.DRAG_END, this.onDragEnd);
 			}
 			
 			// Add the marker to the map
@@ -241,6 +241,7 @@ package models
 		
 		public function hasInit():Boolean
 		{
+			Alert.show(this.isInitialized.toString());
 			return this.isInitialized;
 		}
 		
@@ -306,6 +307,7 @@ package models
 		
 		public function eraseFromMap(map:Map, s:Scene3D):void
 		{
+			Alert.show("Erasing" + this.getNameString());
 			if(this.marker != null){
 				map.removeOverlay(this.marker);
 			}
@@ -451,13 +453,14 @@ package models
 			var m:Map = this.marker.getMap();
 			var b:LatLngBounds = m.getLatLngBounds();
 			var l:LatLng = this.getPosition(b);
+
 			var e:MapMouseEvent = new MapMouseEvent(MapMouseEvent.DRAG_START, this, l);
-			this.onTowerDragStart(e);
-			this.onTowerDragEnd(e);
+			this.onDragStart(e);
+			this.onDragEnd(e);
 		}
 		
 		// Events associated with the dragging of a marker
-		public function onTowerDragStart(event:MapMouseEvent) : void {
+		public function onDragStart(event:MapMouseEvent) : void {
 			var m:Map = this.marker.getMap();
 			if(this.focusPolygon != null){
 				m.removeOverlay(this.focusPolygon);
@@ -469,16 +472,17 @@ package models
 				PropertyChangeEventKind.UPDATE, 'onDragStart', this._isDragging, true, this);
 			this.dispatchEvent(e);
 		}
-		public function onTowerDragEnd(event:MapMouseEvent) : void {
+		public function onDragEnd(event:MapMouseEvent) : void {
 			//createFocusPolygonAtPosition(true);
 			var l:LatLng = event.latLng;
-			
+	
 			// Update the position
 			var m:Map = this.marker.getMap();
 			var v:View3D = this.marker.getView();
 			currentPoint = GameConstants.fromMapToAway3D(l, m);
 			this.model.x = currentPoint.x;
 			this.model.y = currentPoint.y;
+			Alert.show(currentPoint.x.toString() + ":" + currentPoint.y.toString());
 			
 			// Set the flag
 			this._isDragging = false;

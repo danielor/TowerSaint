@@ -312,7 +312,7 @@ package models.states
 				}else{
 					// Create a *drag* event to update all of the state information	
 					var m:MapMouseEvent = new MapMouseEvent(MapMouseEvent.DRAG_END, this.currentCapital, loc);
-					this.currentCapital.onTowerDragEnd(m);
+					this.currentCapital.onDragEnd(m);
 				}
 				
 				// Check if the marker is at a reasonable position.
@@ -349,7 +349,7 @@ package models.states
 			
 			// Send an event to the tower as if it is to be dragged
 			var m:MapMouseEvent = new MapMouseEvent(MapMouseEvent.DRAG_START, this.currentCapital, this.initialMapDragMouse);
-			this.currentCapital.onTowerDragStart(m);
+			this.currentCapital.onDragStart(m);
 		}
 		
 		protected function onMapDragEnd(event:MapMouseEvent) : void {
@@ -400,7 +400,7 @@ package models.states
 				// Dispatch an event to end the "dragging" of the capital
 				// Send an event to the tower as if it is to be dragged
 				var m:MapMouseEvent = new MapMouseEvent(MapMouseEvent.DRAG_END, this.currentCapital, centerOfMap);
-				this.currentCapital.onTowerDragEnd(m);
+				this.currentCapital.onDragEnd(m);
 				
 				// Find out if the position is reasonable or not
 				// Check if the marker is at a reasonable position.

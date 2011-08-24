@@ -114,7 +114,6 @@ package models.states
 				}
 			}
 			// Remove all cursors
-			
 			CursorManager.removeAllCursors();
 			this._newBuildObject = s;
 		}
@@ -123,7 +122,7 @@ package models.states
 			if(this._newBuildObject == null){
 				return false;
 			}else{
-				return this._newBuildObject.hasInit();
+				return !this._newBuildObject.hasInit();
 			}
 		}
 		

@@ -610,6 +610,7 @@ package managers
 			
 			
 			// Remove the previous build object from the map
+			/*
 			if(this.newBuildObject != null){
 				
 				if(!this.queueManager.isInQueue(this.newBuildObject)){
@@ -617,6 +618,7 @@ package managers
 				}
 				
 			}
+			*/
 			//this.buildStateInformation.enterState(this.newBuildObject);
 		}
 		
