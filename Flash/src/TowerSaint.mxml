@@ -94,7 +94,6 @@
 			{
 				// Include the body text in serveral states
 				this._gameManager = null;
-				
 				// Initialize the basic objects
 				this.addEventListener(StateChangeEvent.CURRENT_STATE_CHANGE, onStateChange);
 								

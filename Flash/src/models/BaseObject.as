@@ -2,7 +2,6 @@ package models
 {
 	import assets.ColladaAssetLoader;
 	import assets.PhotoAssets;
-	
 	import away3d.containers.ObjectContainer3D;
 	import away3d.containers.Scene3D;
 	import away3d.containers.View3D;

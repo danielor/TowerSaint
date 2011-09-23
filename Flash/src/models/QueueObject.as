@@ -1,7 +1,8 @@
 package models
 {
-	import mx.controls.ProgressBar;
 	import models.interfaces.SuperObject;
+	
+	import mx.controls.ProgressBar;
 
 	// A queue object containts the essential information associated with an operation
 	// that requires the user to date

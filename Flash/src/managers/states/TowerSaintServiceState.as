@@ -16,7 +16,7 @@ package managers.states
 		// String constants used to control the service state
 		private const serviceString:String = "towersaint"
 		//private const URL:String = "http://towersaint.appspot.com/";
-		private const URL:String = "http://localhost:8083/"
+		private const URL:String = "http://localhost:8081/"
 		private const latticeGranularity:Number = .001;
 		
 		// Dictionary holds all of the remote objects

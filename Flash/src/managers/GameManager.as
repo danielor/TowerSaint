@@ -308,8 +308,9 @@ package managers
 											this.moveState, this.gameStartState]);
 			// Start the state machine
 			var initialState:GameState;
-			
+			Alert.show("Where am i?");
 			if(this.app.currentState == this.initState.getViewString()){
+				Alert.show("InitState");
 				initialState = this.initState;
 			}else{
 				initialState = this.updateState;
