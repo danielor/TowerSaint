@@ -21,6 +21,7 @@ package managers
 	
 	import models.Tower;
 	import models.constants.GameConstants;
+	import models.interfaces.FilteredObject;
 	import models.interfaces.SuperObject;
 	import models.map.TowerSaintMarker;
 	
@@ -74,6 +75,7 @@ package managers
 			this.hasFocus = false;
 			this.previousTime = null;
 			this.isDragging = false;
+			this._focusObject = null;
 			this._map = m;
 			this._app = a;		
 			
@@ -225,6 +227,18 @@ package managers
 			this.titleText.textFlow = null;
 			this.focusImage.source = null;
 			this.hasFocus = false;
+			
+			// Change the view focus if available.
+			this._removeViewFocus(this._focusObject, false);
+		}
+		
+		// The 3d object
+		private function _removeViewFocus(m:SuperObject, b:Boolean):void {
+			var o:ObjectContainer3D = m.get3DObject();
+			if(o is FilteredObject){
+				var f:FilteredObject = o as FilteredObject;
+				f.changeFilterState(b);
+			}
 		}
 		
 		public function displayModel(m:SuperObject) : void {
@@ -241,17 +255,30 @@ package managers
 			pGraph.addChild(iSpan);
 			title.addChild(pGraph);
 			
-			
 			// Set the focus
 			this.titleText.textFlow = title;
 			this.bodyText.textFlow = t;
 			this.focusImage.source = bA;
 			
-			// Change the state of the action group
-			///this._gameManager.changeState(GameManager._emptyState);
+			// If the focusObject exists, make sure to remove the
+			// visual object
+			if(this._focusObject != null){
+				var o:ObjectContainer3D = this._focusObject.get3DObject();
+				if(o is FilteredObject){
+					var f:FilteredObject = o as FilteredObject;
+					f.changeFilterState(false);
+				}
+			}
+			// Remove the view focus
+			if(this._focusObject != null){
+				_removeViewFocus(this._focusObject, false);
+			}
 			
 			// Save a reference to the focused object
 			this._focusObject = m;
+			
+			// Change the view focus if available.
+			_removeViewFocus(this._focusObject, true);
 			
  		}
 		

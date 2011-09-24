@@ -2,6 +2,7 @@ package models
 {
 	import assets.PhotoAssets;
 	
+	import away3d.containers.ObjectContainer3D;
 	import away3d.containers.Scene3D;
 	import away3d.containers.View3D;
 	
@@ -105,6 +106,9 @@ package models
 		}
 		public function isObject(s:SuperObject):Boolean{
 			return true;
+		}
+		public function get3DObject():ObjectContainer3D{
+			return null;
 		}
 		
 		public function getMarker():TowerSaintMarker{

@@ -2,6 +2,7 @@ package models.interfaces
 {
 	import assets.PhotoAssets;
 	
+	import away3d.containers.ObjectContainer3D;
 	import away3d.containers.Scene3D;
 	import away3d.containers.View3D;
 	
@@ -78,6 +79,7 @@ package models.interfaces
 		function getBoundaryPolygon():Polygon
 		function isObject(s:SuperObject):Boolean;
 		function getMarker():TowerSaintMarker;				/* Get marker associated with object */
+		function get3DObject():ObjectContainer3D;			// Return the 3d object associated with the container
 		
 		// Build State interface
 		function isIncompleteState():Boolean;				/* Has the objects finished building */

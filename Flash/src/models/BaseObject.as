@@ -136,6 +136,10 @@ package models
 			}
 		}
 		
+		public function get3DObject():ObjectContainer3D {
+			return this.model;
+		}
+		
 		
 		public function draw(drag:Boolean, map:Map, photo:PhotoAssets, fpm:GameFocusManager, withBoundary:Boolean, scene:Scene3D, view:View3D):void
 		{

@@ -3,18 +3,22 @@ package models.away3D
 {
 	import away3d.containers.ObjectContainer3D;
 	import away3d.containers.Scene3D;
-	import away3d.materials.*;
 	import away3d.core.base.*;
-	import away3d.loaders.utils.*;
 	import away3d.loaders.data.*;
-	import flash.utils.Dictionary;
+	import away3d.loaders.utils.*;
+	import away3d.materials.*;
 	import away3d.primitives.*;
+	
 	import flash.display.Bitmap;
 	import flash.display.BitmapData;
-	
+	import flash.filters.BitmapFilterQuality;
+	import flash.filters.GlowFilter;
 	import flash.geom.*;
+	import flash.utils.Dictionary;
 	
-	public class Portal3D extends ObjectContainer3D
+	import models.interfaces.FilteredObject;
+	
+	public class Portal3D extends ObjectContainer3D implements FilteredObject
 	{
 		[Embed(source="assets/pictures/aw_0.jpg")]
 		private var Aw_0_Bitmap_Bitmap:Class;
@@ -22,6 +26,7 @@ package models.away3D
 		private var objs:Object = {};
 		private var geos:Array = [];
 		private var oList:Array =[];
+		private var focusFilters:Array = [];						// Focus filters
 		private var aC:Array;
 		private var aV:Array;
 		private var aU:Array;
@@ -32,10 +37,36 @@ package models.away3D
 			_scale = scale;
 			setSource();
 			addContainers();
+			createFilters();
 			buildMeshes();
 			buildMaterials();
 			cleanUp();
 		}
+		
+		private function createFilters():void {
+			// First object
+			var gF:GlowFilter = new GlowFilter(0x4169e1,0,6.0,6.0,2,BitmapFilterQuality.MEDIUM,false, false);
+			focusFilters.push(gF);
+		}
+		
+		// The Filtered Object interface
+		public function updateFilter(i:Number):void{
+			for(var k:int = 0; k < focusFilters.length; k++){
+				var gf:GlowFilter = focusFilters[k] as GlowFilter;
+				gf.alpha = i;
+			}
+		}
+		public function changeFilterState(b:Boolean):void {
+			for(var k:int = 0; k < focusFilters.length; k++){
+				var gf:GlowFilter = focusFilters[k] as GlowFilter;
+				if(b){
+					gf.alpha = 1;
+				}else{
+					gf.alpha = 0;
+				}
+			}
+		}
+		
 		
 		private function buildMeshes():void
 		{
@@ -43,7 +74,7 @@ package models.away3D
 			m0.rawData = Vector.<Number>([1,0,0,0,0,1,0,0,0,0,1,0,16.905250000000006*_scale,-45.60765*_scale,26.581799999999987*_scale,1]);
 			transform = m0;
 			
-			objs.obj0 = {name:"aw_0",  transform:m0, pivotPoint:new Vector3D(0,0,0), container:0, bothsides:false, material:null, ownCanvas:false, pushfront:false, pushback:false};
+			objs.obj0 = {name:"aw_0",  transform:m0, pivotPoint:new Vector3D(0,0,0), container:0, bothsides:false, material:null, ownCanvas:true, pushfront:false, pushback:false};
 			objs.obj0.geo=geos[0];
 			
 			var ref:Object;
@@ -68,6 +99,7 @@ package models.away3D
 					mesh.pushfront = ref.pushfront;
 					mesh.pushback = ref.pushback;
 					mesh.ownCanvas = ref.ownCanvas;
+					mesh.filters = [focusFilters[i]]
 					if(aC[ref.container]!= null)
 						aC[ref.container].addChild(mesh);
 					
