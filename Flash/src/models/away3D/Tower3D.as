@@ -3,18 +3,23 @@ package models.away3D
 {
 	import away3d.containers.ObjectContainer3D;
 	import away3d.containers.Scene3D;
-	import away3d.materials.*;
 	import away3d.core.base.*;
-	import away3d.loaders.utils.*;
 	import away3d.loaders.data.*;
-	import flash.utils.Dictionary;
+	import away3d.loaders.utils.*;
+	import away3d.materials.*;
 	import away3d.primitives.*;
+	
 	import flash.display.Bitmap;
 	import flash.display.BitmapData;
-
+	import flash.filters.BitmapFilterQuality;
+	import flash.filters.DropShadowFilter;
+	import flash.filters.GlowFilter;
 	import flash.geom.*;
+	import flash.utils.Dictionary;
+	
+	import models.interfaces.FilteredObject;
 
-	public class Tower3D extends ObjectContainer3D
+	public class Tower3D extends ObjectContainer3D implements FilteredObject
 	{
 		[Embed(source="assets/pictures/TowerLevel0Top.jpg")]
 		private var Cone_Bitmap_Bitmap:Class;
@@ -25,6 +30,7 @@ package models.away3D
 		private var objs:Object = {};
 		private var geos:Array = [];
 		private var oList:Array =[];
+		private var focusFilters:Array = [];									// Focus filters draw a shadow around the object
 		private var aC:Array;
 		private var aV:Array;
 		private var aU:Array;
@@ -34,10 +40,38 @@ package models.away3D
 		{
 			_scale = scale;
 			setSource();
+			createFilters();
 			addContainers();
 			buildMeshes();
 			buildMaterials();
 			cleanUp();
+		}
+		
+		
+		private function createFilters():void {
+			// First object
+			var gF:GlowFilter = new GlowFilter(0xFFFFFF,0,6.0,6.0,2,BitmapFilterQuality.MEDIUM,false, false);
+			var gF2:GlowFilter = new GlowFilter(0xFFFFFF,0,6.0,6.0,2,BitmapFilterQuality.MEDIUM,false, false);
+			focusFilters.push(gF);
+			focusFilters.push(gF2);
+		}
+		
+		// The Filtered Object interface
+		public function updateFilter(i:Number):void{
+			for(var k:int = 0; k < focusFilters.length; k++){
+				var gf:GlowFilter = focusFilters[k] as GlowFilter;
+				gf.alpha = i;
+			}
+		}
+		public function changeFilterState(b:Boolean):void {
+			for(var k:int = 0; k < focusFilters.length; k++){
+				var gf:GlowFilter = focusFilters[k] as GlowFilter;
+				if(b){
+					gf.alpha = 1;
+				}else{
+					gf.alpha = 0;
+				}
+			}
 		}
 
 		private function buildMeshes():void
@@ -46,13 +80,13 @@ package models.away3D
 			m0.rawData = Vector.<Number>([1,0,0,0,0,1,0,0,0,0,1,0,12.600049999999996*_scale,770.30735*_scale,64.6*_scale,1]);
 			transform = m0;
 
-			objs.obj0 = {name:"Cone",  transform:m0, pivotPoint:new Vector3D(0,0,0), container:0, bothsides:false, material:null, ownCanvas:false, pushfront:false, pushback:false};
+			objs.obj0 = {name:"Cone",  transform:m0, pivotPoint:new Vector3D(0,0,0), container:0, bothsides:false, material:null, ownCanvas:true, pushfront:false, pushback:false};
 			objs.obj0.geo=geos[0];
 			var m1:Matrix3D = new Matrix3D();
 			m1.rawData = Vector.<Number>([1,0,0,0,0,1,0,0,0,0,1,0,12.599999999999994*_scale,325.46180000000004*_scale,64.6*_scale,1]);
 			transform = m1;
 
-			objs.obj1 = {name:"Cylinder_Cylinder002",  transform:m1, pivotPoint:new Vector3D(0,0,0), container:0, bothsides:false, material:null, ownCanvas:false, pushfront:false, pushback:false};
+			objs.obj1 = {name:"Cylinder_Cylinder002",  transform:m1, pivotPoint:new Vector3D(0,0,0), container:0, bothsides:false, material:null, ownCanvas:true, pushfront:false, pushback:false};
 			objs.obj1.geo=geos[1];
 
 			var ref:Object;
@@ -77,6 +111,7 @@ package models.away3D
 					mesh.pushfront = ref.pushfront;
 					mesh.pushback = ref.pushback;
 					mesh.ownCanvas = ref.ownCanvas;
+					mesh.filters = [focusFilters[i]];
 					if(aC[ref.container]!= null)
 						aC[ref.container].addChild(mesh);
 

@@ -184,7 +184,6 @@
 			protected function handleInit(success:Object, fail:Object) : void {
  				
 			}
-			
 			protected function getMeHandler(response:Object, fail:Object) : void
 			{	
 				// Create the user

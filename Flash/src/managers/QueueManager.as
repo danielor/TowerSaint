@@ -120,6 +120,9 @@ package managers
 					var q:QueueObject = item.data as QueueObject;
 					var progress:ProgressBar = item.progress;
 					progress.setProgress(q.percentComplete, 1.0);
+					
+					// Update the buildState
+					q.buildObject.updateBuildState(q.percentComplete);
 				}
 				
 				// If the popup is open update it!

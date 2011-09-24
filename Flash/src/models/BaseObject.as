@@ -2,6 +2,7 @@ package models
 {
 	import assets.ColladaAssetLoader;
 	import assets.PhotoAssets;
+	
 	import away3d.containers.ObjectContainer3D;
 	import away3d.containers.Scene3D;
 	import away3d.containers.View3D;
@@ -47,6 +48,7 @@ package models
 	import models.away3D.Tower3D;
 	import models.constants.GameConstants;
 	import models.interfaces.BoundarySuperObject;
+	import models.interfaces.FilteredObject;
 	import models.interfaces.SuperObject;
 	import models.map.TowerSaintMarker;
 	
@@ -415,9 +417,12 @@ package models
 		
 		public function updateBuildState(i:Number):void
 		{
-			if(this.marker != null){
-				
+			
+			if(this.model is FilteredObject){
+				var f:FilteredObject = this.model as FilteredObject;
+				f.updateFilter(i);
 			}
+			
 		}
 		
 		public function updatePosition(loc:LatLng):void {
