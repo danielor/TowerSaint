@@ -6,6 +6,7 @@ package models
 	import away3d.containers.ObjectContainer3D;
 	import away3d.containers.Scene3D;
 	import away3d.containers.View3D;
+	import away3d.core.base.Mesh;
 	import away3d.core.base.Object3D;
 	import away3d.events.MouseEvent3D;
 	import away3d.loaders.Collada;
@@ -77,7 +78,7 @@ package models
 		private var markerEventManager:EventManager;									/* Manages events of the tower view */
 		private var modelEventManager:EventManager;										/* The event manager associated with the 3d model */
 		private var modelBounds:LatLngBounds;											/* Get the bounds of the object */
-		protected var model:ObjectContainer3D;													/* The 3D model of the object */
+		protected var model:Mesh;															/* The 3D model of the object */
 		private var modelDispatcher:EventDispatcher;									/* The event dispatcher sends events */
 		public var icon:BitmapAsset;													/* The icon associated with the current tower */
 
@@ -136,10 +137,21 @@ package models
 			}
 		}
 		
-		public function get3DObject():ObjectContainer3D {
+		public function get3DObject():Mesh {
 			return this.model;
 		}
 		
+		public function isDynamicBuild():Boolean{
+			return false;
+		}
+		
+		public function getNumberOfBuildStages():Number{
+			return 1;
+		}
+		
+		public function drawStage(bS:Number, l:LatLng):void {
+			
+		}
 		
 		public function draw(drag:Boolean, map:Map, photo:PhotoAssets, fpm:GameFocusManager, withBoundary:Boolean, scene:Scene3D, view:View3D):void
 		{

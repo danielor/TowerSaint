@@ -5,6 +5,7 @@ package models.interfaces
 	import away3d.containers.ObjectContainer3D;
 	import away3d.containers.Scene3D;
 	import away3d.containers.View3D;
+	import away3d.core.base.Mesh;
 	
 	import com.google.maps.LatLng;
 	import com.google.maps.LatLngBounds;
@@ -79,7 +80,10 @@ package models.interfaces
 		function getBoundaryPolygon():Polygon
 		function isObject(s:SuperObject):Boolean;
 		function getMarker():TowerSaintMarker;				/* Get marker associated with object */
-		function get3DObject():ObjectContainer3D;			// Return the 3d object associated with the container
+		function get3DObject():Mesh;						// Return the 3d object associated with the container
+		function isDynamicBuild():Boolean;					// Is build dynamic(road) or static(tower)?
+		function getNumberOfBuildStages():Number;			// Get the number of build stages.
+		function drawStage(bS:Number, l:LatLng):void;		// Update the dynamic superobject
 		
 		// Build State interface
 		function isIncompleteState():Boolean;				/* Has the objects finished building */

@@ -4,6 +4,7 @@ package managers
 	
 	import away3d.containers.ObjectContainer3D;
 	import away3d.containers.View3D;
+	import away3d.core.base.Mesh;
 	import away3d.events.MouseEvent3D;
 	import away3d.tools.utils.Drag3D;
 	
@@ -234,7 +235,7 @@ package managers
 		
 		// The 3d object
 		private function _removeViewFocus(m:SuperObject, b:Boolean):void {
-			var o:ObjectContainer3D = m.get3DObject();
+			var o:Mesh = m.get3DObject();
 			if(o is FilteredObject){
 				var f:FilteredObject = o as FilteredObject;
 				f.changeFilterState(b);
@@ -262,13 +263,7 @@ package managers
 			
 			// If the focusObject exists, make sure to remove the
 			// visual object
-			if(this._focusObject != null){
-				var o:ObjectContainer3D = this._focusObject.get3DObject();
-				if(o is FilteredObject){
-					var f:FilteredObject = o as FilteredObject;
-					f.changeFilterState(false);
-				}
-			}
+	
 			// Remove the view focus
 			if(this._focusObject != null){
 				_removeViewFocus(this._focusObject, false);

@@ -113,6 +113,7 @@ package models.states
 			this.mapEventManager.addEventListener(MapMouseEvent.MOUSE_UP, onMapMouseUp);
 			this.mapEventManager.addEventListener(MapMouseEvent.ROLL_OVER, onMapRollOver);
 			this.mapEventManager.addEventListener(MapMouseEvent.ROLL_OUT, onMapRollOut);
+			this.mapEventManager.addEventListener(MapMouseEvent.MOUSE_MOVE, onMapMouseMove);
 			this.mapEventManager.addEventListener(MapMoveEvent.MOVE_END, onMapMoveEnd);
 			this.mapEventManager.addEventListener(MapMoveEvent.MOVE_START, onMapMoveStart);
 			this.isInState = true;
@@ -175,6 +176,12 @@ package models.states
 				// Call the build state hook and return to the previous state
 				this.buildState.onMapMouseClick(event);
 				this._mouseState = BackgroundState.MOUSE_FOCUS;
+			}
+		}
+		
+		private function onMapMouseMove(event:MapMouseEvent):void {
+			if(this._mouseState == BackgroundState.MOUSE_BUILD){
+				
 			}
 		}
 		

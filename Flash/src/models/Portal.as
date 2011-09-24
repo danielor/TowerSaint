@@ -211,6 +211,9 @@ package models
 			return new LatLng(this.latitude, this.longitude);
 		}
 		
+		
+
+		
 
 	}
 }

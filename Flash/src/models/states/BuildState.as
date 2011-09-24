@@ -15,6 +15,8 @@ package models.states
 	import flash.display.BitmapData;
 	import flash.events.Event;
 	import flash.events.MouseEvent;
+	import flash.events.TimerEvent;
+	import flash.utils.Timer;
 	
 	import flashx.textLayout.elements.ParagraphElement;
 	import flashx.textLayout.elements.SpanElement;
@@ -74,8 +76,10 @@ package models.states
 		private var view:View3D											/* The view associated with the 3D scene */
 		private var focusPanelManager:GameFocusManager;					/* The focus panel manager handles game object focus */
 		private var currentPolygons:ArrayCollection;					/* The polygons that make up the current boundary */
+		private var buildStage:Number;									/* For multi stage builds this count holds the stage */
+		private var buildStageTimer:Timer;								/* The build stage timer */
+		private var buildStatePosition:LatLng;							/* The build stage position */
 		// Constants determine whether the state has the active mouse
-		
 		public function BuildState(a:Application, m:Map, u:User, uOM:UserObjectManager, qM:QueueManager, uB:PolygonBoundaryManager,
 					gm:GameManager, rT:ResourceProductionText, p:PhotoAssets, lOFM:ArrayCollection, s:Scene3D, v:View3D,
 					fPM:GameFocusManager)
@@ -93,7 +97,9 @@ package models.states
 			this.scene = s;
 			this.view = v;
 			this.focusPanelManager = fPM;
+			this.buildStage = 0;
 			this.isInState = false;
+			this.buildStageTimer = null;
 		}
 		
 		// Event objects that need to be set
@@ -357,47 +363,103 @@ package models.states
 			}
 		}
 		
+		// The map mouse move
+		public function onMapMouseMove(event:MapMouseEvent):void {
+			if(this._newBuildObject.isDynamicBuild()){
+				// Draw properly 
+				if(this.buildStage >= 1){
+					if(this.buildStageTimer == null){
+						// Set a timer for a certain 
+						this.buildStageTimer = new Timer(100, 1);
+						this.buildStageTimer.addEventListener(TimerEvent.TIMER_COMPLETE, onMapMouseTimerDraw);
+					}
+					this.buildStageTimer.reset();
+					this.buildStatePosition = event.latLng;			// The lat lng
+				}
+			}
+		}
+		
+		// Dynamically draw object after a timer interval
+		private function onMapMouseTimerDraw(event:TimerEvent):void {
+			this._newBuildObject.drawStage(this.buildStage, this.buildStatePosition);
+		}
+		
 		// Deferred events handle map inputs.(Called in background state)
 		public function onMapMouseClick(event:MapMouseEvent):void {
 			var pos:LatLng = event.latLng;
+			
 			if(this.userBoundary.isInsidePolygon(pos)){
-				if(!this.intersectsCurrentObject(pos)){
-					// Setup the action state
-					var b:BuildActionGroup = this.gameManager.getActionGroup(GameManager._buildState) as BuildActionGroup;
-					var c:Class = this.pictureForObject();
-					b.buildImage.source = new c as BitmapAsset;
-					
-					// Create/Set the text flow object
-					var textFlow:TextFlow = new TextFlow();
-					var pGraph:ParagraphElement = new ParagraphElement();
-					var iSpan:SpanElement = new SpanElement();
-					iSpan.text = getBuildString();
-					pGraph.addChild(iSpan);
-					textFlow.addChild(pGraph);
-					b.buildText.textFlow = textFlow;
-					
-					// Change the state
-					this.gameManager.changeState(GameManager._buildState);;
-					
-					// Create an object from the object picture
-					this._newBuildObject.initialize(this.user);
-					this._newBuildObject.setPosition(pos);
-					this._newBuildObject.draw(true, this.map, this.photo, this.focusPanelManager, true, this.scene, this.view);
-					this._newBuildObject.addEventListener(MapMouseEvent.DRAG_END, onDragEnd);
-					
-					// Add the object to the empire boundary
-					this.userBoundary.addAndDraw(_newBuildObject);
-					
-					// Change the cursor manager
-					CursorManager.removeAllCursors();
+				if(this._newBuildObject.isDynamicBuild()){
+					// If initial??
+					if(this.buildStage == 0){
+						_drawBuildFromClick(pos);
+					}
 					
 					
-					// Change the deferred event
-					var p:PropertyChangeEvent = new PropertyChangeEvent(BackgroundState.MOUSE_FOCUS);
-					p.newValue = BackgroundState.MOUSE_FOCUS;
-					this.app.dispatchEvent(p);
-				}	
+					// The shift key switches the build stage
+					if(event.shiftKey){
+						this.buildStage = this.buildStage - 1;
+					}else {
+						this.buildStage = this.buildStage + 1;
+					}
+					
+					// If we have reached the critical stage
+					if(this._newBuildObject.getNumberOfBuildStages() == this.buildStage){
+						this.buildStage = 0;
+						_changeMouseBuildState();
+					}
+					
+				}else{
+					if(!this.intersectsCurrentObject(pos)){
+						_drawBuildFromClick(pos);
+						_changeMouseBuildState();
+					}
+				}
+			}else{
+				if(this._newBuildObject.isDynamicBuild()){
+					this.buildStage = this.buildStage - 1;
+				}
 			}
+		}
+		
+		// Change the mouse state
+		private function _changeMouseBuildState():void {
+			// Change the deferred event
+			var p:PropertyChangeEvent = new PropertyChangeEvent(BackgroundState.MOUSE_FOCUS);
+			p.newValue = BackgroundState.MOUSE_FOCUS;
+			this.app.dispatchEvent(p);
+		}
+		
+		// Update the draw elements
+		private function _drawBuildFromClick(pos:LatLng):void {
+			// Setup the action state
+			var b:BuildActionGroup = this.gameManager.getActionGroup(GameManager._buildState) as BuildActionGroup;
+			var c:Class = this.pictureForObject();
+			b.buildImage.source = new c as BitmapAsset;
+			
+			// Create/Set the text flow object
+			var textFlow:TextFlow = new TextFlow();
+			var pGraph:ParagraphElement = new ParagraphElement();
+			var iSpan:SpanElement = new SpanElement();
+			iSpan.text = getBuildString();
+			pGraph.addChild(iSpan);
+			textFlow.addChild(pGraph);
+			b.buildText.textFlow = textFlow;
+			
+			// Change the state
+			this.gameManager.changeState(GameManager._buildState);;
+			
+			// Create an object from the object picture
+			this._newBuildObject.initialize(this.user);
+			this._newBuildObject.setPosition(pos);
+			this._newBuildObject.draw(true, this.map, this.photo, this.focusPanelManager, true, this.scene, this.view);
+			this._newBuildObject.addEventListener(MapMouseEvent.DRAG_END, onDragEnd);
+			
+			// Add the object to the empire boundary
+			this.userBoundary.addAndDraw(_newBuildObject);
+			
+			// Change the cursor manager
+			CursorManager.removeAllCursors();
 		}
 	
 		// If the build object check if it is a valid location.
