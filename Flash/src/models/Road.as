@@ -37,6 +37,7 @@ package models
 	import models.interfaces.SuperObject;
 	import models.map.TowerSaintMarker;
 	
+	import mx.controls.Alert;
 	import mx.core.BitmapAsset;
 
 	[Bindable]

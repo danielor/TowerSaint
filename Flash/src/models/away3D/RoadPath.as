@@ -28,15 +28,22 @@ package models.away3D
 		private var endPosition:LatLng;									// The end position of the path
 		private var _map:Map;											// The map variable.
 		private var _bitmap:Bitmap;										// Bitmap associated with the picture
+		private var _scene:Scene3D;										// The scene which draws the child.
+		private var firstDraw:Boolean;									// True after the child is added to the scene
 		public function RoadPath()
 		{
+			// Set the state
 			this._bitmap = null;
+			this.firstDraw = true;
 			super();
 		}
 		
 		// Set the map variable
 		public function set map(_m:Map):void {
 			_map = _m;
+		}
+		public function set scene(_s:Scene3D):void {
+			_scene = _s;
 		}
 		
 		// Update the path of points
@@ -46,6 +53,10 @@ package models.away3D
 			}else{
 				endPosition = l;
 				drawRandomPathBetweenPositions(photo);
+				if(this.firstDraw){
+					this.firstDraw = false;
+					this.scene.addChild(this);
+				}
 			}
 		}
 		

@@ -46,6 +46,7 @@ package models
 	import messaging.ChannelJavascriptBridge;
 	import messaging.events.ChannelAttackEvent;
 	
+	import models.away3D.RoadPath;
 	import models.away3D.Tower3D;
 	import models.constants.GameConstants;
 	import models.interfaces.BoundarySuperObject;
@@ -155,27 +156,36 @@ package models
 		
 		public function draw(drag:Boolean, map:Map, photo:PhotoAssets, fpm:GameFocusManager, withBoundary:Boolean, scene:Scene3D, view:View3D):void
 		{
+			Alert.show("Begin Build");
 			var i:Number = 1.9;
-	
-			var bitmapData:BitmapData = new BitmapData(this.model.objectWidth /i, this.model.objectHeight / i, true, 0x00FFFFFF);
-			var asset:BitmapAsset = new BitmapAsset(bitmapData);
 			
-			// Extract the position associated with remoteObject(Tower)		
-			var b:LatLngBounds = map.getLatLngBounds();
-			var gposition:LatLng = this.getPosition(b);
+			if(!this.isDynamicBuild()){
+				var bitmapData:BitmapData = new BitmapData(this.model.objectWidth /i, this.model.objectHeight / i, true, 0x00FFFFFF);
+				var asset:BitmapAsset = new BitmapAsset(bitmapData);
+				
+				// Extract the position associated with remoteObject(Tower)		
+				var b:LatLngBounds = map.getLatLngBounds();
+				var gposition:LatLng = this.getPosition(b);
+				
+				// Create test overlays
+				var markerOptions : MarkerOptions = new MarkerOptions();
+				markerOptions.icon = asset;
+				markerOptions.iconAlignment = MarkerOptions.ALIGN_BOTTOM | MarkerOptions.ALIGN_HORIZONTAL_CENTER;
+				markerOptions.hasShadow = true;
+				markerOptions.clickable = true;
+				markerOptions.radius = 5;
+				markerOptions.draggable = drag;
+				
+				// Create the marker
+				marker = new TowerSaintMarker(this, gposition, markerOptions, map, view);
 			
-			// Create test overlays
-			var markerOptions : MarkerOptions = new MarkerOptions();
-			markerOptions.icon = asset;
-			markerOptions.iconAlignment = MarkerOptions.ALIGN_BOTTOM | MarkerOptions.ALIGN_HORIZONTAL_CENTER;
-			markerOptions.hasShadow = true;
-			markerOptions.clickable = true;
-			markerOptions.radius = 5;
-			markerOptions.draggable = drag;
-			
-			// Create the marker
-			marker = new TowerSaintMarker(this, gposition, markerOptions, map, view);
-			
+				// Add the marker to the map
+				map.addOverlay(this.marker);
+				
+				// Create the bounds around the point
+				this.createBoundsAroundPoint(gposition, map, view);
+				this.generateBoundaryPolygon(map);
+			}
 			
 			// Copy over the icon data
 			icon = getImage(photo);
@@ -183,17 +193,31 @@ package models
 			
 			// Change the state of the program
 			this._isDrawn = true;
-			
+			Alert.show("Before away3D");
 			// Map the position to the map
-			currentPoint = GameConstants.fromMapToAway3D(gposition, map);
-			this.model.x = currentPoint.x;
-			this.model.y = currentPoint.y;
-			this.model.z = 0.;
-			this.model.ownCanvas = true;
-			
-			// Add the container to the scene
-			scene.addChild(this.model);
-			
+			if(!this.isDynamicBuild()){
+				currentPoint = GameConstants.fromMapToAway3D(gposition, map);
+				this.model.x = currentPoint.x;
+				this.model.y = currentPoint.y;
+				this.model.z = 0.;
+				this.model.ownCanvas = true;
+		
+				// Add the container to the scene
+				scene.addChild(this.model);
+			}else{
+				// Dynamic build objects (i.e The ones that change with user input)
+				// are null upon intial drawing. The intial drawing sets up the 
+				// handlers for objects. Away3D does not play nice(buildPrimitive)
+				// with empty paths, so this is needed
+				// TODO: Other dynamic builds???
+				if(this.model is RoadPath){
+					var rp:RoadPath = this.model as RoadPath;
+					rp.map = map;
+					rp.scene = scene;
+				}
+			}
+			Alert.show("After away3D");
+
 			
 			// Create an event manager associated with the marker
 			this.markerEventManager = new EventManager(this.marker);
@@ -204,12 +228,7 @@ package models
 				this.markerEventManager.addEventListener(MapMouseEvent.DRAG_END, this.onDragEnd);
 			}
 			
-			// Add the marker to the map
-			map.addOverlay(this.marker);
-			
-			// Create the bounds around the point
-			this.createBoundsAroundPoint(gposition, map, view);
-			this.generateBoundaryPolygon(map);
+
 		}
 		
 		private function onMarkerClick(event:MapMouseEvent) : void {

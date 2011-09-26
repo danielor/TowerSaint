@@ -384,6 +384,7 @@ package models.states
 		
 		// Dynamically draw object after a timer interval
 		private function onMapMouseTimerDraw(event:TimerEvent):void {
+			Alert.show("Draw Stage");
 			this._newBuildObject.drawStage(this.buildStage, this.buildStatePosition, this.photo);
 		}
 		
@@ -393,12 +394,7 @@ package models.states
 			
 			if(this.userBoundary.isInsidePolygon(pos)){
 				if(this._newBuildObject.isDynamicBuild()){
-					// If initial??
-					if(this.buildStage == 0){
-						_drawBuildFromClick(pos);
-						this._newBuildObject.drawStage(this.buildStage, pos, this.photo);
-					}
-					
+					Alert.show("Dynamic Build" + this.buildStage.toString() + ":" + this._newBuildObject.getNumberOfBuildStages());
 					
 					// The shift key switches the build stage
 					if(event.shiftKey){
@@ -407,16 +403,25 @@ package models.states
 						this.buildStage = this.buildStage + 1;
 					}
 					
+					// If initial??
+					if(this.buildStage == 1){
+						_drawBuildFromClick(pos);
+						this._newBuildObject.drawStage(this.buildStage, pos, this.photo);
+					}
+					
+					
+
+					
 					// If we have reached the critical stage
 					if(this._newBuildObject.getNumberOfBuildStages() == this.buildStage){
 						this.buildStage = 0;
-						_changeMouseBuildState();
+						_finishBuildFromClick();
 					}
 					
 				}else{
 					if(!this.intersectsCurrentObject(pos)){
 						_drawBuildFromClick(pos);
-						_changeMouseBuildState();
+						_finishBuildFromClick();
 					}
 				}
 			}else{
@@ -427,15 +432,7 @@ package models.states
 		}
 		
 		// Change the mouse state
-		private function _changeMouseBuildState():void {
-			// Change the deferred event
-			var p:PropertyChangeEvent = new PropertyChangeEvent(BackgroundState.MOUSE_FOCUS);
-			p.newValue = BackgroundState.MOUSE_FOCUS;
-			this.app.dispatchEvent(p);
-		}
-		
-		// Update the draw elements
-		private function _drawBuildFromClick(pos:LatLng):void {
+		private function _finishBuildFromClick():void {
 			// Setup the action state
 			var b:BuildActionGroup = this.gameManager.getActionGroup(GameManager._buildState) as BuildActionGroup;
 			var c:Class = this.pictureForObject();
@@ -453,17 +450,25 @@ package models.states
 			// Change the state
 			this.gameManager.changeState(GameManager._buildState);;
 			
-			// Create an object from the object picture
-			this._newBuildObject.initialize(this.user);
-			this._newBuildObject.setPosition(pos);
-			this._newBuildObject.draw(true, this.map, this.photo, this.gameFocusManager, true, this.scene, this.view);
-			this._newBuildObject.addEventListener(MapMouseEvent.DRAG_END, onDragEnd);
-			
 			// Add the object to the empire boundary
 			this.userBoundary.addAndDraw(_newBuildObject);
 			
 			// Change the cursor manager
 			CursorManager.removeAllCursors();
+			
+			// Change the deferred event
+			var p:PropertyChangeEvent = new PropertyChangeEvent(BackgroundState.MOUSE_FOCUS);
+			p.newValue = BackgroundState.MOUSE_FOCUS;
+			this.app.dispatchEvent(p);
+		}
+		
+		// Update the draw elements
+		private function _drawBuildFromClick(pos:LatLng):void {
+			// Create an object from the object picture
+			this._newBuildObject.initialize(this.user);
+			this._newBuildObject.setPosition(pos);
+			this._newBuildObject.draw(true, this.map, this.photo, this.gameFocusManager, true, this.scene, this.view);
+			this._newBuildObject.addEventListener(MapMouseEvent.DRAG_END, onDragEnd);
 		}
 	
 		// If the build object check if it is a valid location.
