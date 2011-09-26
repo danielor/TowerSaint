@@ -157,7 +157,7 @@ package models.states
 		private function onMapMouseDown(event:MapMouseEvent):void {
 			this.isClicked = true;
 			if(this._mouseState == BackgroundState.MOUSE_FOCUS){
-				this.gameFocus.onMouseClick(event);
+				this.gameFocus.setFocusFromMapEvent(event);
 
 				// Get the focus object
 				var focusObject:SuperObject = this.gameFocus.focusObject;
@@ -181,7 +181,7 @@ package models.states
 		
 		private function onMapMouseMove(event:MapMouseEvent):void {
 			if(this._mouseState == BackgroundState.MOUSE_BUILD){
-				
+				this.buildState.onMapMouseMove(event);
 			}
 		}
 		

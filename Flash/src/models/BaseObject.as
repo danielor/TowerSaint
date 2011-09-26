@@ -149,7 +149,7 @@ package models
 			return 1;
 		}
 		
-		public function drawStage(bS:Number, l:LatLng):void {
+		public function drawStage(bS:Number, l:LatLng, p:PhotoAssets):void {
 			
 		}
 		

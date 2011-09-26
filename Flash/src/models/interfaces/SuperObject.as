@@ -79,11 +79,11 @@ package models.interfaces
 		function isVisible(map:Map):Boolean;
 		function getBoundaryPolygon():Polygon
 		function isObject(s:SuperObject):Boolean;
-		function getMarker():TowerSaintMarker;				/* Get marker associated with object */
-		function get3DObject():Mesh;						// Return the 3d object associated with the container
-		function isDynamicBuild():Boolean;					// Is build dynamic(road) or static(tower)?
-		function getNumberOfBuildStages():Number;			// Get the number of build stages.
-		function drawStage(bS:Number, l:LatLng):void;		// Update the dynamic superobject
+		function getMarker():TowerSaintMarker;								/* Get marker associated with object */
+		function get3DObject():Mesh;										// Return the 3d object associated with the container
+		function isDynamicBuild():Boolean;									// Is build dynamic(road) or static(tower)?
+		function getNumberOfBuildStages():Number;							// Get the number of build stages.
+		function drawStage(bS:Number, l:LatLng, p:PhotoAssets):void;		// Update the dynamic superobject
 		
 		// Build State interface
 		function isIncompleteState():Boolean;				/* Has the objects finished building */

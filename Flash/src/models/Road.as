@@ -192,9 +192,14 @@ package models
 			return 2;
 		}
 		
+		override public function isDynamicBuild():Boolean {
+			return true;
+		}
+		
 		// Build the road in stages
-		override public function drawStage(bS:Number, l:LatLng):void{
-			
+		override public function drawStage(bS:Number, l:LatLng, p:PhotoAssets):void{
+			var lr:RoadPath = this.model as RoadPath;
+			lr.updatePath(bS, l, p);
 		}
 		
 		/* Return the textflow representation of the model */

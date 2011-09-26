@@ -138,7 +138,7 @@ package models.states
 			this.mapEventHandler = new EventManager(this.map);
 			this.mapEventHandler.addEventListener(MapMouseEvent.DRAG_START, onMapDragStart);
 			this.mapEventHandler.addEventListener(MapMouseEvent.DRAG_END, onMapDragEnd);
-			this.mapEventHandler.addEventListener(MapMouseEvent.MOUSE_DOWN, this.fpm.onMouseClick);
+			this.mapEventHandler.addEventListener(MapMouseEvent.MOUSE_DOWN, this.fpm.setFocusFromMapEvent);
 
 			// Create the address popup associated with the location of the capital
 			this.createAddressPopup();

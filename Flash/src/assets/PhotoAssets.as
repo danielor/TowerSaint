@@ -1,5 +1,7 @@
 package assets
 {
+	import flash.display.Bitmap;
+	
 	import models.Portal;
 
 	public class PhotoAssets
@@ -60,5 +62,7 @@ package assets
 		{
 			
 		}
+		
+
 	}
 }

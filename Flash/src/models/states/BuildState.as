@@ -74,7 +74,7 @@ package models.states
 		private var listOfUserModels:ArrayCollection;					/* The list of models associated with the game */
 		private var scene:Scene3D										/* The scene where the away3D objects exist */
 		private var view:View3D											/* The view associated with the 3D scene */
-		private var focusPanelManager:GameFocusManager;					/* The focus panel manager handles game object focus */
+		private var gameFocusManager:GameFocusManager;					/* The focus panel manager handles game object focus */
 		private var currentPolygons:ArrayCollection;					/* The polygons that make up the current boundary */
 		private var buildStage:Number;									/* For multi stage builds this count holds the stage */
 		private var buildStageTimer:Timer;								/* The build stage timer */
@@ -96,7 +96,7 @@ package models.states
 			this.listOfUserModels = lOFM;
 			this.scene = s;
 			this.view = v;
-			this.focusPanelManager = fPM;
+			this.gameFocusManager = fPM;
 			this.buildStage = 0;
 			this.isInState = false;
 			this.buildStageTimer = null;
@@ -375,13 +375,16 @@ package models.states
 					}
 					this.buildStageTimer.reset();
 					this.buildStatePosition = event.latLng;			// The lat lng
+				}else{
+					// Highlight the objects with focus, when a dynamic object 
+					this.gameFocusManager.setFocusFromMapEvent(event);
 				}
 			}
 		}
 		
 		// Dynamically draw object after a timer interval
 		private function onMapMouseTimerDraw(event:TimerEvent):void {
-			this._newBuildObject.drawStage(this.buildStage, this.buildStatePosition);
+			this._newBuildObject.drawStage(this.buildStage, this.buildStatePosition, this.photo);
 		}
 		
 		// Deferred events handle map inputs.(Called in background state)
@@ -393,6 +396,7 @@ package models.states
 					// If initial??
 					if(this.buildStage == 0){
 						_drawBuildFromClick(pos);
+						this._newBuildObject.drawStage(this.buildStage, pos, this.photo);
 					}
 					
 					
@@ -452,7 +456,7 @@ package models.states
 			// Create an object from the object picture
 			this._newBuildObject.initialize(this.user);
 			this._newBuildObject.setPosition(pos);
-			this._newBuildObject.draw(true, this.map, this.photo, this.focusPanelManager, true, this.scene, this.view);
+			this._newBuildObject.draw(true, this.map, this.photo, this.gameFocusManager, true, this.scene, this.view);
 			this._newBuildObject.addEventListener(MapMouseEvent.DRAG_END, onDragEnd);
 			
 			// Add the object to the empire boundary

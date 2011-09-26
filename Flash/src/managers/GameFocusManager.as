@@ -131,7 +131,7 @@ package managers
 		}
 		
 		// Upon pressing down give focus to the event
-		public function onMouseClick(e:MapMouseEvent) : void {
+		public function setFocusFromMapEvent(e:MapMouseEvent) : void {
 			var found:Boolean = false;
 			for(var i:int = 0; i < this._listOfModels.length; i++){
 				var s:SuperObject = this._listOfModels[i] as SuperObject;
