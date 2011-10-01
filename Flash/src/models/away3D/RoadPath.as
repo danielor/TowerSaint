@@ -17,6 +17,8 @@ package models.away3D
 	import flash.geom.Vector3D;
 	
 	import models.constants.GameConstants;
+	
+	import mx.controls.Alert;
 
 	/* 
 	Road path uses away3D to draw a path on google maps. 
@@ -35,6 +37,8 @@ package models.away3D
 			// Set the state
 			this._bitmap = null;
 			this.firstDraw = true;
+			this.bothsides = true;
+			this.subdivision = 2;
 			super();
 		}
 		
@@ -43,6 +47,7 @@ package models.away3D
 			_map = _m;
 		}
 		public function set scene(_s:Scene3D):void {
+			Alert.show("Set Scene");
 			_scene = _s;
 		}
 		
@@ -51,17 +56,19 @@ package models.away3D
 			if(bS == 0){
 				startPosition = l;
 			}else{
+				
 				endPosition = l;
 				drawRandomPathBetweenPositions(photo);
 				if(this.firstDraw){
 					this.firstDraw = false;
-					this.scene.addChild(this);
+					this._scene.addChild(this);
 				}
 			}
 		}
 		
 		// draw the random path between the positions
 		private function drawRandomPathBetweenPositions(photo:PhotoAssets):void {
+
 			// Get the distance and angle
 			var distance:Number = startPosition.distanceFrom(this.endPosition);
 			var angle:Number = startPosition.angleFrom(this.endPosition);
@@ -73,23 +80,34 @@ package models.away3D
 									endPoint.y - startPoint.y);
 			// Calculate the number of points
 			// TODO: Make paths curved.
-			var numberOfPoints:Number = distance  * this.numberOfPointsPerL;
-			
+			var numberOfPoints:Number = distance ;
+		
 			// Create a path
-			var pathPoint:Array = new Array();		
-			var scale:Number = Math.sqrt(dP.x * dP.x + dP.y * dP.y) / numberOfPoints;
-			for(var i:int = 0; i < numberOfPoints; i++){
-				var v:Vector3D = new Vector3D(startPoint.x + dP.x * scale, endPoint.y + dP.y * scale, -.01);
-				pathPoint.push(v);
+			
+			
+			var startVector:Vector3D = new Vector3D(startPoint.x, startPoint.y, -100);
+			var controlVector:Vector3D = new Vector3D((startPoint.x + endPoint.x) / 2., (startPoint.y + endPoint.y) / 2, -100);
+			var endVector:Vector3D = new Vector3D(endPoint.x, endPoint.y, -100);
+			var pC:PathCommand;
+			if(endPoint.x < startPoint.x){
+				pC = new PathCommand(PathCommand.CURVE, startVector, controlVector, endVector);
+			}else{
+				pC = new PathCommand(PathCommand.CURVE, endVector, controlVector, startVector);
 			}
-			var path:Path = new Path(pathPoint);
+			var pathPoint:Vector.<PathCommand> = new Vector.<PathCommand>();
+			pathPoint.push(pC);
+			//Alert.show(pathPoint.toString());
+			this.path = new Path();
+			this.path.aSegments = pathPoint;			// Save the list of information
 			
 			// Create the profile to extrude, and set it equal to the proper value
 			var profileWidth:Number = 10;
 			var pF:Array = new Array();
-			var pv:Vector3D = new Vector3D(profileWidth * Math.acos(angle), profileWidth * Math.asin(angle), 0.);
-			var pv2:Vector3D = new Vector3D(profileWidth * Math.acos(angle), profileWidth * Math.asin(angle), 0.);
-			pv2.negate();
+			//var pv:Vector3D = new Vector3D(profileWidth * Math.acos(angle), profileWidth * Math.asin(angle), 0.);
+			//var pv2:Vector3D = new Vector3D(profileWidth * Math.acos(angle), profileWidth * Math.asin(angle), 0.);
+			var pv:Vector3D = new Vector3D(0., 10., 0.);
+			var pv2:Vector3D = new Vector3D(0., -10, 0.);
+			//pv2.negate();
 			pF.push(pv);pF.push(pv2);
 			this.profile = pF;
 			
@@ -100,8 +118,7 @@ package models.away3D
 				this.material = bm;
 			}
 			
-			// Set the path variable
-			this.path = path;
+			
 		}
 		
 		// Return the distance between a point and a line

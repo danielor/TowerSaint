@@ -230,7 +230,9 @@ package managers
 			this.hasFocus = false;
 			
 			// Change the view focus if available.
-			this._removeViewFocus(this._focusObject, false);
+			if(this._focusObject != null){
+				this._removeViewFocus(this._focusObject, false);
+			}
 		}
 		
 		// The 3d object

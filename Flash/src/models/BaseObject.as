@@ -185,6 +185,15 @@ package models
 				// Create the bounds around the point
 				this.createBoundsAroundPoint(gposition, map, view);
 				this.generateBoundaryPolygon(map);
+				
+				this.markerEventManager = new EventManager(this.marker);
+				this.markerEventManager.addEventListener(MapMouseEvent.CLICK, onMarkerClick);
+				if(drag){
+					// Add events associated with the dragging of the marker on the screen
+					this.markerEventManager.addEventListener(MapMouseEvent.DRAG_START, this.onDragStart);
+					this.markerEventManager.addEventListener(MapMouseEvent.DRAG_END, this.onDragEnd);
+				}
+				
 			}
 			
 			// Copy over the icon data
@@ -193,7 +202,6 @@ package models
 			
 			// Change the state of the program
 			this._isDrawn = true;
-			Alert.show("Before away3D");
 			// Map the position to the map
 			if(!this.isDynamicBuild()){
 				currentPoint = GameConstants.fromMapToAway3D(gposition, map);
@@ -215,19 +223,7 @@ package models
 					rp.map = map;
 					rp.scene = scene;
 				}
-			}
-			Alert.show("After away3D");
-
-			
-			// Create an event manager associated with the marker
-			this.markerEventManager = new EventManager(this.marker);
-			this.markerEventManager.addEventListener(MapMouseEvent.CLICK, onMarkerClick);
-			if(drag){
-				// Add events associated with the dragging of the marker on the screen
-				this.markerEventManager.addEventListener(MapMouseEvent.DRAG_START, this.onDragStart);
-				this.markerEventManager.addEventListener(MapMouseEvent.DRAG_END, this.onDragEnd);
-			}
-			
+			}	
 
 		}
 		

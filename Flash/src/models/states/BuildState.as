@@ -370,11 +370,14 @@ package models.states
 				if(this.buildStage >= 1){
 					if(this.buildStageTimer == null){
 						// Set a timer for a certain 
-						this.buildStageTimer = new Timer(100, 1);
-						this.buildStageTimer.addEventListener(TimerEvent.TIMER_COMPLETE, onMapMouseTimerDraw);
+						this.buildStageTimer = new Timer(250, 1);
+						this.buildStageTimer.addEventListener(TimerEvent.TIMER, onMapMouseTimerDraw);
+						this.buildStageTimer.start();
+					}else{
+						this.buildStageTimer.reset();
+						this.buildStatePosition = event.latLng;			// The lat lng
+						this.buildStageTimer.start();
 					}
-					this.buildStageTimer.reset();
-					this.buildStatePosition = event.latLng;			// The lat lng
 				}else{
 					// Highlight the objects with focus, when a dynamic object 
 					this.gameFocusManager.setFocusFromMapEvent(event);
@@ -384,8 +387,8 @@ package models.states
 		
 		// Dynamically draw object after a timer interval
 		private function onMapMouseTimerDraw(event:TimerEvent):void {
-			Alert.show("Draw Stage");
-			this._newBuildObject.drawStage(this.buildStage, this.buildStatePosition, this.photo);
+			this.buildStageTimer = null;
+			this._newBuildObject.drawStage(1, this.buildStatePosition, this.photo);
 		}
 		
 		// Deferred events handle map inputs.(Called in background state)
@@ -394,7 +397,7 @@ package models.states
 			
 			if(this.userBoundary.isInsidePolygon(pos)){
 				if(this._newBuildObject.isDynamicBuild()){
-					Alert.show("Dynamic Build" + this.buildStage.toString() + ":" + this._newBuildObject.getNumberOfBuildStages());
+					//Alert.show("Dynamic Build" + this.buildStage.toString() + ":" + this._newBuildObject.getNumberOfBuildStages());
 					
 					// The shift key switches the build stage
 					if(event.shiftKey){
@@ -405,8 +408,8 @@ package models.states
 					
 					// If initial??
 					if(this.buildStage == 1){
+						this._newBuildObject.drawStage(0, pos, this.photo);
 						_drawBuildFromClick(pos);
-						this._newBuildObject.drawStage(this.buildStage, pos, this.photo);
 					}
 					
 					

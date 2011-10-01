@@ -175,7 +175,7 @@ package models.states
 			}else if(this._mouseState == BackgroundState.MOUSE_BUILD){
 				// Call the build state hook and return to the previous state
 				this.buildState.onMapMouseClick(event);
-				this._mouseState = BackgroundState.MOUSE_FOCUS;
+				//this._mouseState = BackgroundState.MOUSE_FOCUS;
 			}
 		}
 		
