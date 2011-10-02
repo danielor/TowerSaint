@@ -375,10 +375,10 @@ class Road(GeoModel, BoundsPlugin):
     user = db.ReferenceProperty(User)
     
     # The latitude and longitude associated with the objects
-    lonIndex = db.IntegerProperty()
-    latIndex = db.IntegerProperty()
-    latitude = db.FloatProperty() 
-    longitude = db.FloatProperty()
+    startLatitude = db.FloatProperty() 
+    startLongitude = db.FloatProperty()
+    endLatitude = db.FloatProperty()
+    endLongitude = db.FloatProperty()
     
    
     @classmethod
@@ -396,18 +396,23 @@ class Road(GeoModel, BoundsPlugin):
         return """<Road>
                     <hitpoints>%s</hitpoints>
                     <level>%s</level>
-                    <latitude>%s</latitude>
-                    <longitude>%s</longitude>
+                    <startlatitude>%s</startlatitude>
+                    <startlongitude>%s</startlongitude>
+                    <endlatitude>%s</endlatitude>
+                    <endlongitude>%s</endlongitude>
                     <isComplete>%s</isComplete>
                     %s
-                  </Road>""" %(self.hitPoints, self.level, self.latitude, self.longitude, self.isComplete, userString)
+                  </Road>""" %(self.hitPoints, self.level, self.startLatitude, self.startLongitude,
+                               self.endLatitude, self.endLongitude, self.isComplete, userString)
 
     def toJSON(self):
         """Get the json equivalent of the model. The JSON should be consistent throughout
         all of the models"""
         return {"Class" : "Road", "Value" : {'level' : self.level,
-                                             'latitude' : self.latitude,
-                                             'longitude' : self.longitude,
+                                             'startlatitude' : self.startLatitude,
+                                             'endlatitude' : self.endLatitiude,
+                                             'startlongitude' : self.startLongitude,
+                                             'endlongitude' : self.endLongitude,
                                              'user' : self.user.toJSON()}}
         
     def toCompleteJSON(self):
@@ -415,8 +420,10 @@ class Road(GeoModel, BoundsPlugin):
         that own the object"""
         return {"Class" : "User", "Value" : {'level' : self.level,
                                              'hitpoints' : self.hitPoints,
-                                             'latitude' : self.latitude,
-                                             'longitude' : self.longitude,
+                                             'startlatitude' : self.startLatitude,
+                                             'endlatitude' : self.endLatitude,
+                                             'startlongitude' : self.startLongitude,
+                                             'endlongitude' : self.endLongitude,
                                              'iscomplete' : self.isComplete,
                                              'user' : self.user.toJSON()}}
 
@@ -425,11 +432,11 @@ class Road(GeoModel, BoundsPlugin):
         Setup an object randomly in some model.Bounds
         """
         location = bounds.createRandomLocationInBounds()
-        self.latitude = location.latitude
-        self.longitude = location.longitude
-        self.latIndex = int(self.latitude / Constants.latIndex())
-        self.lonIndex = int(self.longitude / Constants.lonIndex())
-        self.location = db.GeoPt(self.latitude, self.longitude)
+        self.startLatitude = location.latitude
+        self.startLongitude = location.startLongitude
+        self.latIndex = int(self.startLatitude / Constants.latIndex())
+        self.lonIndex = int(self.startLongitude / Constants.lonIndex())
+        self.location = db.GeoPt(self.startLatitude, self.startLongitude)
         self.update_location()
         
     @classmethod
@@ -445,7 +452,7 @@ class Road(GeoModel, BoundsPlugin):
     
     def getPosition(self):
         """Returns a list of positions associated with this object"""
-        return [db.GeoPt(self.latitude, self.longitude)]
+        return [db.GeoPt(self.startLatitude, self.startLatitude), db.GeoPt(self.endLatitude, self.endLongitude)]
     
 class Tower(GeoModel, BoundsPlugin):
 #class Tower(db.Model):

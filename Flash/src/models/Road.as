@@ -53,13 +53,11 @@ package models
 		// Who owns it?
 		public var user:User;
 		
-		// Location 
-		public var latIndex:int;
-		public var lonIndex:int;
-		public var latitude:Number;
-		public var longitude:Number;
-		
-		
+		//  The beginning and end of a road.
+		public var startLatitude:Number;
+		public var startLongitude:Number;
+		public var endLatitude:Number;
+		public var endLongitude:Number;
 		
 		public function Road()
 		{
@@ -82,8 +80,10 @@ package models
 			var r:Road = new Road();
 			r.hitPoints = buildObject.hitpoints;
 			r.level = buildObject.level;
-			r.latitude = buildObject.latitude;
-			r.longitude = buildObject.longitude;
+			r.startLatitude = buildObject.startlatitude;
+			r.startLongitude = buildObject.startLongitude;
+			r.endLatitude = buildObject.endlatitude;
+			r.endLongitude = buildObject.endlongitude;
 			r.isComplete = buildObject.iscomplete;
 			return r;
 		}
@@ -91,8 +91,10 @@ package models
 		public static function createRoadFromJSON(buildObject:Object):Road{
 			var r:Road = new Road();
 			r.level = buildObject.level;
-			r.latitude = buildObject.latitude;
-			r.longitude = buildObject.longitude;
+			r.startLatitude = buildObject.startlatitude;
+			r.startLongitude = buildObject.startLongitude;
+			r.endLatitude = buildObject.endlatitude;
+			r.endLongitude = buildObject.endlongitude;
 			r.user = User.createUserFromJSON(buildObject.user);
 			return r;
 		}
@@ -124,10 +126,14 @@ package models
 		override public function isEqual(s:SuperObject) : Boolean {
 			if(s is Road){
 				var r:Road = s as Road;
-				var pos:LatLng = new LatLng(this.latitude, this.longitude);
-				var cpos:LatLng = new LatLng(this.latitude, this.longitude);
+				
+				// Make sure that all of the start and end points are the same.
+				var pos:LatLng = new LatLng(this.startLatitude, this.startLongitude);
+				var cpos:LatLng = new LatLng(r.startLatitude, r.startLongitude);
+				var epos:LatLng = new LatLng(this.endLatitude, this.endLongitude);
+				var ecpos:LatLng = new LatLng(r.endLatitude, r.endLongitude);
 				if(pos.equals(cpos) && this.hitPoints == r.hitPoints  && this.level == r.level && 
-					this.user.isEqual(r.user)){
+					this.user.isEqual(r.user) && epos.equals(ecpos)){
 					return true;
 				}else{
 					return false;
@@ -199,6 +205,15 @@ package models
 		
 		// Build the road in stages
 		override public function drawStage(bS:Number, l:LatLng, p:PhotoAssets):void{
+			// Save the positions associated with each stage. Two stage -> two positions
+			if(bS == 0){
+				this.startLatitude = l.lat();
+				this.startLongitude = l.lng();
+			}else{
+				this.endLatitude = l.lat();
+				this.endLongitude = l.lng();
+			}
+		
 			var lr:RoadPath = this.model as RoadPath;
 			lr.updatePath(bS, l, p);
 		}
@@ -225,14 +240,16 @@ package models
 			var s:String = "";
 			s+="HitPoints\t" + hitPoints.toString() + "\n";
 			s+="Level\t\t" + level.toString() + "\n";
-			s+="Latitude\t\t" + latitude.toPrecision(5) + "\n";
-			s+="Lognitude\t" + longitude.toPrecision(5) + "\n";
+			s+="StartLatitude\t\t" + this.startLatitude.toPrecision(5) + "\n";
+			s+="StartLongitude\t\t" + this.startLongitude.toPrecision(5) + "\n";
+			s+="EndLatitude\t\t" + this.endLatitude.toPrecision(5) + "\n";
+			s+="EndLongitude\t\t" + this.endLongitude.toPrecision(5) + "\n";
 			return s;
 		}
 		
+		// Functionality ignored.
 		override public function setPosition(pos:LatLng) : void {
-			latitude = pos.lat();
-			longitude = pos.lng();
+
 		}
 		
 
@@ -256,7 +273,7 @@ package models
 		}
 		
 		override public function getPosition(b:LatLngBounds):LatLng{
-			return new LatLng(this.latitude, this.longitude);
+			return new LatLng(this.startLatitude, this.startLongitude);
 		}
 		
 	}
