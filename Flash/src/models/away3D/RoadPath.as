@@ -3,6 +3,7 @@ package models.away3D
 	import assets.PhotoAssets;
 	
 	import away3d.containers.Scene3D;
+	import away3d.containers.View3D;
 	import away3d.core.geom.Path;
 	import away3d.core.geom.PathCommand;
 	import away3d.extrusions.PathExtrusion;
@@ -31,6 +32,7 @@ package models.away3D
 		private var _map:Map;											// The map variable.
 		private var _bitmap:Bitmap;										// Bitmap associated with the picture
 		private var _scene:Scene3D;										// The scene which draws the child.
+		private var _view:View3D;										// The view.
 		private var firstDraw:Boolean;									// True after the child is added to the scene
 		public function RoadPath()
 		{
@@ -47,8 +49,10 @@ package models.away3D
 			_map = _m;
 		}
 		public function set scene(_s:Scene3D):void {
-			Alert.show("Set Scene");
 			_scene = _s;
+		}
+		public function set view(_v:View3D):void {
+			_view = _v;
 		}
 		
 		// Update the path of points
@@ -74,20 +78,17 @@ package models.away3D
 			var angle:Number = startPosition.angleFrom(this.endPosition);
 			
 			// Convert the positions to away3D coordinates
-			var startPoint:Point = GameConstants.fromMapToAway3D(startPosition, this._map);
-			var endPoint:Point = GameConstants.fromMapToAway3D(endPosition, this._map);
-			var dP:Point = new Point(endPoint.x - startPoint.x,
-									endPoint.y - startPoint.y);
+			var depth:Number = 1000;							// How deepd would we like the path to be.
+			var a:Array = GameConstants.transfromMapLineTo3DCoordinatesWithDepth(startPosition, endPosition,
+				_map, depth, _view,_scene);
+			var startPoint:Point =a[0] as Point;
+			var endPoint:Point = a[1] as Point;
+			
 			// Calculate the number of points
 			// TODO: Make paths curved.
-			var numberOfPoints:Number = distance ;
-		
-			// Create a path
-			
-			
-			var startVector:Vector3D = new Vector3D(startPoint.x, startPoint.y, -100);
-			var controlVector:Vector3D = new Vector3D((startPoint.x + endPoint.x) / 2., (startPoint.y + endPoint.y) / 2, -100);
-			var endVector:Vector3D = new Vector3D(endPoint.x, endPoint.y, -100);
+			var startVector:Vector3D = new Vector3D(startPoint.x, startPoint.y, depth);
+			var controlVector:Vector3D = new Vector3D((startPoint.x + endPoint.x) / 2., (startPoint.y + endPoint.y) / 2, depth);
+			var endVector:Vector3D = new Vector3D(endPoint.x, endPoint.y, depth);
 			var pC:PathCommand;
 			if(endPoint.x < startPoint.x){
 				pC = new PathCommand(PathCommand.CURVE, startVector, controlVector, endVector);
@@ -96,18 +97,15 @@ package models.away3D
 			}
 			var pathPoint:Vector.<PathCommand> = new Vector.<PathCommand>();
 			pathPoint.push(pC);
-			//Alert.show(pathPoint.toString());
+
 			this.path = new Path();
 			this.path.aSegments = pathPoint;			// Save the list of information
 			
 			// Create the profile to extrude, and set it equal to the proper value
 			var profileWidth:Number = 10;
 			var pF:Array = new Array();
-			//var pv:Vector3D = new Vector3D(profileWidth * Math.acos(angle), profileWidth * Math.asin(angle), 0.);
-			//var pv2:Vector3D = new Vector3D(profileWidth * Math.acos(angle), profileWidth * Math.asin(angle), 0.);
 			var pv:Vector3D = new Vector3D(0., 10., 0.);
 			var pv2:Vector3D = new Vector3D(0., -10, 0.);
-			//pv2.negate();
 			pF.push(pv);pF.push(pv2);
 			this.profile = pF;
 			

@@ -95,6 +95,9 @@ package managers
 		public function get focusObject():SuperObject {
 			return this._focusObject;
 		}
+		public function get focusActive():Boolean {
+			return this.hasFocus;
+		}
 		public function set queueManager(qM:QueueManager):void{
 			this._queueManager = qM;
 		}
@@ -263,9 +266,9 @@ package managers
 			this.bodyText.textFlow = t;
 			this.focusImage.source = bA;
 			
-			// If the focusObject exists, make sure to remove the
-			// visual object
-	
+			// Set the focus
+			this.hasFocus = true;
+			
 			// Remove the view focus
 			if(this._focusObject != null){
 				_removeViewFocus(this._focusObject, false);

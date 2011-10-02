@@ -2,12 +2,18 @@ package models.constants
 {
 	import assets.PhotoAssets;
 	
+	import away3d.cameras.Camera3D;
+	import away3d.containers.Scene3D;
+	import away3d.containers.View3D;
+	
 	import com.google.maps.LatLng;
 	import com.google.maps.LatLngBounds;
 	import com.google.maps.Map;
 	
 	import flash.display.BitmapData;
+	import flash.geom.Matrix3D;
 	import flash.geom.Point;
+	import flash.geom.Vector3D;
 	
 	import mx.controls.Alert;
 	import mx.core.BitmapAsset;
@@ -45,6 +51,70 @@ package models.constants
 		
 			// Create the point
 			return new Point(Math.abs(totalWidth *(1 - xFraction)), totalHeight * (1 - yFraction));
+		}
+		
+		// Convert a lat lng to away3d coordinates. The difference betwen the previous 
+		// the simple version above is that this function calculates the depth, and rescales
+		// the position
+		public static function transfromMapLineTo3DCoordinatesWithDepth(startPos:LatLng, endPos:LatLng, map:Map, depth:Number,
+																		view:View3D, scene:Scene3D):Array{
+			var a:Array = new Array();
+			
+			
+			// Get points at zero depth
+			var startPoint:Point = GameConstants.fromMapToAway3D(startPos, map);
+			var endPoint:Point = GameConstants.fromMapToAway3D(endPos, map);
+			
+			
+			// TODO: Good god I hate this haaaaaaack!
+			// TODO: Fix this complete hack. Cannot seem to get
+			// the proper transform
+			var constant:Number = 950;
+			var sconstant:Number = 2.;
+			var totalWidth:Number = 2. * (map.width + map.y);
+			var totalHeight:Number = -2. * (map.height + map.y);
+			var shift:Point = new Point(constant/ depth  *totalWidth / 2, constant/ depth * totalHeight / 2);
+			
+			// Get the distance betwen the points
+			var diff:Point = endPoint.subtract(startPoint);
+			diff.x = diff.x * sconstant * (constant / depth);
+			diff.y = diff.y * sconstant * (constant / depth);
+			/*
+			// Convert to vector3D
+			var startVec:Vector3D = new Vector3D(startPoint.x, endPoint.x, 0);
+			var endVec:Vector3D = new Vector3D(endPoint.x, endPoint.y, 0.);
+			var dStartVec:Vector3D = new Vector3D(startPoint.x, endPoint.y, depth);
+			var dEndVec:Vector3D = new Vector3D(endPoint.x, endPoint.y, depth);
+			
+			// Get the camera
+			var c:Camera3D = view.camera;
+			var m:Matrix3D = c.transform;
+			
+			// Transform to local vector
+			var sVecLoc:Vector3D = m.transformVector(startVec);
+			var eVecLoc:Vector3D = m.transformVector(endVec);
+			var dSVecLoc:Vector3D = m.transformVector(dStartVec);
+			var dEVecLoc:Vector3D = m.transformVector(dEndVec);
+
+			
+			// Find the rescaling that occurs
+			var xDiff:Number = sVecLoc.x - dSVecLoc.x;
+			var yDiff:Number = sVecLoc.y - dSVecLoc.y;
+			var rescaling:Number = Math.abs((dSVecLoc.x - dEVecLoc.x) / (sVecLoc.x - eVecLoc.x));
+			Alert.show(xDiff.toString()+ ":" + yDiff.toString() + ":" + rescaling.toString() + ":" + sVecLoc.toString() + ":" + 
+						dSVecLoc.toString() + ":" + m.determinant.toString());
+ 			// Create the new points
+			//var nStartPoint:Point = new Point(startPoint.x + xDiff, startPoint.y + yDiff);
+			//var nEndPoint:Point = new Point(startPoint.x + rescaling * (startPoint.x + endPoint.x),
+			//								startPoint.y + rescaling * (startPoint.y + endPoint.y));
+			*/
+			var nStartPoint:Point = new Point(startPoint.x + shift.x, startPoint.y + shift.y);
+			var nEndPoint:Point = new Point(startPoint.x + diff.x + shift.x, 
+											startPoint.y + diff.y +  shift.y);
+			// Push the array.
+			a.push(nStartPoint);
+			a.push(nEndPoint);
+			return a;
 		}
 		
 		// Convert a away3D coordinate to lat lng

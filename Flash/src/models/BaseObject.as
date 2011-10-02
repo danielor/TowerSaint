@@ -222,6 +222,7 @@ package models
 					var rp:RoadPath = this.model as RoadPath;
 					rp.map = map;
 					rp.scene = scene;
+					rp.view = view;
 				}
 			}	
 

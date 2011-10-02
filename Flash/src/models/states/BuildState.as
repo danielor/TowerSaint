@@ -397,7 +397,18 @@ package models.states
 			
 			if(this.userBoundary.isInsidePolygon(pos)){
 				if(this._newBuildObject.isDynamicBuild()){
-					//Alert.show("Dynamic Build" + this.buildStage.toString() + ":" + this._newBuildObject.getNumberOfBuildStages());
+					// If the focus is true. Get the EXACT location of the build
+					// object
+					if(this.gameFocusManager.focusActive){
+						if(this.buildStage == 0){
+							var b:LatLngBounds = this.map.getLatLngBounds();
+							var s:SuperObject = this.gameFocusManager.focusObject;
+							pos = s.getPosition(b);
+						}else{
+							// Remove the focus
+							this.gameFocusManager.removeFocus();
+						}
+					}
 					
 					// The shift key switches the build stage
 					if(event.shiftKey){
@@ -412,8 +423,6 @@ package models.states
 						_drawBuildFromClick(pos);
 					}
 					
-					
-
 					
 					// If we have reached the critical stage
 					if(this._newBuildObject.getNumberOfBuildStages() == this.buildStage){
