@@ -69,7 +69,7 @@ package models.constants
 			// TODO: Good god I hate this haaaaaaack!
 			// TODO: Fix this complete hack. Cannot seem to get
 			// the proper transform
-			var constant:Number = 950;
+			var constant:Number = 940;
 			var sconstant:Number = 2.;
 			var totalWidth:Number = 2. * (map.width + map.y);
 			var totalHeight:Number = -2. * (map.height + map.y);

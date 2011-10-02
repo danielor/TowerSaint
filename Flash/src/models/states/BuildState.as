@@ -378,10 +378,10 @@ package models.states
 						this.buildStatePosition = event.latLng;			// The lat lng
 						this.buildStageTimer.start();
 					}
-				}else{
-					// Highlight the objects with focus, when a dynamic object 
-					this.gameFocusManager.setFocusFromMapEvent(event);
 				}
+				// Highlight the objects with focus, when a dynamic object 
+				this.gameFocusManager.setFocusFromMapEvent(event);
+				
 			}
 		}
 		
@@ -400,13 +400,19 @@ package models.states
 					// If the focus is true. Get the EXACT location of the build
 					// object
 					if(this.gameFocusManager.focusActive){
-						if(this.buildStage == 0){
-							var b:LatLngBounds = this.map.getLatLngBounds();
-							var s:SuperObject = this.gameFocusManager.focusObject;
-							pos = s.getPosition(b);
-						}else{
+						// Attach position to focus object
+						var b:LatLngBounds = this.map.getLatLngBounds();
+						var s:SuperObject = this.gameFocusManager.focusObject;
+						pos = s.getPosition(b);
+						
+						
+						if(this.buildStage != 0){
 							// Remove the focus
 							this.gameFocusManager.removeFocus();
+							
+							// Redraw the build stage and set the timer to null
+							this.buildStageTimer = null;
+							this._newBuildObject.drawStage(1, pos, this.photo);
 						}
 					}
 					

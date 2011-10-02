@@ -184,13 +184,14 @@ package managers
 		public function getQueueObjectAtPosition(pos:LatLng, m:Map):QueueObject {
 			var q:QueueObject;
 			var bounds:LatLngBounds = m.getLatLngBounds();
-			
+			Alert.show("Inside");
 			// Search for the positions of the super object
 			for(var i:int = 0; i < this.listOfQueueObjects.length; i++){
 				var tempQ:QueueObject = this.listOfQueueObjects[i] as QueueObject;
 				var buildObject:SuperObject = tempQ.buildObject;
 		
 				var cPos:LatLng = buildObject.getPosition(bounds);
+				Alert.show(cPos.toString() + ":" + pos.toString());
 				if(cPos.equals(pos)){
 					q = tempQ;
 					break;

@@ -458,7 +458,7 @@ package managers
 				
 				// TODO: Get the object for other user
 			}
-			
+			Alert.show("After create");
 			
 			// Get the queue manager. Remove the object from the map/queue
 			// Add the user object to the list of relevant user objects
@@ -466,6 +466,7 @@ package managers
 			var pos:LatLng = s.getPosition(bounds);
 			var qObject:QueueObject = this.queueManager.getQueueObjectAtPosition(pos, this.map);
 			qObject.buildObject.eraseFromMap(this.map, this.scene);
+
 			this.queueManager.removeFromQueue(qObject);
 			if(this.queueManager.isEmpty() && this.currentTabStateString == GameManager._queueState){
 				this.changeState(GameManager._emptyState);

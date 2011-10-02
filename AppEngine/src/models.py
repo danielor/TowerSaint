@@ -410,7 +410,7 @@ class Road(GeoModel, BoundsPlugin):
         all of the models"""
         return {"Class" : "Road", "Value" : {'level' : self.level,
                                              'startlatitude' : self.startLatitude,
-                                             'endlatitude' : self.endLatitiude,
+                                             'endlatitude' : self.endLatitude,
                                              'startlongitude' : self.startLongitude,
                                              'endlongitude' : self.endLongitude,
                                              'user' : self.user.toJSON()}}
@@ -418,7 +418,7 @@ class Road(GeoModel, BoundsPlugin):
     def toCompleteJSON(self):
         """Get the complete json equivalent of the model. This object is sent only to the users
         that own the object"""
-        return {"Class" : "User", "Value" : {'level' : self.level,
+        return {"Class" : "Road", "Value" : {'level' : self.level,
                                              'hitpoints' : self.hitPoints,
                                              'startlatitude' : self.startLatitude,
                                              'endlatitude' : self.endLatitude,

@@ -81,7 +81,7 @@ package models
 			r.hitPoints = buildObject.hitpoints;
 			r.level = buildObject.level;
 			r.startLatitude = buildObject.startlatitude;
-			r.startLongitude = buildObject.startLongitude;
+			r.startLongitude = buildObject.startlongitude;
 			r.endLatitude = buildObject.endlatitude;
 			r.endLongitude = buildObject.endlongitude;
 			r.isComplete = buildObject.iscomplete;
@@ -92,7 +92,7 @@ package models
 			var r:Road = new Road();
 			r.level = buildObject.level;
 			r.startLatitude = buildObject.startlatitude;
-			r.startLongitude = buildObject.startLongitude;
+			r.startLongitude = buildObject.startlongitude;
 			r.endLatitude = buildObject.endlatitude;
 			r.endLongitude = buildObject.endlongitude;
 			r.user = User.createUserFromJSON(buildObject.user);
