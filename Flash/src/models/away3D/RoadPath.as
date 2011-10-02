@@ -14,19 +14,23 @@ package models.away3D
 	import com.google.maps.Map;
 	
 	import flash.display.Bitmap;
+	import flash.filters.BitmapFilterQuality;
+	import flash.filters.GlowFilter;
 	import flash.geom.Point;
 	import flash.geom.Vector3D;
 	
 	import models.constants.GameConstants;
+	import models.interfaces.FilteredObject;
 	
 	import mx.controls.Alert;
 
 	/* 
 	Road path uses away3D to draw a path on google maps. 
 	*/
-	public class RoadPath extends PathExtrusion
+	public class RoadPath extends PathExtrusion implements FilteredObject
 	{
 		private const numberOfPointsPerL:Number = 10000;				// The number of points lat
+		private const profileWidth:Number = 10;							// The width of the road
 		private var startPosition:LatLng;								// The starting position of the path
 		private var endPosition:LatLng;									// The end position of the path
 		private var _map:Map;											// The map variable.
@@ -34,14 +38,53 @@ package models.away3D
 		private var _scene:Scene3D;										// The scene which draws the child.
 		private var _view:View3D;										// The view.
 		private var firstDraw:Boolean;									// True after the child is added to the scene
+		private var startPoint:Point;									// The start point of the path
+		private var endPoint:Point;										// The end point of the path
+		private var focusFilters:Array;									// Focus filters 
 		public function RoadPath()
 		{
 			// Set the state
 			this._bitmap = null;
+			
+			// Flags control the extrusion.
 			this.firstDraw = true;
 			this.bothsides = true;
 			this.subdivision = 2;
 			super();
+		}
+		
+		
+		// The filter interface
+		private function createFilters():void {
+			// Make sure that the objects can show the filter
+			this.ownCanvas = true;
+			
+			// First object
+			this.focusFilters = new Array();
+			var gF:GlowFilter = new GlowFilter(0x4169e1,0,6.0,6.0,2,BitmapFilterQuality.MEDIUM,false, false);
+			focusFilters.push(gF);
+			
+			// Set the filter of the path extrusion
+			this.filters = [this.focusFilters[0]];
+		}
+		
+		// The Filtered Object interface
+		public function updateFilter(i:Number):void{
+
+			for(var k:int = 0; k < focusFilters.length; k++){
+				var gf:GlowFilter = focusFilters[k] as GlowFilter;
+				gf.alpha = i;
+			}
+		}
+		public function changeFilterState(b:Boolean):void {
+			for(var k:int = 0; k < focusFilters.length; k++){
+				var gf:GlowFilter = focusFilters[k] as GlowFilter;
+				if(b){
+					gf.alpha = 1;
+				}else{
+					gf.alpha = 0;
+				}
+			}
 		}
 		
 		// Set the map variable
@@ -66,13 +109,18 @@ package models.away3D
 				if(this.firstDraw){
 					this.firstDraw = false;
 					this._scene.addChild(this);
+					this.createFilters();
+
 				}
 			}
 		}
 		
 		// draw the random path between the positions
 		private function drawRandomPathBetweenPositions(photo:PhotoAssets):void {
-
+			// Save the start, and end point
+			this.startPoint = GameConstants.fromMapToAway3D(this.startPosition, this._map);
+			this.endPoint = GameConstants.fromMapToAway3D(this.endPosition, this._map);
+			
 			// Get the distance and angle
 			var distance:Number = startPosition.distanceFrom(this.endPosition);
 			var angle:Number = startPosition.angleFrom(this.endPosition);
@@ -81,16 +129,16 @@ package models.away3D
 			var depth:Number = 1000;							// How deepd would we like the path to be.
 			var a:Array = GameConstants.transfromMapLineTo3DCoordinatesWithDepth(startPosition, endPosition,
 				_map, depth, _view,_scene);
-			var startPoint:Point =a[0] as Point;
-			var endPoint:Point = a[1] as Point;
+			var sP:Point =a[0] as Point;
+			var eP:Point = a[1] as Point;
 			
 			// Calculate the number of points
 			// TODO: Make paths curved.
-			var startVector:Vector3D = new Vector3D(startPoint.x, startPoint.y, depth);
-			var controlVector:Vector3D = new Vector3D((startPoint.x + endPoint.x) / 2., (startPoint.y + endPoint.y) / 2, depth);
-			var endVector:Vector3D = new Vector3D(endPoint.x, endPoint.y, depth);
+			var startVector:Vector3D = new Vector3D(sP.x, sP.y, depth);
+			var controlVector:Vector3D = new Vector3D((sP.x + eP.x) / 2., (sP.y + eP.y) / 2, depth);
+			var endVector:Vector3D = new Vector3D(eP.x, eP.y, depth);
 			var pC:PathCommand;
-			if(endPoint.x < startPoint.x){
+			if(eP.x < sP.x){
 				pC = new PathCommand(PathCommand.CURVE, startVector, controlVector, endVector);
 			}else{
 				pC = new PathCommand(PathCommand.CURVE, endVector, controlVector, startVector);
@@ -115,8 +163,13 @@ package models.away3D
 				var bm:BitmapMaterial = new BitmapMaterial(this._bitmap.bitmapData);
 				this.material = bm;
 			}
-			
-			
+		}
+		
+		public function onPath(p:LatLng):Boolean {
+			// Convert the latlng to a away3d position
+			var testPoint:Point = GameConstants.fromMapToAway3D(p, this._map);
+			var distance:Number = _distanceBetweeenPointAndLine(this.startPoint, this.endPoint, testPoint);
+			return distance < this.profileWidth;
 		}
 		
 		// Return the distance between a point and a line

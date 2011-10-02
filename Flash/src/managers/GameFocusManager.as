@@ -20,6 +20,7 @@ package managers
 	import flashx.textLayout.elements.SpanElement;
 	import flashx.textLayout.elements.TextFlow;
 	
+	import models.Road;
 	import models.Tower;
 	import models.constants.GameConstants;
 	import models.interfaces.FilteredObject;
@@ -140,10 +141,21 @@ package managers
 				var s:SuperObject = this._listOfModels[i] as SuperObject;
 				if(s.isVisible(this._map)){
 					var p:LatLng = e.latLng;
-					var bounds:LatLngBounds = s.getBounds();
-					if(bounds.containsLatLng(p)){
-						this.displayModel(s);
-						found = true;
+					
+					// TODO: Possible change of interface.
+					if(s is Road){
+						Alert.show("OnRoad");
+						var r:Road = s as Road;
+						if(r.isOnRoad(p)){
+							this.displayModel(s);
+							found = true;
+						}
+					}else{
+						var bounds:LatLngBounds = s.getBounds();
+						if(bounds.containsLatLng(p)){
+							this.displayModel(s);
+							found = true;
+						}
 					}
 				}
 			}

@@ -34,6 +34,7 @@ package models
 	
 	import models.away3D.RoadPath;
 	import models.constants.GameConstants;
+	import models.interfaces.FilteredObject;
 	import models.interfaces.SuperObject;
 	import models.map.TowerSaintMarker;
 	
@@ -288,6 +289,12 @@ package models
 		
 		override public function getPosition(b:LatLngBounds):LatLng{
 			return new LatLng(this.startLatitude, this.startLongitude);
+		}
+		
+		// Is it on the road???
+		public function isOnRoad(p:LatLng):Boolean {
+			var lr:RoadPath = this.model as RoadPath;
+			return lr.onPath (p);
 		}
 		
 	}

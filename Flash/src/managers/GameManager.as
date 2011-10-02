@@ -458,7 +458,6 @@ package managers
 				
 				// TODO: Get the object for other user
 			}
-			Alert.show("After create");
 			
 			// Get the queue manager. Remove the object from the map/queue
 			// Add the user object to the list of relevant user objects

@@ -249,7 +249,6 @@ package models
 			modelBounds = new LatLngBounds(sw, ne);
 		}
 		
-
 		public function display():TextFlow
 		{
 			return null;
@@ -265,8 +264,7 @@ package models
 		// View the 3d model
 		public function view():void
 		{
-			Alert.show("View");
-			this.model.x = this.currentPoint.x;
+ 			this.model.x = this.currentPoint.x;
 			this.model.y = this.currentPoint.y;
 		}
 		

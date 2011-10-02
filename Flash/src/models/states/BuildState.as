@@ -263,7 +263,6 @@ package models.states
 		}
 		private function _buildInit():void {
 			var d:Date = new Date();
-			
 			if(canPurchase(d)){
 				
 				// Build the object 
