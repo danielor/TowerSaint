@@ -74,6 +74,7 @@ package models
 			this.user = user;
 			this.hitPoints = 50;
 			this.level = 0;
+			this.isComplete = false;
 		}
 		
 		public static function createUserRoadFromJSON(buildObject:Object, u:User):Road {
@@ -217,6 +218,19 @@ package models
 			var lr:RoadPath = this.model as RoadPath;
 			lr.updatePath(bS, l, p);
 		}
+		
+		override public function drawAllStages(p:PhotoAssets):void{
+			// Create the information needed to draw
+			var lr:RoadPath = this.model as RoadPath;
+			var sPos:LatLng = new LatLng(this.startLatitude, this.startLongitude);
+			var ePos:LatLng = new LatLng(this.endLatitude, this.endLongitude);
+			
+			// Draw both of the stages
+			lr.updatePath(0, sPos, p);
+			lr.updatePath(1, ePos, p);
+			
+		}
+		
 		
 		/* Return the textflow representation of the model */
 		override public function display():TextFlow {

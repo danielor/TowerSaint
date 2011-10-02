@@ -223,6 +223,9 @@ package models
 					rp.map = map;
 					rp.scene = scene;
 					rp.view = view;
+					if(this.isIncompleteState()){
+						this.drawAllStages(photo);
+					}
 				}
 			}	
 
@@ -608,6 +611,10 @@ package models
 		public function hasBoundary():Boolean
 		{
 			return false;
+		}
+		
+		public function drawAllStages(p:PhotoAssets):void {
+			
 		}
 		
 		public function isOverLappingBoundsOfObject(pos:LatLng, map:Map, photo:PhotoAssets):Boolean

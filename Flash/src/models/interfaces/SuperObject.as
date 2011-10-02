@@ -84,6 +84,7 @@ package models.interfaces
 		function isDynamicBuild():Boolean;									// Is build dynamic(road) or static(tower)?
 		function getNumberOfBuildStages():Number;							// Get the number of build stages.
 		function drawStage(bS:Number, l:LatLng, p:PhotoAssets):void;		// Update the dynamic superobject
+		function drawAllStages(p:PhotoAssets):void;							// Draw a dynamic object completely with the models information
 		
 		// Build State interface
 		function isIncompleteState():Boolean;				/* Has the objects finished building */
