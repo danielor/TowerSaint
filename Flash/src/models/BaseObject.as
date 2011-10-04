@@ -156,7 +156,6 @@ package models
 		
 		public function draw(drag:Boolean, map:Map, photo:PhotoAssets, fpm:GameFocusManager, withBoundary:Boolean, scene:Scene3D, view:View3D):void
 		{
-			Alert.show("Begin Build");
 			var i:Number = 1.9;
 			
 			if(!this.isDynamicBuild()){
@@ -231,6 +230,7 @@ package models
 
 		}
 		
+		
 		private function onMarkerClick(event:MapMouseEvent) : void {
 			
 		}
@@ -275,7 +275,6 @@ package models
 		
 		public function hasInit():Boolean
 		{
-			Alert.show(this.isInitialized.toString());
 			return this.isInitialized;
 		}
 		
@@ -341,7 +340,6 @@ package models
 		
 		public function eraseFromMap(map:Map, s:Scene3D):void
 		{
-			Alert.show("Erasing" + this.getNameString());
 			if(this.marker != null){
 				map.removeOverlay(this.marker);
 			}
@@ -519,7 +517,6 @@ package models
 			currentPoint = GameConstants.fromMapToAway3D(l, m);
 			this.model.x = currentPoint.x;
 			this.model.y = currentPoint.y;
-			Alert.show(currentPoint.x.toString() + ":" + currentPoint.y.toString());
 			
 			// Set the flag
 			this._isDragging = false;
@@ -624,6 +621,16 @@ package models
 		
 		public function getMarker():TowerSaintMarker{
 			return this.marker;
+		}
+		
+		public function isManyPointDraw():Boolean {
+			return false;
+		}
+		
+		public function getClosestPointOnObject(l:LatLng):LatLng{
+			var map:Map = this.marker.getMap();
+			var b:LatLngBounds = map.getLatLngBounds();
+			return this.getPosition(b);
 		}
 
 	}

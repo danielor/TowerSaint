@@ -290,6 +290,13 @@ package models
 		override public function getPosition(b:LatLngBounds):LatLng{
 			return new LatLng(this.startLatitude, this.startLongitude);
 		}
+		override public function isManyPointDraw():Boolean{
+			return false;
+		}
+		override public function getClosestPointOnObject(l:LatLng):LatLng{
+			var rp:RoadPath = this.model as RoadPath;
+			return rp.getClosestPointToObject(l);
+		}
 		
 		// Is it on the road???
 		public function isOnRoad(p:LatLng):Boolean {

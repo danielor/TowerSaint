@@ -47,6 +47,8 @@ package assets
 		[Bindable] public var SouthWestRoad:Class;
 		[Embed(source="assets/pictures/WestRoad.png")]
 		[Bindable] public var WestRoad:Class;
+		[Embed(source="assets/pictures/dirt.jpg")]
+		[Bindable] public var Dirt:Class;
 		
 		// The portal
 		[Embed(source="assets/pictures/Portal.png")]

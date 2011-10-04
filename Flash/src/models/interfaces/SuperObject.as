@@ -85,6 +85,8 @@ package models.interfaces
 		function getNumberOfBuildStages():Number;							// Get the number of build stages.
 		function drawStage(bS:Number, l:LatLng, p:PhotoAssets):void;		// Update the dynamic superobject
 		function drawAllStages(p:PhotoAssets):void;							// Draw a dynamic object completely with the models information
+		function isManyPointDraw():Boolean;									// True if many points(such as road or wall) are required to make object.
+		function getClosestPointOnObject(l:LatLng):LatLng;					// Get the closest point on an object.
 		
 		// Build State interface
 		function isIncompleteState():Boolean;				/* Has the objects finished building */

@@ -126,11 +126,11 @@ package models.away3D
 			var angle:Number = startPosition.angleFrom(this.endPosition);
 			
 			// Convert the positions to away3D coordinates
-			var depth:Number = 1000;							// How deepd would we like the path to be.
+			var depth:Number = 0.1;							// How deepd would we like the path to be.
 			var a:Array = GameConstants.transfromMapLineTo3DCoordinatesWithDepth(startPosition, endPosition,
 				_map, depth, _view,_scene);
-			var sP:Point =a[0] as Point;
-			var eP:Point = a[1] as Point;
+			var sP:Point = startPoint;
+			var eP:Point =  endPoint;
 			
 			// Calculate the number of points
 			// TODO: Make paths curved.
@@ -159,8 +159,9 @@ package models.away3D
 			
 			// Create the material with the appropriate bitmap
 			if(this._bitmap == null){
-				this._bitmap = new photo.cannonMaterial();
+				this._bitmap = new photo.Dirt();
 				var bm:BitmapMaterial = new BitmapMaterial(this._bitmap.bitmapData);
+				bm.alpha = .5;
 				this.material = bm;
 			}
 		}
@@ -170,6 +171,32 @@ package models.away3D
 			var testPoint:Point = GameConstants.fromMapToAway3D(p, this._map);
 			var distance:Number = _distanceBetweeenPointAndLine(this.startPoint, this.endPoint, testPoint);
 			return distance < 2. * this.profileWidth;
+		}
+		
+		public function getClosestPointToObject(l:LatLng):LatLng{
+			// Transform the latlng into points.
+			var p:Point = GameConstants.fromMapToAway3D(l, this._map);
+			
+			// Convert into vectors
+			var sV:Vector3D = new Vector3D(startPoint.x, startPoint.y, 0.);
+			var eV:Vector3D = new Vector3D(endPoint.x, endPoint.y, 0.);
+			var pV:Vector3D = new Vector3D(p.x, p.y, 0.);
+			
+			// Calculate the nearest point on the line between sV, eV to pV
+			var A:Vector3D = pV.subtract(sV);
+			var u:Vector3D = eV.subtract(sV);
+			u.normalize();
+			var d:Number = A.dotProduct(u);
+			u.scaleBy(d);
+			var nl:Vector3D = sV.add(u);
+			
+			// Convert into a point, and then to latlng ... may need work
+			var nlP:Point = new Point(nl.x, nl.y);
+			Alert.show(nlP.toString());
+			var rLL:LatLng = GameConstants.fromAway3DtoMap(nlP, this._map);
+			
+			return rLL;
+			
 		}
 		
 		// Return the distance between a point and a line

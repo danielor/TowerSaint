@@ -9,6 +9,7 @@ package managers
 	import away3d.containers.*;
 	import away3d.core.base.*;
 	import away3d.core.clip.RectangleClipping;
+	import away3d.core.filter.ZSortFilter;
 	import away3d.core.render.*;
 	import away3d.events.*;
 	import away3d.lights.DirectionalLight3D;
@@ -833,7 +834,9 @@ package managers
 			camera.hover(true);
 			
 			// Create the renderer
+			var fa:Array = [new ZSortFilter()];			// Try z sorting..
 			renderer = new BasicRenderer();
+			renderer.filters = fa;
 			
 			// Create the view
 			view = new View3D();
