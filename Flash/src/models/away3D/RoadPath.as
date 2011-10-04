@@ -169,7 +169,7 @@ package models.away3D
 			// Convert the latlng to a away3d position
 			var testPoint:Point = GameConstants.fromMapToAway3D(p, this._map);
 			var distance:Number = _distanceBetweeenPointAndLine(this.startPoint, this.endPoint, testPoint);
-			return distance < this.profileWidth;
+			return distance < 2. * this.profileWidth;
 		}
 		
 		// Return the distance between a point and a line

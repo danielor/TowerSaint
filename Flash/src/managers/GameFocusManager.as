@@ -144,7 +144,6 @@ package managers
 					
 					// TODO: Possible change of interface.
 					if(s is Road){
-						Alert.show("OnRoad");
 						var r:Road = s as Road;
 						if(r.isOnRoad(p)){
 							this.displayModel(s);
