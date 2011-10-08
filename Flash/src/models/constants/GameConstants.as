@@ -126,8 +126,8 @@ package models.constants
 			var totalHeight:Number = -2. * (map.height + map.y);
 			var xFraction:Number = p.x / totalWidth;
 			var yFraction:Number = p.y / totalHeight;
-			return new LatLng(northwest.lat() + yFraction * (Math.abs(bounds.getNorth() - bounds.getSouth())),
-							 northwest.lng() + xFraction * (Math.abs(bounds.getEast() - bounds.getWest())));
+			return new LatLng(northwest.lat() - yFraction * (Math.abs(bounds.getNorth() - bounds.getSouth())),
+							 northwest.lng() - xFraction * (Math.abs(bounds.getEast() - bounds.getWest())));
 		}
 		
 		// TODO: A more robust mechanism is needed to hide objects on the map.

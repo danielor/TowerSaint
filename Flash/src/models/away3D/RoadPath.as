@@ -178,21 +178,22 @@ package models.away3D
 			var p:Point = GameConstants.fromMapToAway3D(l, this._map);
 			
 			// Convert into vectors
-			var sV:Vector3D = new Vector3D(startPoint.x, startPoint.y, 0.);
-			var eV:Vector3D = new Vector3D(endPoint.x, endPoint.y, 0.);
+			var eV:Vector3D = new Vector3D(startPoint.x, startPoint.y, 0.);
+			var sV:Vector3D = new Vector3D(endPoint.x, endPoint.y, 0.);
 			var pV:Vector3D = new Vector3D(p.x, p.y, 0.);
 			
 			// Calculate the nearest point on the line between sV, eV to pV
 			var A:Vector3D = pV.subtract(sV);
-			var u:Vector3D = eV.subtract(sV);
-			u.normalize();
-			var d:Number = A.dotProduct(u);
-			u.scaleBy(d);
-			var nl:Vector3D = sV.add(u);
+			var B:Vector3D = eV.subtract(sV);
 			
+			var cosTheta:Number = A.dotProduct(B) / (A.length * B.length);
+			var pLength:Number = A.length * cosTheta;
+			var scale:Number = pLength / B.length;
+			B.scaleBy(scale);
+			var nl:Vector3D = sV.add(B);
+
 			// Convert into a point, and then to latlng ... may need work
 			var nlP:Point = new Point(nl.x, nl.y);
-			Alert.show(nlP.toString());
 			var rLL:LatLng = GameConstants.fromAway3DtoMap(nlP, this._map);
 			
 			return rLL;
