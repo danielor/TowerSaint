@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<s:Application xmlns:fx="http://ns.adobe.com/mxml/2009" xmlns:s="library://ns.adobe.com/flex/spark"  xmlns:mx="library://ns.adobe.com/flex/mx" 
-			   xmlns:maps="com.google.maps.*" currentState="start" applicationComplete="initApp()" width="800" height="600" >
+<s:Application xmlns:fx="http://ns.adobe.com/mxml/2009"
+			   xmlns:s="library://ns.adobe.com/flex/spark"
+			   xmlns:mx="library://ns.adobe.com/flex/mx"
+			   xmlns:maps="com.google.maps.*"
+			   xmlns:forum="forum.*"
+			   width="800" height="600" applicationComplete="initApp()" currentState="start">
 	<fx:Script>
 		<![CDATA[
 			import assets.PhotoAssets;
@@ -30,6 +34,8 @@
 			import flash.net.*;
 			import flash.utils.Dictionary;
 			
+			import forum.renderer.ForumListItemRenderer;
+			
 			import managers.GameFocusManager;
 			import managers.GameManager;
 			import managers.UserObjectManager;
@@ -39,9 +45,9 @@
 			import models.Location;
 			import models.Portal;
 			import models.Road;
-			import models.interfaces.SuperObject;
 			import models.Tower;
 			import models.User;
+			import models.interfaces.SuperObject;
 			import models.states.ImageState;
 			
 			import mx.collections.ArrayCollection;
@@ -119,6 +125,7 @@
 				if(this.currentState == "initUser" || this.currentState == "inApp"){
 					if(this.initializedInAppManagers){
 						if(this._gameManager == null){
+						
 							this._focusPanelManager = new GameFocusManager(focusImage, bodyText, titleText, _photo, this.map, this);
 							this._gameManager = new GameManager(this._user, this.map, this._photo, this._focusPanelManager, this,
 								this.sendButton, this.chatFeed, this.userList, this.userObjectList, this.chatText, this._userObjectManager,
@@ -281,8 +288,7 @@
 				}else if(im.id == "roadImage"){
 					imageState.endObject = new Road();
 				}
-			}
-			
+			}			
 			
 		]]>
 	</fx:Script>
@@ -290,6 +296,7 @@
 		<s:State name="inApp"/>
 		<s:State name="start"/>
 		<s:State name="initUser"/>
+		<s:State name="forum"/>
 	</s:states>
 	<fx:Declarations>
 		<!-- Place non-visual elements (e.g., services, value objects) here -->
@@ -298,18 +305,22 @@
 	<s:VGroup includeIn="inApp,initUser" x="0" y="0" id="mapGroup">
 		<mx:MenuBar includeIn="inApp" width="619"></mx:MenuBar>
 		<s:HGroup includeIn="initUser" width="625" height="22">
-			<s:Button includeIn="initUser" label="changeLocation" id="locationChanger"/>
+			<s:Button id="locationChanger" label="changeLocation"/>
 			<mx:Spacer height="18" width="439"/>
-			<s:Button includeIn="initUser" label="Build" id="buildButton"/>
+			<s:Button id="buildButton" label="Build"/>
 		</s:HGroup>
 		<s:SpriteVisualElement id="mySprite"/>
-		<maps:Map id="map" includeIn="inApp,initUser" width="619" height="80%" mapevent_mapready="onMapReady(event)" key="ABQIAAAA5PSKhvT9XxMwIJsiXZLnshROkT7oJpmGVVDvh2HNZs_1KkkwNxQMSTOQJaZvC41MHmPhrh-NHIDstw" sensor="false" width.inApp="619" height.inApp="419" width.initUser="619" height.initUser="420"/>
+		<maps:Map id="map" width="619" height="80%"
+				  key="ABQIAAAA5PSKhvT9XxMwIJsiXZLnshROkT7oJpmGVVDvh2HNZs_1KkkwNxQMSTOQJaZvC41MHmPhrh-NHIDstw"
+				  mapevent_mapready="onMapReady(event)" sensor="false"
+				  width.inApp="619" height.inApp="419"
+				  width.initUser="619" height.initUser="420"/>
 		<s:List height="91" width="615" id="userObjectList" itemRenderer="HUserObjectRenderer">
 			<s:layout>
 				<s:HorizontalLayout/>
 			</s:layout>
 		</s:List>
-		<s:HGroup includeIn="inApp,initUser" width="616" height="33">
+		<s:HGroup width="616" height="33">
 			<s:TextInput width="537" id="chatText"/>
 			<s:Button label="Send" id="sendButton"/>
 		</s:HGroup>
@@ -325,20 +336,21 @@
 				<s:RichEditableText height="100%" width="100%" id="chatFeed"/>
 			</s:Scroller>
 		</s:BorderContainer>
-		<mx:TabNavigator width="153" includeIn="inApp,initUser" height="262"  id="theTab">
+		<mx:TabNavigator id="theTab" width="153" height="262">
 			<s:NavigatorContent label="Inspect" width="100%" height="100%">
-				<s:VGroup x="10" y="10" width="132" height="201" includeIn="inApp,initUser">
-					<s:HGroup width="138" height="71" includeIn="inApp,initUser">
+				<s:VGroup x="10" y="10" width="132" height="201">
+					<s:HGroup width="138" height="71">
 						<mx:Image width="61" height="65" id="focusImage"/>
 						<s:RichEditableText height="66" id="titleText" width="60"/>
 					</s:HGroup>
-					<s:Scroller width="128" height="123" includeIn="inApp,initUser">
+					<s:Scroller width="128" height="123">
 						<s:RichEditableText x="6" y="11"  width="113" height="123"  id="bodyText"  />
 					</s:Scroller>
 				</s:VGroup>
 			</s:NavigatorContent>
 			<s:NavigatorContent label="Build" width="100%" height="100%">
-				<s:List x="10" y="10" width="132" height="209" id="buildList" itemRenderer="BuildListItemRenderer" includeIn="inApp,initUser">
+				<s:List id="buildList" x="10" y="10" width="132" height="209"
+						itemRenderer="BuildListItemRenderer">
 					<s:layout>
 						<s:VerticalLayout/>
 					</s:layout>
@@ -356,5 +368,17 @@
 		</mx:TabNavigator>
 	</s:VGroup>
 	
+	<s:VGroup includeIn="forum" x="0" y="0" width="100%" height="100%">
+		<s:HGroup includeIn="forum" width="100%" height="32">
+			<s:VGroup width="72" height="28">
+				<s:Spacer width="100%" height="2"/>
+				<s:Button label="Back"/>
+			</s:VGroup>
+			<s:Spacer width="100%" height="30"/>
+			<s:Label fontSize="36" text="Forum"/>
+		</s:HGroup>
+		<forum:ForumList id="forumList" width="100%" height="100%"/>
+	</s:VGroup>
+
 	
 </s:Application>

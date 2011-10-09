@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:List xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		xmlns:s="library://ns.adobe.com/flex/spark" 
+		xmlns:mx="library://ns.adobe.com/flex/mx"
+		itemRendererFunction="selectRendereFromForumType" >
+	<s:layout>
+		<s:VerticalLayout/>
+	</s:layout>
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+	</fx:Declarations>
+	<fx:Script>
+		<![CDATA[
+			import forum.models.ForumEntry;
+			import forum.models.ForumNavigation;
+			import forum.models.ForumTopic;
+			import forum.renderer.ForumListItemRenderer;
+			
+			import mx.controls.listClasses.IListItemRenderer;
+			
+			public function selectRendereFromForumType(item:Object):ClassFactory{
+				var classFactory:ClassFactory;
+				if(item is ForumEntry){
+					classFactory = new ClassFactory(ForumListItemRenderer);
+				}else if(item is ForumNavigation){
+					classFactory = new ClassFactory(ForumListItemRenderer);
+				}else if(item is ForumTopic){
+					classFactory = new ClassFactory(ForumListItemRenderer);
+				}
+				return classFactory
+			}
+			
+		]]>
+	</fx:Script>
+</s:List>
