@@ -26,7 +26,7 @@ package models.interfaces
 	
 	import mx.core.BitmapAsset;
 
-	public interface SuperObject extends TowerSaintDispatcher
+	public interface SuperObject extends TowerSaintDispatcher, UserObject
 	{
 		// Draw the object on the map
 		function draw(drag:Boolean, map:Map, photo:PhotoAssets, fpm:GameFocusManager, withBoundary:Boolean, scence:Scene3D, view:View3D) : void;
@@ -48,7 +48,6 @@ package models.interfaces
 		function getBounds():LatLngBounds;								/* Get the bounds of the object on the map */
 		
 		// Initialize the information for a new build object
-		function initialize(u:User) : void;
 		function eraseFromMap(map:Map, s:Scene3D) : void;							/*Remove the marker/3D object from the map  */		
 		
 		// Set focus on the object

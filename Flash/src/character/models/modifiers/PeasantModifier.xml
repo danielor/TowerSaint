@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Peasant>
+	<level name = "1">
+		<hitpoints> 10 </hitpoints>
+		<strength>  1 </strength>
+		<dexterity> 1 </dexterity>
+		<wisdom> 1 </wisdom>
+		<intelligence> 1 </intelligence>
+		<building> 1 </building>
+		<experience> 1000 </experience>
+	</level>
+	<level name = "2">
+		<hitpoints> 15 </hitpoints>
+		<strength>  1 </strength>
+		<dexterity> 1 </dexterity>
+		<wisdom> 1 </wisdom>
+		<intelligence> 1 </intelligence>
+		<buidling> 2 </buidling>
+		<experience> 10000 </experience>
+	</level>
+	<level name = "3">
+		<hitpoints> 20 </hitpoints>
+		<strength>  1 </strength>
+		<dexterity> 1 </dexterity>
+		<wisdom> 1 </wisdom>
+		<intelligence> 1 </intelligence>
+		<building> 10 </building>
+		<experience> 50000 </experience>
+	</level>
+	<level name = "4">
+		<hitpoints> 25 </hitpoints>
+		<strength>  1 </strength>
+		<dexterity> 1 </dexterity>
+		<wisdom> 1 </wisdom>
+		<intelligence> 1 </intelligence>
+		<building> 40 </building>
+		<experience> 200000 </experience>
+	</level>
+	<level name = "5">
+		<hitpoints> 30 </hitpoints>
+		<strength>  1 </strength>
+		<dexterity> 1 </dexterity>
+		<wisdom> 1 </wisdom>
+		<intelligence> 1 </intelligence>
+		<building> 200 </building>
+		<experience> 600000 </experience>
+	</level>
+	
+</Peasant>

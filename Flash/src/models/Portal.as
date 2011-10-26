@@ -30,6 +30,7 @@ package models
 	
 	import models.away3D.Portal3D;
 	import models.constants.GameConstants;
+	import models.interfaces.ObjectModifier;
 	import models.interfaces.SuperObject;
 	import models.map.TowerSaintMarker;
 	
@@ -64,7 +65,7 @@ package models
 		}
 		
 		
-		override public function initialize(u:User):void {
+		override public function initialize(u:User, obj:ObjectModifier):void {
 			//this.user = u;
 			this.hitPoints = 10;
 			this.level = 0;

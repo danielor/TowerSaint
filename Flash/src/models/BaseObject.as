@@ -51,6 +51,7 @@ package models
 	import models.constants.GameConstants;
 	import models.interfaces.BoundarySuperObject;
 	import models.interfaces.FilteredObject;
+	import models.interfaces.ObjectModifier;
 	import models.interfaces.SuperObject;
 	import models.map.TowerSaintMarker;
 	
@@ -334,7 +335,7 @@ package models
 			return this.modelBounds;
 		}
 		
-		public function initialize(u:User):void
+		public function initialize(u:User, obj:ObjectModifier):void
 		{
 		}
 		

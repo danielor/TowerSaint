@@ -482,7 +482,7 @@ package models.states
 		// Update the draw elements
 		private function _drawBuildFromClick(pos:LatLng):void {
 			// Create an object from the object picture
-			this._newBuildObject.initialize(this.user);
+			this._newBuildObject.initialize(this.user, null);
 			this._newBuildObject.setPosition(pos);
 			this._newBuildObject.draw(true, this.map, this.photo, this.gameFocusManager, true, this.scene, this.view);
 			this._newBuildObject.addEventListener(MapMouseEvent.DRAG_END, onDragEnd);

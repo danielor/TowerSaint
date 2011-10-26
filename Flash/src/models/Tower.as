@@ -47,6 +47,7 @@ package models
 	import models.away3D.Tower3D;
 	import models.constants.GameConstants;
 	import models.interfaces.BoundarySuperObject;
+	import models.interfaces.ObjectModifier;
 	import models.interfaces.SuperObject;
 	import models.map.TowerSaintMarker;
 	
@@ -55,6 +56,7 @@ package models
 	import mx.core.BitmapAsset;
 	import mx.events.PropertyChangeEvent;
 	import mx.events.PropertyChangeEventKind;
+
 	[Bindbale]
 	[RemoteClass(alias="models.Tower")]
 	public class Tower extends BaseObject
@@ -174,7 +176,7 @@ package models
 			return t;
 		}
 		
-		override public function initialize(u:User): void {
+		override public function initialize(u:User, obj:ObjectModifier): void {
 			this.Experience = 0;
 			this.Speed = 1;
 			this.Power = 1;

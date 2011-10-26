@@ -14,7 +14,7 @@ package character.away3D
 
 	import flash.geom.*;
 
-	public class Peasant extends ObjectContainer3D
+	public class Peasant3D extends ObjectContainer3D
 	{
 		[Embed(source="assets/pictures/Peasant_UV.jpg")]
 		private var Aw_0_Bitmap_Bitmap:Class;
@@ -27,7 +27,7 @@ package character.away3D
 		private var aU:Array;
 		private var _scale:Number;
 
-		public function Peasant(scale:Number = 1)
+		public function Peasant3D(scale:Number = 1)
 		{
 			_scale = scale;
 			setSource();

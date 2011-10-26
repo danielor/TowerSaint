@@ -35,6 +35,7 @@ package models
 	import models.away3D.RoadPath;
 	import models.constants.GameConstants;
 	import models.interfaces.FilteredObject;
+	import models.interfaces.ObjectModifier;
 	import models.interfaces.SuperObject;
 	import models.map.TowerSaintMarker;
 	
@@ -71,7 +72,7 @@ package models
 			return s is Road;
 		}
 		
-		override public function initialize(u:User) : void {
+		override public function initialize(u:User, obj:ObjectModifier) : void {
 			this.user = user;
 			this.hitPoints = 50;
 			this.level = 0;
