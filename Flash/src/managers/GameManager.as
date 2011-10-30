@@ -17,6 +17,8 @@ package managers
 	import away3d.primitives.*;
 	import away3d.tools.utils.Drag3D;
 	
+	import character.CharacterManager;
+	
 	import com.facebook.graph.core.FacebookJSBridge;
 	import com.google.maps.LatLng;
 	import com.google.maps.LatLngBounds;
@@ -143,7 +145,7 @@ package managers
 		private var buildButton:Button;										/* In the init state, builds the capital */
 		private var modelListEventManager:EventManager;						/* The model list event manager */
 		private var stageEventManager:EventManager;							/* Listen/fans events in the stage */
-	
+		private var characterManager:CharacterManager;						/* Manages the character of a user */
 		
 		// Constants
 		public static const _emptyState:String = "Empty";							/* The constant string associated with the empty state */
@@ -215,6 +217,7 @@ package managers
 			this.listOfUserModels = new ArrayCollection();
 			this.listOfLoggedInUsers = new ArrayCollection();
 			this.queueManager = new QueueManager(this.app, this.photo, this);
+			this.characterManager = new CharacterManager(this.user); 
 			
 			// Setup the game channels
 			this.channelBridge = new ChannelJavascriptBridge(this.app);
@@ -243,10 +246,9 @@ package managers
 		public function run() : void{
 			// Setup Map events
 			this.initializeMap();
-		
 			// Setup up the game channels. The channels run the game
 			this.setupGameChannels();
-			
+
 			// Initialize the game
 			//this.initGame();
 			
@@ -255,6 +257,7 @@ package managers
 			//this.map.addEventListener(MapEvent.MAPEVENT_MAPREADY, onMapReady);
 			
 			this.setupChat();	
+
 			this.setupUIEvents();				// Sets up the events associated with UI elements
 			this.setupActionPanelState();		// Setup the action panel state
 			this.init3DView();					// Initialize away3D
@@ -287,7 +290,7 @@ package managers
 			// Create the states
 			this.initState = new InitState(this.map, this.locationChanger, this.userObjectManager, this.app,
 				this.user, this.photo, this.gameFocus, this.buildButton, this.scene, this.listOfUserModels,
-				this.view);
+				this.view, this.characterManager);
 			this.updateState = new UpdateState(this.map, this.user, this.listOfUserModels, this.userObjectManager, this.app,
 				this.queueManager);
 			this.buildState = new BuildState(this.app, this.map, this.user, this.userObjectManager, this.queueManager, 
@@ -561,9 +564,12 @@ package managers
 		
 		// ==== UI ====
 		public function setupUIEvents() : void {
+			Alert.show("SetupUI");
+
 			// Master events
 			this.buildObjectList.addEventListener(ItemClickEvent.ITEM_CLICK, onBuildItemClick);
 			this.listOfUserObjects.addEventListener(ItemClickEvent.ITEM_CLICK, onListSuperItemClick);
+
 			
 			// Tie array collections
 			this.listOfUserObjects.dataProvider = this.listOfUserModels;

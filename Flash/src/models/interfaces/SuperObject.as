@@ -53,12 +53,6 @@ package models.interfaces
 		// Set focus on the object
 		function setFocusOnObject(error:Boolean) : void;
 		
-		// Set the position of the object on the map
-		function setPosition(pos:LatLng) : void;
-		
-		// Get the position of the object
-		function getPosition(b:LatLngBounds):LatLng;
-		
 		// Interface to the isModified flag, which is true when an object has been create.
 		function setIsModified(t:Boolean) : void;
 		function getIsModified():Boolean;
@@ -96,8 +90,7 @@ package models.interfaces
 		// Boundary interface
 		function getMaxInfluence():Number;					/* Get the number of tower units in pixels */
 		
-		// Get the string associated with object
-		function getNameString():String;
+	
 		
 		// Returns the production of resources associated with o
 		function getProduction():Production; 				

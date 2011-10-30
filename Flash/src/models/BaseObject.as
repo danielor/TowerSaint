@@ -159,14 +159,15 @@ package models
 		{
 			var i:Number = 1.9;
 			
+			// Extract the position associated with remoteObject(Tower)		
+			var b:LatLngBounds = map.getLatLngBounds();
+			var gposition:LatLng = this.getPosition(b);
+			
 			if(!this.isDynamicBuild()){
 				var bitmapData:BitmapData = new BitmapData(this.model.objectWidth /i, this.model.objectHeight / i, true, 0x00FFFFFF);
 				var asset:BitmapAsset = new BitmapAsset(bitmapData);
 				
-				// Extract the position associated with remoteObject(Tower)		
-				var b:LatLngBounds = map.getLatLngBounds();
-				var gposition:LatLng = this.getPosition(b);
-				
+			
 				// Create test overlays
 				var markerOptions : MarkerOptions = new MarkerOptions();
 				markerOptions.icon = asset;

@@ -5,6 +5,9 @@ package models.states
 	import away3d.containers.Scene3D;
 	import away3d.containers.View3D;
 	
+	import character.CharacterManager;
+	import character.models.NPC.Peasant;
+	
 	import com.google.maps.LatLng;
 	import com.google.maps.LatLngBounds;
 	import com.google.maps.Map;
@@ -53,6 +56,7 @@ package models.states
 		private var popup:TitleWindow;						/* Popup window designed to get information from the user */
 		private var activeManager:Boolean;					/* True if he manager is running the game state */
 		private var currentCapital:Tower;					/* The current location of the new empire */
+		private var initialPeasant:Peasant;					/* The free peasant that you received */
 		private var currentUser:User;						/* The current user of the game */
 		private var photo:PhotoAssets;						/* The assets to the draw the markers */
 		private var fpm:GameFocusManager;					/* The manager used to inspect focus panel manager */
@@ -68,10 +72,12 @@ package models.states
 		private var pEBoundary:PolygonBoundaryManager;		/* Create a boundary */
 		private var view:View3D;							/* The away3D view */
 		private var firstLocation:Boolean;					/* The first location placed on the map */
+		private var characterManager:CharacterManager;		/* The character manager of the user */
 		private const viewString:String = "initUser";		/* The view(app) string associated with the state */
 		
 		public function InitState(m:Map, s:Button, uOM:UserObjectManager, a:Application, u:User, 
-					ph:PhotoAssets, fpm:GameFocusManager, bB:Button, sce:Scene3D, lOfO:ArrayCollection, v:View3D)
+					ph:PhotoAssets, fpm:GameFocusManager, bB:Button, sce:Scene3D, lOfO:ArrayCollection, v:View3D,
+					cManager:CharacterManager)
 		{
 			this.map = m;
 			this.searchButton = s;
@@ -85,13 +91,15 @@ package models.states
 			this.listOfUserModels = lOfO
 			this.view = v;
 			this.firstLocation = true;
-				
+			this.characterManager = cManager;
+			
 			// Out of state. Initialization of certain objects
 			this.isInState = false;				
 			
 			// Create the current capital
 			var p:LatLng = new LatLng(0., 0.);
 			this.currentCapital = Tower.createCapitalAtPosition(p, this.currentUser);
+			this.initialPeasant = this.characterManager.initializeObjectFromClass(Peasant) as Peasant;
 		}
 		
 		/* GameState interface */
@@ -127,7 +135,7 @@ package models.states
 		/* The actual entering/exiting of the state */
 		public function enterState():void {
 			this.isInState = true;
-			
+			Alert.show("init");
 			// Setup the initial map state.
 			// Set up the button manager
 			this.searchButton.addEventListener(MouseEvent.MOUSE_UP, onChangeLocationClick);
@@ -304,8 +312,15 @@ package models.states
 				this.currentCapital.updatePosition(loc);
 				
 				if(this.firstLocation){
+					// Create capital
 					this.currentCapital.draw(true, this.map, this.photo, this.fpm, true, this.scence, this.view);
 					this.listOfUserModels.addItem(this.currentCapital);
+
+					// Create the peasant, and sets its position
+					this.initialPeasant.setPosition(loc);
+					this.initialPeasant.draw(this.scence, this.view, this.map);
+					this.characterManager.addToManager(this.initialPeasant);
+					
 					//this.pEBoundary.addAndDraw(this.currentCapital);
 					this.currentCapital.addEventListener(MapMouseEvent.DRAG_END, this.onDragEnd);
 					this.firstLocation = false;

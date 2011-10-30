@@ -350,7 +350,7 @@
 			</s:NavigatorContent>
 			<s:NavigatorContent label="Build" width="100%" height="100%">
 				<s:List id="buildList" x="10" y="10" width="132" height="209"
-						itemRenderer="BuildListItemRenderer">
+						itemRenderer="BuildListItemRenderer" includeIn="inApp,initUser">
 					<s:layout>
 						<s:VerticalLayout/>
 					</s:layout>

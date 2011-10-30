@@ -1,11 +1,17 @@
 package character.intefaces
 {
+	import away3d.containers.Scene3D;
+	import away3d.containers.View3D;
+	
+	import com.google.maps.LatLng;
+	import com.google.maps.Map;
+	
 	import models.interfaces.UserObject;
 
 	public interface NPCFunctionality extends UserObject
 	{
-		public function move():void;							// Move
-		public function attack():void;							// Attack
-		public function alterWithModifier(xml:XML):void;		// Alter the NPC with a modifier
+		function move(l:LatLng):void;					// Move
+		function attack():void;							// Attack
+		function draw(s:Scene3D, v:View3D, m:Map):void;	// Draw the object on the map
 	}
 }
