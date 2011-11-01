@@ -823,6 +823,10 @@ package managers
 			initObjects();
 			initListeners();
 			initText();
+			
+			// Tie the 3d view to the game focus
+			this.gameFocus.scene = this.scene;
+			this.gameFocus.view = this.view;
 		}
 		
 		private function initEngine() : void {

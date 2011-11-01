@@ -3,10 +3,13 @@ package managers
 	import assets.PhotoAssets;
 	
 	import away3d.containers.ObjectContainer3D;
+	import away3d.containers.Scene3D;
 	import away3d.containers.View3D;
 	import away3d.core.base.Mesh;
 	import away3d.events.MouseEvent3D;
 	import away3d.tools.utils.Drag3D;
+	
+	import character.away3D.FocusCircle;
 	
 	import com.google.maps.LatLng;
 	import com.google.maps.LatLngBounds;
@@ -63,6 +66,9 @@ package managers
 		private var _gameManager:GameManager;								/* The game manager */
 		private var _focusObject:SuperObject;								/* The object with focus */ 
 		private var _queueManager:QueueManager;								/* Manager partially created objects */
+		private var _focusView:FocusCircle;									/* The graphical representation of focus */
+		private var _view:View3D;											/* The view that draws all of the data */
+		private var _scene:Scene3D;											/* The scene that draws all of the data */
 		
 		public function GameFocusManager(fI:Image, bT:RichEditableText, tT:RichEditableText, 
 										  p:PhotoAssets, m:Map, a:Application)
@@ -79,8 +85,8 @@ package managers
 			this.isDragging = false;
 			this._focusObject = null;
 			this._map = m;
-			this._app = a;		
-			
+			this._app = a;	
+			this._focusView = null;
 		}
 		
 		// Interface to the drag object
@@ -102,7 +108,12 @@ package managers
 		public function set queueManager(qM:QueueManager):void{
 			this._queueManager = qM;
 		}
-		
+		public function set view(v:View3D):void {
+			this._view = v;
+		}
+		public function set scene(s:Scene3D):void {
+			this._scene = s;
+		}
 		// Set the map variable
 		public function set map(m:Map) : void{
 			this._map = m;
@@ -243,6 +254,12 @@ package managers
 			this.focusImage.source = null;
 			this.hasFocus = false;
 			
+			// Remove the focus
+			if(this._focusView != null){
+				var poi:Point = GameConstants.hideAWAY3DCoordinate();
+				this._focusView.changeFocusToPoint(poi);
+			}
+			
 			// Change the view focus if available.
 			if(this._focusObject != null){
 				this._removeViewFocus(this._focusObject, false);
@@ -279,6 +296,21 @@ package managers
 			
 			// Set the focus
 			this.hasFocus = true;
+			
+			// Draw the bounding circle
+			var b:LatLngBounds = this._map.getLatLngBounds();
+			var pos:LatLng = m.getPosition(b);
+			
+			// Create the focus view ... For now a simple representation of focus.
+			if(this._focusView == null){
+				Alert.show("Creating");
+				var poi:Point = GameConstants.hideAWAY3DCoordinate();
+				this._focusView = new FocusCircle(50, poi, this._scene);
+			}
+			Alert.show("Updating");
+			// Update focus circle to object
+			var p:Point = GameConstants.fromMapToAway3D(pos, this._map);
+			this._focusView.changeFocusToPoint(p);
 			
 			// Remove the view focus
 			if(this._focusObject != null){
