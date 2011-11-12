@@ -42,11 +42,10 @@ package character.models.NPC
 		}
 		
 		override public function initialize(u:User, cMod:ObjectModifier):void {
-			Alert.show("Initialize");
 			this.name = CharacterNameGenerator.generateName(2); 			// Simple name for a simple creature.
 			this.user = u;													// Set the user
 			this.level = 1;													// Set the level
-			
+			Alert.show(this.name);
 			// Get the peasant. Needs to be character modifier
 			var xml:XML = cMod.getModifierForClass(this);
 			var xmlList:XMLList = xml..level.(@name = 1);
@@ -59,6 +58,7 @@ package character.models.NPC
 			this.intelligence = xmlList.@intelligence;
 			this.building = xmlList.@building;
 			this.experience = 0;
+		
 		}
 		
 		// Get the name string
@@ -81,6 +81,10 @@ package character.models.NPC
 		override public function setPosition(pos:LatLng):void{
 			this.latitude = pos.lat();
 			this.longitude = pos.lng();
+		}
+		
+		override public function getCharacterName():String {
+			return this.name;
 		}
 	}
 }

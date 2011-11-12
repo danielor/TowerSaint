@@ -1,5 +1,7 @@
 package character
 {
+	import mx.controls.Alert;
+
 	public class CharacterNameGenerator
 	{
 		public static var latinAndGreek:Array =  ['vol', 'viv', 'vit', 'ven', 'van', 'vel','zo', 'urb', 'urg', 'unc', 'ulo', 'trin',
@@ -32,8 +34,10 @@ package character
 		
 		public static function generateName(numberOfRoots:Number):String {
 			var name:String = "";
+			Alert.show(CharacterNameGenerator.latinAndGreek.length.toString());
 			for(var i:int = 0; i < numberOfRoots; i++){
-				name += CharacterNameGenerator.latinAndGreek[Math.random() * CharacterNameGenerator.latinAndGreek.length];
+				var nj:int = int(Math.random() * CharacterNameGenerator.latinAndGreek.length);
+				name += CharacterNameGenerator.latinAndGreek[nj];
 			}
 			return name;
 		}

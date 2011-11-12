@@ -53,6 +53,8 @@ package models.constants
 			return new Point(Math.abs(totalWidth *(1 - xFraction)), totalHeight * (1 - yFraction));
 		}
 		
+
+		
 		// Convert a lat lng to away3d coordinates. The difference betwen the previous 
 		// the simple version above is that this function calculates the depth, and rescales
 		// the position
@@ -128,6 +130,11 @@ package models.constants
 			var yFraction:Number = p.y / totalHeight;
 			return new LatLng(northwest.lat() - yFraction * (Math.abs(bounds.getNorth() - bounds.getSouth())),
 							 northwest.lng() - xFraction * (Math.abs(bounds.getEast() - bounds.getWest())));
+		}
+		
+		// Proximity distance
+		public static function proximityDistance():Number{
+			return 50;
 		}
 		
 		// TODO: A more robust mechanism is needed to hide objects on the map.

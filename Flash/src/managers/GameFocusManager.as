@@ -1,5 +1,7 @@
 package managers
 {
+	import action.FocusList;
+	
 	import assets.PhotoAssets;
 	
 	import away3d.containers.ObjectContainer3D;
@@ -9,13 +11,16 @@ package managers
 	import away3d.events.MouseEvent3D;
 	import away3d.tools.utils.Drag3D;
 	
+	import character.CharacterManager;
 	import character.away3D.FocusCircle;
+	import character.intefaces.NPCFunctionality;
 	
 	import com.google.maps.LatLng;
 	import com.google.maps.LatLngBounds;
 	import com.google.maps.Map;
 	import com.google.maps.MapMouseEvent;
 	
+	import flash.display.Stage;
 	import flash.events.MouseEvent;
 	import flash.geom.Point;
 	
@@ -23,25 +28,33 @@ package managers
 	import flashx.textLayout.elements.SpanElement;
 	import flashx.textLayout.elements.TextFlow;
 	
+	import models.QueueObject;
 	import models.Road;
 	import models.Tower;
 	import models.constants.GameConstants;
 	import models.interfaces.FilteredObject;
 	import models.interfaces.SuperObject;
+	import models.interfaces.UserObject;
 	import models.map.TowerSaintMarker;
 	
 	import mx.collections.ArrayCollection;
 	import mx.controls.Alert;
 	import mx.controls.Image;
+	import mx.controls.Menu;
 	import mx.core.BitmapAsset;
+	import mx.events.CloseEvent;
 	import mx.events.CollectionEvent;
 	import mx.events.CollectionEventKind;
 	import mx.events.ItemClickEvent;
+	import mx.events.MenuEvent;
+	import mx.managers.CursorManager;
+	import mx.managers.PopUpManager;
 	import mx.utils.ObjectUtil;
 	
 	import spark.components.Application;
 	import spark.components.Button;
 	import spark.components.RichEditableText;
+	import spark.components.TitleWindow;
 	
 	// The Game focus manager, shows a visual manifestation of the focused object(atm it is text)
 	// and allows for specific manipulation of the focused object.
@@ -69,7 +82,12 @@ package managers
 		private var _focusView:FocusCircle;									/* The graphical representation of focus */
 		private var _view:View3D;											/* The view that draws all of the data */
 		private var _scene:Scene3D;											/* The scene that draws all of the data */
-		
+		private var _focusLatLng:LatLng;									/* The position of focus in the game */
+		private var _foundObjects:ArrayCollection;							/* The objects found at the focus point */
+		private var _charManager:CharacterManager;							/* The manager of characters */
+		private var _focusMenu:Menu;										/* Focus menu allows one to select one of multiple objects */
+		private var _focusMenuXML:XML;										/* Focus menu xml - contains the items to be used */
+		private var _popup:TitleWindow;										/* Active popup reference */
 		public function GameFocusManager(fI:Image, bT:RichEditableText, tT:RichEditableText, 
 										  p:PhotoAssets, m:Map, a:Application)
 		{
@@ -87,6 +105,14 @@ package managers
 			this._map = m;
 			this._app = a;	
 			this._focusView = null;
+			this._focusMenuXML = new XML();
+			this.setUpXML();
+		}
+		
+		// Setup the xml document
+		private function setUpXML():void {
+			var xml:XML = <root></root>
+			this._focusMenuXML = xml;
 		}
 		
 		// Interface to the drag object
@@ -114,14 +140,15 @@ package managers
 		public function set scene(s:Scene3D):void {
 			this._scene = s;
 		}
-		// Set the map variable
 		public function set map(m:Map) : void{
 			this._map = m;
 			this._map.addEventListener(MapMouseEvent.MOUSE_MOVE, onMouseMove);
 		}
-		
 		public function set listOfModels(arr:ArrayCollection) : void {
 			this._listOfModels = arr;
+		}
+		public function set characterManager(c:CharacterManager):void {
+			this._charManager = c;
 		}
 		
 		// Called when the user model chnges
@@ -145,50 +172,135 @@ package managers
 			}
 		}
 		
+		// Realize the focus of the selected object
+		private function _realizeFocus(o:Object):void {
+			if(o is SuperObject){
+				var s:SuperObject = o as SuperObject;
+				// TODO: Possible change of interface.
+				if(s is Road){
+					var r:Road = s as Road;
+					if(r.isOnRoad(this._focusLatLng)){
+						this.displayModel(s);
+					}
+				}else{
+					var bounds:LatLngBounds = s.getBounds();
+					if(bounds.containsLatLng(this._focusLatLng)){
+						this.displayModel(s);
+					}
+				}
+			}else if(o is QueueObject){
+				var q:QueueObject = o as QueueObject;
+				var j:int = this._queueManager.listOfQueueObjects.getItemIndex(q);
+				var iEv:ItemClickEvent = new ItemClickEvent(ItemClickEvent.ITEM_CLICK, false, false, "Focus", j, null, null);
+				this._queueManager.onQueueItemClick(iEv);
+			}
+		}
+		
+		// Activate the menu selector
+		private function _activateMenuObjectSelector(arr:ArrayCollection):void{
+			// Get the global position
+			var mousePoint:Point = new Point(this._app.mouseX, this._app.mouseY);
+					
+			// Reset the xml
+			var menu:ArrayCollection = new ArrayCollection();
+	
+			for(var i:int = 0; i < arr.length; i++){
+				// Get the focus menu string
+				var s:String = this._getFocusMenuString(arr[i]);
+				
+				// Add the relevant information to the XML document
+				menu.addItem({'label':s});
+			
+			}
+			
+			// Create the focus list
+			var fL:FocusList = new FocusList();
+			this._popup = fL;
+
+			// Add to the popupmanager
+			PopUpManager.addPopUp(fL, this._app, true);
+			
+			fL.x = this._app.mouseX;
+			fL.y = this._app.mouseY;
+			// Set the data and events
+			fL.nameList.dataProvider = menu;
+			fL.addEventListener(ItemClickEvent.ITEM_CLICK, onFocusListItemClick);
+			fL.cancelButton.addEventListener(MouseEvent.CLICK, onCancelButtonClick);
+			fL.addEventListener(CloseEvent.CLOSE, onFocusListClose);
+		
+			
+		}
+		
+		// The focus list close
+		private function onFocusListClose(evt:CloseEvent):void {
+			PopUpManager.removePopUp(_popup);
+		}
+		
+		// Get the function to click
+		private function onCancelButtonClick(evt:MouseEvent):void{
+			PopUpManager.removePopUp(_popup);
+		}
+		
+		// Upon the focus click
+		private function onFocusListItemClick(evt:ItemClickEvent):void {
+			Alert.show("Item Click");
+			var index:Number = evt.index;
+			this._realizeFocus(this._foundObjects[index]);
+			PopUpManager.removePopUp(this._popup);
+		}
+		
+		// Returns the string label for the menu.
+		private function _getFocusMenuString(obj:Object):String{
+			var s:String = "";
+			var uO:UserObject = obj as UserObject;
+			s+= uO.getNameString();
+			
+			// Specialized functionality for characeters
+			if(uO is NPCFunctionality){
+				var npc:NPCFunctionality = uO as NPCFunctionality;
+				s += ":" + npc.getCharacterName();
+			}
+			return s;
+		}
+		
+		// Choose the focus of an object
+		private function onFocusMenuClick(event:MenuEvent):void {
+			for(var i:int = 0; i < this._foundObjects.length; i++){
+				var obj:Object = this._foundObjects[i];
+				var s:String = _getFocusMenuString(obj);
+				if(s == event.item.@label){			// Compare the xml label
+					this._realizeFocus(obj);
+				}
+			}
+			this._focusMenu.hide();
+		}
+		
 		// Upon pressing down give focus to the event
 		public function setFocusFromMapEvent(e:MapMouseEvent) : void {
-			var found:Boolean = false;
+			Alert.show("Focus");
+			this._foundObjects = new ArrayCollection();
+			this._focusLatLng = e.latLng;
+			var p:Point = GameConstants.fromMapToAway3D(this._focusLatLng, this._map);
 			for(var i:int = 0; i < this._listOfModels.length; i++){
 				var s:SuperObject = this._listOfModels[i] as SuperObject;
 				if(s.isVisible(this._map)){
-					var p:LatLng = e.latLng;
-					
-					// TODO: Possible change of interface.
-					if(s is Road){
-						var r:Road = s as Road;
-						if(r.isOnRoad(p)){
-							this.displayModel(s);
-							found = true;
-						}
-					}else{
-						var bounds:LatLngBounds = s.getBounds();
-						if(bounds.containsLatLng(p)){
-							this.displayModel(s);
-							found = true;
-						}
-					}
+					this._foundObjects.addItem(s);
 				}
 			}
-			var queueFound:Boolean = false;
-			if(!this._queueManager.isEmpty() && !found){
-				var arr:ArrayCollection = this._queueManager.getListOfSuperObjects();
-				for(var j:int = 0; j < arr.length; j++){
-					var sl:SuperObject = arr[j] as SuperObject;
-					if(sl.isVisible(this._map)){
-						var p2:LatLng = e.latLng;
-						var bbounds:LatLngBounds = sl.getBounds();
-						if(bbounds.containsLatLng(p2)){
-
-							//this._queueManager.
-							var iEv:ItemClickEvent = new ItemClickEvent(ItemClickEvent.ITEM_CLICK, false, false, "Focus", j, null, null);
-							this._queueManager.onQueueItemClick(iEv);
-							queueFound = true;
-						}
-					}
+			var arr:ArrayCollection = this._queueManager.listOfQueueObjects
+			for(var j:int = 0; j < arr.length; j++){
+				var q:QueueObject = arr[j] as QueueObject
+				var sl:SuperObject = q.buildObject;
+				if(sl.isVisible(this._map)){
+					this._foundObjects.addItem(q);
 				}
 			}
-			
-			if(!found && !queueFound){
+			this._charManager.findCharactersCloseToPoint(p, this._map, this._foundObjects);
+			if(this._foundObjects.length > 1){
+				this._activateMenuObjectSelector(this._foundObjects);
+			}else if(this._foundObjects.length == 1){
+				this._realizeFocus(this._foundObjects[0]);
+			}else{
 				this.removeFocus();
 				this._focusObject = null;
 			}
@@ -303,11 +415,10 @@ package managers
 			
 			// Create the focus view ... For now a simple representation of focus.
 			if(this._focusView == null){
-				Alert.show("Creating");
 				var poi:Point = GameConstants.hideAWAY3DCoordinate();
 				this._focusView = new FocusCircle(50, poi, this._scene);
 			}
-			Alert.show("Updating");
+			
 			// Update focus circle to object
 			var p:Point = GameConstants.fromMapToAway3D(pos, this._map);
 			this._focusView.changeFocusToPoint(p);

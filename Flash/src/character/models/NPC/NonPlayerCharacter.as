@@ -77,10 +77,22 @@ package character.models.NPC
 		public function getPosition(b:LatLngBounds):LatLng{
 			return null;
 		}
+		
+		// Get the current position of the object
+		public function getPoint(m:Map):Point {
+			var b:LatLngBounds = m.getLatLngBounds();
+			var pos:LatLng = this.getPosition(b);
+			return GameConstants.fromMapToAway3D(pos, map);
+		}
 			
 		// Set the position of the npc
 		public function setPosition(pos:LatLng):void {
 		
+		}
+		
+		// Return the character name
+		public function getCharacterName():String {
+			return "";
 		}
 	}
 }

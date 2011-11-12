@@ -3,7 +3,12 @@ package character
 	import character.intefaces.NPCFunctionality;
 	import character.models.CharacterModifier;
 	
+	import com.google.maps.Map;
+	
+	import flash.geom.Point;
+	
 	import models.User;
+	import models.constants.GameConstants;
 	
 	import mx.collections.ArrayCollection;
 	import mx.controls.Alert;
@@ -30,6 +35,23 @@ package character
 		// Add to Manager
 		public function addToManager(obj:Object):void {
 			this.listOfCharacters.addItem(obj);
+		}
+		
+		// Find characters within a point
+		public function findCharactersCloseToPoint(p:Point, m:Map, arr:ArrayCollection):void {
+ 
+			for(var i:int = 0; i < this.listOfCharacters.length; i++){
+				var npc:NPCFunctionality = this.listOfCharacters[i] as NPCFunctionality;
+				var np:Point = npc.getPoint(m);
+				
+				// Calculate the distance
+				var xDiff:Number = np.x - p.x;
+				var yDiff:Number = np.y - p.y;
+				var distance:Number = Math.sqrt(xDiff * xDiff + yDiff * yDiff);
+				if(distance < GameConstants.proximityDistance()){
+					arr.addItem(npc);
+				}
+			}
 		}
 	}
 }

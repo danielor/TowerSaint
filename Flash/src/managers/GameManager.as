@@ -236,6 +236,7 @@ package managers
 			this.gameFocus.listOfModels = this.listOfUserModels;
 			this.gameFocus.gameManager = this;
 			this.gameFocus.queueManager = this.queueManager;
+			this.gameFocus.characterManager = this.characterManager;
 			
 			// Setup some state variables
 			//this.buildStateInformation = new BuildState(null, false);
