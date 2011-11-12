@@ -77,7 +77,7 @@ package managers
 		private var _app:Application;										/* The application running the manager */
 		private var _drag3D:Drag3D;											/* Drag focused objects in a plane */
 		private var _gameManager:GameManager;								/* The game manager */
-		private var _focusObject:SuperObject;								/* The object with focus */ 
+		private var _focusObject:UserObject;								/* The object with focus */ 
 		private var _queueManager:QueueManager;								/* Manager partially created objects */
 		private var _focusView:FocusCircle;									/* The graphical representation of focus */
 		private var _view:View3D;											/* The view that draws all of the data */
@@ -125,7 +125,7 @@ package managers
 		public function get drag3D():Drag3D {
 			return this._drag3D;
 		}
-		public function get focusObject():SuperObject {
+		public function get focusObject():UserObject {
 			return this._focusObject;
 		}
 		public function get focusActive():Boolean {
@@ -193,6 +193,9 @@ package managers
 				var j:int = this._queueManager.listOfQueueObjects.getItemIndex(q);
 				var iEv:ItemClickEvent = new ItemClickEvent(ItemClickEvent.ITEM_CLICK, false, false, "Focus", j, null, null);
 				this._queueManager.onQueueItemClick(iEv);
+			}else if(o is NPCFunctionality){
+				var npc:NPCFunctionality = o as NPCFunctionality;
+				this.displayModel(npc);
 			}
 		}
 		
@@ -243,7 +246,6 @@ package managers
 		
 		// Upon the focus click
 		private function onFocusListItemClick(evt:ItemClickEvent):void {
-			Alert.show("Item Click");
 			var index:Number = evt.index;
 			this._realizeFocus(this._foundObjects[index]);
 			PopUpManager.removePopUp(this._popup);
@@ -307,23 +309,7 @@ package managers
 		}
 		
 		private function onMouseDown(e:MouseEvent3D) : void {
-			/*
-			if(previousTime == null){
-				this.previousTime = new Date();
-			}else{
-				var currentTime:Date = new Date();
-				var mili:Number = currentTime.valueOf() - this.previousTime.valueOf();
-				
-				// A double click
-				if(ObjectUtil.compare(this.focusModel, e.object as ObjectContainer3D)){
-					if(mili < 500){
-						this.isDragging = true;
-					}
-				}
-				this.previousTime = currentTime;
-			}
-			*/
-			Alert.show("Mouse down");
+	
 			this.isDragging = true;
 			this.focusModel = e.object as ObjectContainer3D;
 			this.attachFocus(this.focusModel);
@@ -379,7 +365,7 @@ package managers
 		}
 		
 		// The 3d object
-		private function _removeViewFocus(m:SuperObject, b:Boolean):void {
+		private function _removeViewFocus(m:UserObject, b:Boolean):void {
 			var o:Mesh = m.get3DObject();
 			if(o is FilteredObject){
 				var f:FilteredObject = o as FilteredObject;
@@ -387,7 +373,7 @@ package managers
 			}
 		}
 		
-		public function displayModel(m:SuperObject) : void {
+		public function displayModel(m:UserObject) : void {
 			// Get the objects from the model
 			var t:TextFlow = m.display();
 			var bA:BitmapAsset = m.getImage(this._photo);

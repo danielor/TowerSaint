@@ -13,6 +13,7 @@ package models.states
 	import managers.UserObjectManager;
 	
 	import models.interfaces.SuperObject;
+	import models.interfaces.UserObject;
 	import models.states.events.GameStartEvent;
 	import models.states.events.MoveStateEvent;
 	import models.states.events.UpdateStateEvent;
@@ -160,7 +161,7 @@ package models.states
 				this.gameFocus.setFocusFromMapEvent(event);
 
 				// Get the focus object
-				var focusObject:SuperObject = this.gameFocus.focusObject;
+				var focusObject:UserObject = this.gameFocus.focusObject;
 				if(focusObject != null){
 					// Set the internal state
 					this._mouseState = BackgroundState.MOUSE_MOVE;

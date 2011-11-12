@@ -3,12 +3,13 @@ package models.states.events
 	import flash.events.Event;
 	
 	import models.interfaces.SuperObject;
+	import models.interfaces.UserObject;
 	import models.states.GameState;
 	
 	public class MoveStateEvent extends Event implements StateEvent
 	{
 		private var previousState:GameState;							/* The previous state */
-		private var _moveObject:SuperObject;							/* The object being moved */
+		private var _moveObject:UserObject;							/* The object being moved */
 		public static const MOVE_START:String = "MoveStateStart";		/* The move state starts */
 		public static const MOVE_STEP:String = "MoveStateStep";			/* Itermediate drag movements in the state */
 		public static const MOVE_END:String = "MoveStateEnd"; 			/* The end of the movement */
@@ -18,10 +19,10 @@ package models.states.events
 			super(type, bubbles, cancelable);
 		}
 		
-		public function set moveObject(s:SuperObject):void {
+		public function set moveObject(s:UserObject):void {
 			this._moveObject = s;	
 		}
-		public function get moveObject():SuperObject {
+		public function get moveObject():UserObject {
 			return this._moveObject;	
 		}
 		

@@ -1,5 +1,7 @@
 package character.models.NPC
 {
+	import assets.PhotoAssets;
+	
 	import away3d.containers.Scene3D;
 	import away3d.containers.View3D;
 	import away3d.core.base.Mesh;
@@ -12,11 +14,14 @@ package character.models.NPC
 	
 	import flash.geom.Point;
 	
+	import flashx.textLayout.elements.TextFlow;
+	
 	import models.User;
 	import models.constants.GameConstants;
 	import models.interfaces.ObjectModifier;
 	
 	import mx.controls.Alert;
+	import mx.core.BitmapAsset;
 	
 	public class NonPlayerCharacter implements NPCFunctionality
 	{
@@ -73,6 +78,11 @@ package character.models.NPC
 			s.addChild(this.model);
 		}
 		
+		// Get the 3d model of the object
+		public function get3DObject():Mesh {
+			return this.model;
+		}
+		
 		// Get the position of the npc... must overload
 		public function getPosition(b:LatLngBounds):LatLng{
 			return null;
@@ -93,6 +103,15 @@ package character.models.NPC
 		// Return the character name
 		public function getCharacterName():String {
 			return "";
+		}
+		
+		public function getImage(photo:PhotoAssets):BitmapAsset
+		{
+			return null;
+		}
+		public function display():TextFlow
+		{
+			return null;
 		}
 	}
 }

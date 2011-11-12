@@ -401,7 +401,7 @@ package models.states
 					if(this.gameFocusManager.focusActive){
 						// Attach position to focus object
 						var b:LatLngBounds = this.map.getLatLngBounds();
-						var s:SuperObject = this.gameFocusManager.focusObject;
+						var s:SuperObject = this.gameFocusManager.focusObject as SuperObject;
 						pos = s.getClosestPointOnObject(pos);
 						
 						

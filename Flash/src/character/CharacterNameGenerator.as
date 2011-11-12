@@ -34,7 +34,6 @@ package character
 		
 		public static function generateName(numberOfRoots:Number):String {
 			var name:String = "";
-			Alert.show(CharacterNameGenerator.latinAndGreek.length.toString());
 			for(var i:int = 0; i < numberOfRoots; i++){
 				var nj:int = int(Math.random() * CharacterNameGenerator.latinAndGreek.length);
 				name += CharacterNameGenerator.latinAndGreek[nj];

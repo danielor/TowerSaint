@@ -60,6 +60,10 @@ package assets
 		[Embed(source="assets/pictures/Cannon_Material.png")]
 		[Bindable] public var cannonMaterial : Class;
 		
+		// TODO: Change this placeholder for the peasant
+		[Embed(source="assets/pictures/character/Peasant_UV.png")]
+		[Bindable] public var PeasantPic:Class;
+		
 		public function PhotoAssets()
 		{
 			
