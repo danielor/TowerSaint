@@ -8,6 +8,7 @@
 		<intelligence> 1 </intelligence>
 		<building> 1 </building>
 		<experience> 1000 </experience>
+		<speed> 1 </speed>
 	</level>
 	<level name = "2">
 		<hitpoints> 15 </hitpoints>
@@ -17,6 +18,7 @@
 		<intelligence> 1 </intelligence>
 		<buidling> 2 </buidling>
 		<experience> 10000 </experience>
+		<speed> 1 </speed>
 	</level>
 	<level name = "3">
 		<hitpoints> 20 </hitpoints>
@@ -26,6 +28,7 @@
 		<intelligence> 1 </intelligence>
 		<building> 10 </building>
 		<experience> 50000 </experience>
+		<speed> 1.1 </speed>
 	</level>
 	<level name = "4">
 		<hitpoints> 25 </hitpoints>
@@ -35,6 +38,7 @@
 		<intelligence> 1 </intelligence>
 		<building> 40 </building>
 		<experience> 200000 </experience>
+		<speed> 1.1 </speed>
 	</level>
 	<level name = "5">
 		<hitpoints> 30 </hitpoints>
@@ -44,6 +48,7 @@
 		<intelligence> 1 </intelligence>
 		<building> 200 </building>
 		<experience> 600000 </experience>
+		<speed> 1.2 </speed>
 	</level>
 	
 </Peasant>

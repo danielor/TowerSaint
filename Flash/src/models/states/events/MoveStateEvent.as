@@ -1,5 +1,7 @@
 package models.states.events
 {
+	import com.google.maps.LatLng;
+	
 	import flash.events.Event;
 	
 	import models.interfaces.SuperObject;
@@ -9,7 +11,8 @@ package models.states.events
 	public class MoveStateEvent extends Event implements StateEvent
 	{
 		private var previousState:GameState;							/* The previous state */
-		private var _moveObject:UserObject;							/* The object being moved */
+		private var _moveObject:UserObject;								/* The object being moved */
+		private var _targetLocation:LatLng;								/* The location to end up in */
 		public static const MOVE_START:String = "MoveStateStart";		/* The move state starts */
 		public static const MOVE_STEP:String = "MoveStateStep";			/* Itermediate drag movements in the state */
 		public static const MOVE_END:String = "MoveStateEnd"; 			/* The end of the movement */
@@ -24,6 +27,12 @@ package models.states.events
 		}
 		public function get moveObject():UserObject {
 			return this._moveObject;	
+		}
+		public function set targetLocation(l:LatLng):void {
+			this._targetLocation = l;
+		}
+		public function get targetLocation():LatLng {
+			return this._targetLocation;
 		}
 		
 		override public function clone():Event {

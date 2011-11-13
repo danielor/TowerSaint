@@ -45,6 +45,10 @@ package character.models.NPC
 			this.model.y = currentPoint.y;
 		}
 		
+		public function getSpeed():Number {
+			return 0.;
+		}
+		
 		public function attack():void {
 			
 		}

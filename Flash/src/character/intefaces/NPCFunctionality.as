@@ -17,5 +17,6 @@ package character.intefaces
 		function draw(s:Scene3D, v:View3D, m:Map):void;	// Draw the object on the map
 		function getPoint(m:Map):Point;					// Get the current location of the object
 		function getCharacterName():String;				// Get the name of the character
+		function getSpeed():Number;						// Get the speed of the character
 	}
 }

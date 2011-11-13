@@ -302,7 +302,7 @@ package managers
 					this.buildState);
 			
 			this.backgroundState = new BackgroundState(this.map, this.app, this.gameFocus, this.buildState, this);
-			this.moveState = new MoveState(this.map);
+			this.moveState = new MoveState(this.map, this.view, this.scene);
 			this.gameStartState = new GameStartState(this, this.app);
 			
 			// Setup up some interestate property events
@@ -356,6 +356,14 @@ package managers
 		}
 		private function onMoveState(event:MoveStateEvent):void  {
 			var lastState:GameState = event.getPreviousState();
+			
+			// Attach the state information
+			this.moveState.moveStateEventType = event.type;
+			this.moveState.moveObject = event.moveObject;
+			this.moveState.targetLocation = event.targetLocation;
+			
+			// Change the game state
+			this.changeGameState(this.moveState, lastState);
 		}
 
 		public function changeGameState(newState:GameState, lastState:GameState) : void {

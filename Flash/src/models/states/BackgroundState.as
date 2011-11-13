@@ -1,5 +1,7 @@
 package models.states
 {
+	import character.intefaces.NPCFunctionality;
+	
 	import com.google.maps.LatLng;
 	import com.google.maps.LatLngBounds;
 	import com.google.maps.Map;
@@ -163,14 +165,17 @@ package models.states
 				// Get the focus object
 				var focusObject:UserObject = this.gameFocus.focusObject;
 				if(focusObject != null){
-					// Set the internal state
-					this._mouseState = BackgroundState.MOUSE_MOVE;
-					
-					// Send out a move event
-					var e:MoveStateEvent = new MoveStateEvent(MoveStateEvent.MOVE_START);
-					e.attachPreviousState(this);
-					e.moveObject = focusObject;
-					this.app.dispatchEvent(e);
+					if(focusObject is NPCFunctionality){
+						// Set the internal state
+						this._mouseState = BackgroundState.MOUSE_MOVE;
+						
+						// Send out a move event
+						var e:MoveStateEvent = new MoveStateEvent(MoveStateEvent.MOVE_START);
+						e.attachPreviousState(this);
+						e.moveObject = focusObject;				// Set object to move
+						e.targetLocation = event.latLng;		// Set the end pos
+						this.app.dispatchEvent(e);
+					}
 				}
 				
 			}else if(this._mouseState == BackgroundState.MOUSE_BUILD){

@@ -53,7 +53,10 @@ package models.constants
 			return new Point(Math.abs(totalWidth *(1 - xFraction)), totalHeight * (1 - yFraction));
 		}
 		
-
+		// Convert  distance and speed into an amount of time
+		public static function convertSpeedIntoTime(s:Number, distance:Number):Number{
+			return distance / s;
+		}
 		
 		// Convert a lat lng to away3d coordinates. The difference betwen the previous 
 		// the simple version above is that this function calculates the depth, and rescales

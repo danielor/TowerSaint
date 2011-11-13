@@ -41,7 +41,8 @@ package character.models.NPC
 		private var dexterity:Number;					// The dexterity of a peasant
 		private var wisdom:Number;						// The wisdom of a peasant
 		private var intelligence:Number;				// Intelligence of a peasant
-		private var building:Number;					
+		private var building:Number;					// The building rate of the peasant
+		private var speed:Number;						// The speed that peasant moves at.
 		
 		public function Peasant()
 		{
@@ -64,6 +65,7 @@ package character.models.NPC
 			this.wisdom = xmlList[0].wisdom;
 			this.intelligence = xmlList[0].intelligence;
 			this.building = xmlList[0].building;
+			this.speed = xmlList[0].speed;
 			this.experience = 0;
 		
 		}
@@ -128,6 +130,10 @@ package character.models.NPC
 			s+="Intelligence\t" + intelligence.toString() + "\n";
 			s+="Building\t\t" + building.toString() + "\n";
 			return s;
+		}
+		
+		override public function getSpeed():Number{
+			return this.speed;
 		}
 	}
 }
