@@ -25,6 +25,7 @@ package models.states
 	import models.states.events.MoveStateEvent;
 	
 	import mx.collections.ArrayCollection;
+	import mx.controls.Alert;
 
 	public class MoveState implements GameState
 	{
@@ -64,6 +65,9 @@ package models.states
 		}
 		public function set targetLocation(l:LatLng):void {
 			this._targetLocation = l;
+		}
+		public function get animationList():ArrayCollection {
+			return this._animationList;
 		}
 		
 		public function isMapActive():Boolean
@@ -120,12 +124,12 @@ package models.states
 			
 			// Get the speed of the move object
 			var meters:Number = this._originalLocation.distanceFrom(this._targetLocation);
-			var s:Number = 1;
+			var s:Number = 1000;
+			
 			if(this._moveObject is NPCFunctionality){
 				var npc:NPCFunctionality = this._moveObject as NPCFunctionality;
-				s = npc.getSpeed();
+				s = GameConstants.convertSpeedIntoTime(npc.getSpeed(), meters);
 			}
-			
 			// Create the path animator
 			var init:Object = {
 				duration:s,
@@ -138,26 +142,38 @@ package models.states
 				easeout:false
 			};
 			
-			var pan:PathBoneAnimator = new PathBoneAnimator(this._moveObject, p, m, init);
+
+			var pan:PathBoneAnimator = new PathBoneAnimator(this._moveObject, s, this._targetLocation, 
+				 this._map, p, m, init);
+			pan.loop = false;
 			
 			// Setup the events associated with the path animator
-			pan.addOnCycle(onPathCycle);
-			pan.play();
+			pan.addEventListener(AnimatorEvent.STOP, onAnimatorStop);
+
+			this._animationList.addItem(pan);
 		}
 		
-		private function onPathCycle(evt:AnimatorEvent):void {
+		private function onAnimatorStop(evt:AnimatorEvent):void {
 			// Stop the animation
-			var p:PathBoneAnimator = evt.animator as PathBoneAnimator;
-			p.stop();
 			
-			// Get the user object, and update the lat lng from the point
-			var uo:UserObject = p.userObject;
+			// Remove the animator at the point
+			var pan:PathBoneAnimator = evt.animator as PathBoneAnimator;
+			pan.isActive = false;
+			var uo:UserObject = pan.userObject;
+			var tL:LatLng = pan.targetLocation;
 			var m:Mesh = uo.get3DObject();
-			var np:Point = new Point(m.x, m.y);
-			var l:LatLng = GameConstants.fromAway3DtoMap(np, this._map);
-			uo.setPosition(l);			// Update the position
-				
+			var p:Point = GameConstants.fromMapToAway3D(tL, this._map);
+	
+			
+			// Remove the item from the animation list	
+			this.animationList.removeItemAt(this.animationList.getItemIndex(evt.animator));
+
+			// Set the location and the mesh position
+			uo.setPosition(tL);
+			m.x = p.x;
+			m.y = p.y;
 		}
+		
 		
 		private function _moveEnd():void {
 			

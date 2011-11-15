@@ -55,7 +55,7 @@ package models.constants
 		
 		// Convert  distance and speed into an amount of time
 		public static function convertSpeedIntoTime(s:Number, distance:Number):Number{
-			return distance / s;
+			return 5 * distance / s;
 		}
 		
 		// Convert a lat lng to away3d coordinates. The difference betwen the previous 

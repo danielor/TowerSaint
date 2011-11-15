@@ -59,6 +59,7 @@ package managers
 	import models.Road;
 	import models.Tower;
 	import models.User;
+	import models.away3D.PathBoneAnimator;
 	import models.away3D.ResourceProductionText;
 	import models.constants.DateConstants;
 	import models.constants.PurchaseConstants;
@@ -241,6 +242,7 @@ package managers
 			// Setup some state variables
 			//this.buildStateInformation = new BuildState(null, false);
 			this.currentTabStateString = GameManager._emptyState;
+
 		}
 		
 		// Run the game. Intialize active objects, events, and interfaces.
@@ -949,18 +951,19 @@ package managers
 			var d:Date = new Date();
 			this.resourceText.updateState(d);
 			this.queueManager.update(d);
-			//this.dragManager.updateDrag();
+			
+			if(this.moveState != null){
+				var aN:ArrayCollection = this.moveState.animationList;
+				for(var i:int = 0; i < aN.length; i++){
+					var an:PathBoneAnimator = aN[i] as PathBoneAnimator;
+					an.tweenWithVelocity();
+				}
+			}
+			
+			
 			this.view.render();
 			
-			//if(finishedLoadingMap){
-		//	camera.hover();
-			
-			// Change the z position of the sphere
-			//sphere.z = (sphere.z + 10) % 100 - 100
-			
-			
-		//	view.render();
-		//	}
+
 		}
 		
 		/*
