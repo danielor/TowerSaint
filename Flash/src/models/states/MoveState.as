@@ -18,14 +18,19 @@ package models.states
 	import flash.geom.Point;
 	import flash.geom.Vector3D;
 	
+	import managers.GameFocusManager;
+	
 	import models.away3D.PathBoneAnimator;
 	import models.constants.GameConstants;
 	import models.interfaces.SuperObject;
 	import models.interfaces.UserObject;
+	import models.states.events.BackgroundStateEvent;
 	import models.states.events.MoveStateEvent;
 	
 	import mx.collections.ArrayCollection;
 	import mx.controls.Alert;
+	
+	import spark.components.Application;
 
 	public class MoveState implements GameState
 	{
@@ -40,13 +45,17 @@ package models.states
 		private var _targetLocation:LatLng;					/* The target location of the animation */
 		private var _scene:Scene3D;							/* The scene to draw all the animations */
 		private var _view:View3D;							/* The view to draw the animations */
+		private var _focusManager:GameFocusManager;			/* Focus follows the moving object */
+		private var _app:Application;						/* The application running the state */
 		
-		public function MoveState(m:Map, v:View3D, s:Scene3D)
+		public function MoveState(m:Map, v:View3D, s:Scene3D, fM:GameFocusManager, app:Application)
 		{
 			this.isInState = false;
 			this._map = m;
 			this._scene = s;
 			this._view = v;
+			this._app = app;
+			this._focusManager = fM;
 			this.moveStateEventType = MoveStateEvent.MOVE_START;
 			this._animationList = new ArrayCollection();
 		}
@@ -95,6 +104,11 @@ package models.states
 			}else if(this._moveStateEventType == MoveStateEvent.MOVE_END){
 				this._moveEnd();	
 			}
+			
+			// Return to the background state
+			var e:BackgroundStateEvent = new BackgroundStateEvent(BackgroundStateEvent.BACKGROUND_STATE);
+			e.attachPreviousState(this);
+			this._app.dispatchEvent(e);
 		}
 		
 		// Internal function actually perform the substate tasks
@@ -144,7 +158,7 @@ package models.states
 			
 
 			var pan:PathBoneAnimator = new PathBoneAnimator(this._moveObject, s, this._targetLocation, 
-				 this._map, p, m, init);
+				 this._map, this._focusManager, p, m, init);
 			pan.loop = false;
 			
 			// Setup the events associated with the path animator

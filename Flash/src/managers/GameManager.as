@@ -304,7 +304,7 @@ package managers
 					this.buildState);
 			
 			this.backgroundState = new BackgroundState(this.map, this.app, this.gameFocus, this.buildState, this);
-			this.moveState = new MoveState(this.map, this.view, this.scene);
+			this.moveState = new MoveState(this.map, this.view, this.scene, this.gameFocus, this.app);
 			this.gameStartState = new GameStartState(this, this.app);
 			
 			// Setup up some interestate property events

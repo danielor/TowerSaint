@@ -13,10 +13,13 @@ package models.away3D
 	import flash.geom.Point;
 	import flash.geom.Vector3D;
 	
+	import managers.GameFocusManager;
+	
 	import models.constants.GameConstants;
 	import models.interfaces.UserObject;
 	
 	import mx.controls.Alert;
+	import mx.managers.FocusManager;
 	
 	// PathBoneAnimator - an Animator that combines the functionality of bone animator
 	// and path animator for multiple objects. 
@@ -30,6 +33,7 @@ package models.away3D
 		private var _isActive:Boolean;						// Is the animator active??
 		private var _endAtAnimationEnd:Boolean;				// End where the animation ends.
 		private var _endVector:Vector3D;					// Where the animation stops...
+		private var _focusManager:GameFocusManager;			// The game focus manager(Focus will follow)
 		
 		// Away 3d path private variables
 		private var _path:Path;
@@ -41,7 +45,8 @@ package models.away3D
 		private var _rotation:Vector3D = new Vector3D();
 		private var _worldAxis:Vector3D = new Vector3D(0,1,0);
 		
-		public function PathBoneAnimator(uO:UserObject, tT:Number, tL:LatLng, m:Map, path:Path=null, target:Object3D=null, init:Object=null)
+		public function PathBoneAnimator(uO:UserObject, tT:Number, tL:LatLng, m:Map, fM:GameFocusManager,
+										 path:Path=null, target:Object3D=null, init:Object=null)
 		{
 			// Call the animator class
 			super(target, init);
@@ -51,6 +56,9 @@ package models.away3D
 			this._targetLocation = tL;
 			this._currentTime = 0;
 			this._map = m;
+			this._focusManager = fM;
+			
+			// Set the state
 			this._isActive = true;
 			this._endAtAnimationEnd = true;
 			
@@ -126,13 +134,20 @@ package models.away3D
 			_position.x = start.x + _fraction * (dt * (control.x - start.x) + _fraction * (end.x - start.x));
 			_position.y = start.y + _fraction * (dt * (control.y - start.y) + _fraction * (end.y - start.y));
 			_position.z = start.z + _fraction * (dt * (control.z - start.z) + _fraction * (end.z - start.z));
-			
+		
+			// Do we return to the beginning?	
 			if(this._endAtAnimationEnd){
 				if(!start.equals(_position)){
 					_target.position = _position;
+					if(this._focusManager.isFocusObject(this._userObject)){
+						this._focusManager.updateViewAtPosition(_position);
+					}
 				}
 			}else{
 				_target.position = _position;
+				if(this._focusManager.isFocusObject(this._userObject)){
+					this._focusManager.updateViewAtPosition(_position);
+				}
 			}
 
 			if (alignToPath) {

@@ -23,6 +23,7 @@ package managers
 	import flash.display.Stage;
 	import flash.events.MouseEvent;
 	import flash.geom.Point;
+	import flash.geom.Vector3D;
 	
 	import flashx.textLayout.elements.ParagraphElement;
 	import flashx.textLayout.elements.SpanElement;
@@ -172,6 +173,17 @@ package managers
 			}
 		}
 		
+		// Is the focus object?
+		public function isFocusObject(o:UserObject):Boolean {
+			return ObjectUtil.compare(o, this._focusObject) == 0;
+		}
+		
+		// Update the focus circle to vector
+		public function updateViewAtPosition(v:Vector3D):void {
+			var p:Point = new Point(v.x, v.y);
+			this._focusView.changeFocusToPoint(p);
+		}
+		
 		// Realize the focus of the selected object
 		private function _realizeFocus(o:Object):void {
 			if(o is SuperObject){
@@ -230,8 +242,6 @@ package managers
 			fL.addEventListener(ItemClickEvent.ITEM_CLICK, onFocusListItemClick);
 			fL.cancelButton.addEventListener(MouseEvent.CLICK, onCancelButtonClick);
 			fL.addEventListener(CloseEvent.CLOSE, onFocusListClose);
-		
-			
 		}
 		
 		// The focus list close
@@ -279,7 +289,6 @@ package managers
 		
 		// Upon pressing down give focus to the event
 		public function setFocusFromMapEvent(e:MapMouseEvent) : void {
-			Alert.show("Focus");
 			this._foundObjects = new ArrayCollection();
 			this._focusLatLng = e.latLng;
 			var p:Point = GameConstants.fromMapToAway3D(this._focusLatLng, this._map);
