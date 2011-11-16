@@ -73,16 +73,27 @@ package models.away3D
 		public function get targetLocation():LatLng{
 			return this._targetLocation;
 		}
+		public function set targetLocation(l:LatLng):void {
+			this._targetLocation = l;
+		}
 		public function get isActive():Boolean{
 			return this._isActive;
 		}
 		public function set isActive(b:Boolean):void {
-			this._isActive = false;
+			this._isActive = b;
 		}
 		public function set endAtAnimationEnd(b:Boolean):void {
 			this._endAtAnimationEnd = b;
 		}
 
+		// Restart the animator
+		public function restartAnimator():void {
+			this._currentTime = 0;
+			//this.init3D(path, target);
+		}
+		public function set animationTime(s:Number):void {
+			this._totalTime = s;
+		}
 		
 		// Tween with velocity
 		public function tweenWithVelocity():void {

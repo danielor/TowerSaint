@@ -1,9 +1,11 @@
 package models.states
 {
+	import away3d.animators.Animator;
 	import away3d.animators.PathAnimator;
 	import away3d.containers.Scene3D;
 	import away3d.containers.View3D;
 	import away3d.core.base.Mesh;
+	import away3d.core.base.Object3D;
 	import away3d.core.geom.Path;
 	import away3d.core.geom.PathCommand;
 	import away3d.events.AnimatorEvent;
@@ -29,6 +31,7 @@ package models.states
 	
 	import mx.collections.ArrayCollection;
 	import mx.controls.Alert;
+	import mx.utils.ObjectUtil;
 	
 	import spark.components.Application;
 
@@ -111,16 +114,31 @@ package models.states
 			this._app.dispatchEvent(e);
 		}
 		
-		// Internal function actually perform the substate tasks
-		private function _moveStart():void {
-			// Save the original location so that the panel can pop back if it needs to.
-			var b:LatLngBounds = this._map.getLatLngBounds();
-			this._originalLocation = this._moveObject.getPosition(b);
-			
-			// Create a path between its original location and the new location.
-			var sP:Point = GameConstants.fromMapToAway3D(this._originalLocation, this._map);
-			var eP:Point = GameConstants.fromMapToAway3D(this._targetLocation, this._map);
-			
+		
+		// Is the object moving?
+		public function isMoving(uo:UserObject):Boolean {
+			for(var i:int = 0; i < this._animationList.length; i++){
+				var cuo:PathBoneAnimator = this._animationList[i] as PathBoneAnimator;
+				if(ObjectUtil.compare(cuo.userObject, uo) == 0){
+					return true;
+				}
+			}
+			return false;
+		}
+		
+		// Get the animator for the user object
+		private function getAnimatorUserObject(uo:UserObject):Animator {
+			for(var i:int = 0; i < this._animationList.length; i++){
+				var cuo:PathBoneAnimator = this._animationList[i] as PathBoneAnimator;
+				if(ObjectUtil.compare(cuo.userObject, uo) == 0){
+					return cuo;
+				}
+			}
+			return null;
+		}
+		
+		// Create a path between two points
+		private function _getPathFromPoints(sP:Point, eP:Point):Path{
 			// Convert to world coordinates
 			var startVector:Vector3D = new Vector3D(sP.x, sP.y, 0.);
 			var controlVector:Vector3D = new Vector3D((sP.x + eP.x) / 2., (sP.y + eP.y) / 2, 0.);
@@ -130,12 +148,15 @@ package models.states
 			var pC:PathCommand = new PathCommand(PathCommand.CURVE, startVector, controlVector, endVector);
 			var pathPoint:Vector.<PathCommand> = new Vector.<PathCommand>();
 			pathPoint.push(pC);
+		
+			// Create and return the path
 			var p:Path = new Path();
 			p.aSegments = pathPoint;
-			
-			// Get the 3D object that will be moved.
-			var m:Mesh = this._moveObject.get3DObject();
-			
+			return p;
+		}
+		
+		// Get the speed of the object
+		private function _getAnimationTimeOfObject(uo:UserObject):Number{
 			// Get the speed of the move object
 			var meters:Number = this._originalLocation.distanceFrom(this._targetLocation);
 			var s:Number = 1000;
@@ -144,27 +165,70 @@ package models.states
 				var npc:NPCFunctionality = this._moveObject as NPCFunctionality;
 				s = GameConstants.convertSpeedIntoTime(npc.getSpeed(), meters);
 			}
-			// Create the path animator
-			var init:Object = {
-				duration:s,
-				lookat:false,
-				targetobject:null,
-				offset:new Vector3D(0,0,0),
-				rotations:null,
-				fps:24,
-				easein:false,
-				easeout:false
-			};
 			
-
-			var pan:PathBoneAnimator = new PathBoneAnimator(this._moveObject, s, this._targetLocation, 
-				 this._map, this._focusManager, p, m, init);
-			pan.loop = false;
-			
-			// Setup the events associated with the path animator
-			pan.addEventListener(AnimatorEvent.STOP, onAnimatorStop);
-
-			this._animationList.addItem(pan);
+			return s;
+		}
+		
+		// Internal function actually perform the substate tasks
+		private function _moveStart():void {
+			if(this.isMoving(this._moveObject)){
+				var ar:PathBoneAnimator = getAnimatorUserObject(this._moveObject) as PathBoneAnimator;
+				ar.isActive = false;						// Deactive the object
+				ar.restartAnimator();						// Restart the animator
+				ar.targetLocation = this._targetLocation;	// Set the target location
+				
+				// Create a new path
+				var obj:Object3D = ar.target;
+				var sPE:Point = new Point(obj.x, obj.y);
+				var ePE:Point = GameConstants.fromMapToAway3D(this._targetLocation, this._map);
+				var np:Path = _getPathFromPoints(sPE, ePE);
+				ar.path = np; 					// Set the new path
+				
+				// The new speed of the object
+				var aN:Number = _getAnimationTimeOfObject(this._moveObject);
+				ar.animationTime = aN;			// Update the animation time.
+				
+				// Restart the animation
+				ar.isActive = true;
+				
+			}else{
+				// Save the original location so that the panel can pop back if it needs to.
+				var b:LatLngBounds = this._map.getLatLngBounds();
+				this._originalLocation = this._moveObject.getPosition(b);
+				
+				// Create a path between its original location and the new location.
+				var sP:Point = GameConstants.fromMapToAway3D(this._originalLocation, this._map);
+				var eP:Point = GameConstants.fromMapToAway3D(this._targetLocation, this._map);
+				
+				var p:Path = _getPathFromPoints(sP, eP);
+				
+				// Get the 3D object that will be moved.
+				var m:Mesh = this._moveObject.get3DObject();
+				
+				var s:Number = this._getAnimationTimeOfObject(this._moveObject);
+				
+				// Create the path animator
+				var init:Object = {
+					duration:s,
+					lookat:false,
+					targetobject:null,
+					offset:new Vector3D(0,0,0),
+					rotations:null,
+					fps:24,
+					easein:false,
+					easeout:false
+				};
+				
+	
+				var pan:PathBoneAnimator = new PathBoneAnimator(this._moveObject, s, this._targetLocation, 
+					 this._map, this._focusManager, p, m, init);
+				pan.loop = false;
+				
+				// Setup the events associated with the path animator
+				pan.addEventListener(AnimatorEvent.STOP, onAnimatorStop);
+	
+				this._animationList.addItem(pan);
+			}
 		}
 		
 		private function onAnimatorStop(evt:AnimatorEvent):void {
