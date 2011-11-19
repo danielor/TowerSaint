@@ -14,6 +14,7 @@ package models.interfaces
 	import com.google.maps.overlays.Polygon;
 	
 	import flash.events.IEventDispatcher;
+	import flash.geom.Point;
 	
 	import flashx.textLayout.elements.TextFlow;
 	
@@ -80,7 +81,7 @@ package models.interfaces
 		function isIncompleteState():Boolean;				/* Has the objects finished building */
 		function getFoundingDate():Date;					/* Return the date the object was built */
 		function setUser(u:User):void;						/* Set the user of the object equal to something */				
-		
+		function isCloseToPoint(p:Point):Boolean;			// Is the 3d model close to this point?
 		
 		// Boundary interface
 		function getMaxInfluence():Number;					/* Get the number of tower units in pixels */

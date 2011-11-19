@@ -114,6 +114,8 @@ package models.states
 			this._app.dispatchEvent(e);
 		}
 		
+		// Get the object which corresponds to the
+		
 		
 		// Is the object moving?
 		public function isMoving(uo:UserObject):Boolean {

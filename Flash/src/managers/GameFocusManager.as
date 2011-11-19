@@ -287,6 +287,12 @@ package managers
 			this._focusMenu.hide();
 		}
 		
+		// Lose focus from the map event
+		public function loseFocus():void {
+			this.removeFocus();
+			this._focusObject = null;
+		}
+		
 		// Upon pressing down give focus to the event
 		public function setFocusFromMapEvent(e:MapMouseEvent) : void {
 			this._foundObjects = new ArrayCollection();
@@ -294,7 +300,7 @@ package managers
 			var p:Point = GameConstants.fromMapToAway3D(this._focusLatLng, this._map);
 			for(var i:int = 0; i < this._listOfModels.length; i++){
 				var s:SuperObject = this._listOfModels[i] as SuperObject;
-				if(s.isVisible(this._map)){
+				if(s.isCloseToPoint(p)){
 					this._foundObjects.addItem(s);
 				}
 			}
@@ -302,7 +308,7 @@ package managers
 			for(var j:int = 0; j < arr.length; j++){
 				var q:QueueObject = arr[j] as QueueObject
 				var sl:SuperObject = q.buildObject;
-				if(sl.isVisible(this._map)){
+				if(s.isCloseToPoint(p)){
 					this._foundObjects.addItem(q);
 				}
 			}
@@ -311,9 +317,6 @@ package managers
 				this._activateMenuObjectSelector(this._foundObjects);
 			}else if(this._foundObjects.length == 1){
 				this._realizeFocus(this._foundObjects[0]);
-			}else{
-				this.removeFocus();
-				this._focusObject = null;
 			}
 		}
 		

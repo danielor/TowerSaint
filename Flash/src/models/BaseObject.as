@@ -634,6 +634,15 @@ package models
 			var b:LatLngBounds = map.getLatLngBounds();
 			return this.getPosition(b);
 		}
+		
+		public function isCloseToPoint(p:Point):Boolean {
+			
+			// Calculate the distance
+			var xDiff:Number = this.model.x - p.x;
+			var yDiff:Number = this.model.y - p.y;
+			var distance:Number = Math.sqrt(xDiff * xDiff + yDiff * yDiff);
+			return distance < GameConstants.proximityDistance();
+		}
 
 	}
 }

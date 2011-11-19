@@ -38,6 +38,7 @@ package models.states
 		private var buildState:BuildState;								/* The build state is needed for deferred events */
 		private var isClicked:Boolean;									/* True if the operation is clicked */
 		private var gameManager:GameManager;							/* The game manager running the state */
+		private var moveState:MoveState;								/* The state associated with moving */
 		private const viewString:String = "inApp";						/* The view state */
 		
 		// Constants associate a certain type of mouse activity with a certain state.
@@ -52,7 +53,7 @@ package models.states
 		public static const MAP_READY:String = "MapMoveOver";
 		
 		public function BackgroundState(m:Map, a:Application, gF:GameFocusManager, bS:BuildState,
-								gm:GameManager)
+								gm:GameManager, mv:MoveState)
 		{
 			// Initialize
 			this.map = m;
@@ -160,21 +161,26 @@ package models.states
 		private function onMapMouseDown(event:MapMouseEvent):void {
 			this.isClicked = true;
 			if(this._mouseState == BackgroundState.MOUSE_FOCUS){
-				this.gameFocus.setFocusFromMapEvent(event);
-
-				// Get the focus object
-				var focusObject:UserObject = this.gameFocus.focusObject;
-				if(focusObject != null){
-					if(focusObject is NPCFunctionality){
-						// Set the internal state
-						this._mouseState = BackgroundState.MOUSE_MOVE;
-						
-						// Send out a move event
-						var e:MoveStateEvent = new MoveStateEvent(MoveStateEvent.MOVE_START);
-						e.attachPreviousState(this);
-						e.moveObject = focusObject;				// Set object to move
-						e.targetLocation = event.latLng;		// Set the end pos
-						this.app.dispatchEvent(e);
+				if(event.altKey){
+					// Lose focus 
+					this.gameFocus.loseFocus();
+				}else{
+					this.gameFocus.setFocusFromMapEvent(event);
+	
+					// Get the focus object
+					var focusObject:UserObject = this.gameFocus.focusObject;
+					if(focusObject != null){
+						if(focusObject is NPCFunctionality){
+							// Set the internal state
+							this._mouseState = BackgroundState.MOUSE_MOVE;
+							
+							// Send out a move event
+							var e:MoveStateEvent = new MoveStateEvent(MoveStateEvent.MOVE_START);
+							e.attachPreviousState(this);
+							e.moveObject = focusObject;				// Set object to move
+							e.targetLocation = event.latLng;		// Set the end pos
+							this.app.dispatchEvent(e);
+						}
 					}
 				}
 				
