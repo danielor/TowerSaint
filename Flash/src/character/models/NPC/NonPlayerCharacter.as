@@ -16,12 +16,20 @@ package character.models.NPC
 	
 	import flashx.textLayout.elements.TextFlow;
 	
+	import managers.EventManager;
+	import managers.GameManager;
+	
 	import models.User;
 	import models.constants.GameConstants;
 	import models.interfaces.ObjectModifier;
 	
+	import mx.collections.ArrayCollection;
 	import mx.controls.Alert;
 	import mx.core.BitmapAsset;
+	import mx.core.ClassFactory;
+	
+	import spark.components.Application;
+	import spark.components.supportClasses.ItemRenderer;
 	
 	public class NonPlayerCharacter implements NPCFunctionality
 	{
@@ -117,5 +125,21 @@ package character.models.NPC
 		{
 			return null;
 		}
+		
+		// Object list support.. for special functionality
+		public function canUsurpObjectList():Boolean {
+			return false;
+		}
+		public function getObjectListRenderer():ClassFactory{
+			return null;
+		}
+		public function provideOLDataProvider(p:PhotoAssets):ArrayCollection {
+			return null;
+		}
+		
+		public function realizeModifiedFocusClick(a:Application, g:GameManager):void {
+
+		}
+		
 	}
 }

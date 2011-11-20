@@ -643,6 +643,8 @@ package models
 			var distance:Number = Math.sqrt(xDiff * xDiff + yDiff * yDiff);
 			return distance < GameConstants.proximityDistance();
 		}
+		
+
 
 	}
 }

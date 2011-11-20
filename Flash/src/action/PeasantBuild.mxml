@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:ItemRenderer xmlns:fx="http://ns.adobe.com/mxml/2009"
+				xmlns:s="library://ns.adobe.com/flex/spark"
+				xmlns:mx="library://ns.adobe.com/flex/mx"
+				width="170" height="91" autoDrawBackground="true"
+				click="onItemClick(event)">
+	<fx:Script>
+		<![CDATA[
+			import mx.events.ItemClickEvent;
+			protected function onItemClick(evt:MouseEvent) : void {
+				var e:ItemClickEvent = new ItemClickEvent(ItemClickEvent.ITEM_CLICK, true);
+				e.item = this.data;
+				e.index = this.itemIndex;
+				
+				dispatchEvent(e);
+			}
+		]]>
+	</fx:Script>
+	
+	<s:HGroup x="0" y="0" width="100%" height="100%">
+		<s:VGroup width="61" height="100%">
+			<s:Label width="100%" text="{data.title}"/>
+			<s:Image width="60" height="60" source = "{data.icon}"/>
+		</s:VGroup>
+		<s:VGroup width="100%" height="100%">
+			<s:HGroup width="100%" height="25">
+				<s:Label height="100%" paddingTop="7" text="Wood"/>
+				<s:Label width="100%" height="100%" paddingTop="7" text="{data.wood}"/>	 
+			</s:HGroup>
+			<s:HGroup width="100%" height="25">
+				<s:Label height="100%" paddingTop="7" text="Stone"/>
+				<s:Label width="100%" height="100%" paddingTop="7" text="{data.stone}"/>
+			</s:HGroup>
+			<s:HGroup width="100%" height="25">
+				<s:Label height="100%" paddingTop="7" text="Mana"/>
+				<s:Label width="100%" height="100%" paddingTop="7" text="{data.mana}"/>
+			</s:HGroup>
+		</s:VGroup>
+	</s:HGroup>
+	
+</s:ItemRenderer>

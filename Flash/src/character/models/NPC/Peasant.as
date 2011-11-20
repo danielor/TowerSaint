@@ -1,5 +1,7 @@
 package character.models.NPC
 {
+	import action.PeasantBuild;
+	
 	import assets.PhotoAssets;
 	
 	import away3d.containers.Scene3D;
@@ -13,15 +15,26 @@ package character.models.NPC
 	import com.google.maps.LatLngBounds;
 	import com.google.maps.Map;
 	
+	import flash.utils.ByteArray;
+	
 	import flashx.textLayout.elements.ParagraphElement;
 	import flashx.textLayout.elements.SpanElement;
 	import flashx.textLayout.elements.TextFlow;
 	
+	import managers.EventManager;
+	import managers.GameManager;
+	
 	import models.User;
 	import models.interfaces.ObjectModifier;
 	
+	import mx.collections.ArrayCollection;
 	import mx.controls.Alert;
 	import mx.core.BitmapAsset;
+	import mx.core.ClassFactory;
+	import mx.events.CollectionEvent;
+	
+	import spark.components.Application;
+	import spark.components.supportClasses.ItemRenderer;
 
 	// Peasant is the object which builds things in your empire.
 	[Bindable]
@@ -44,6 +57,10 @@ package character.models.NPC
 		private var building:Number;					// The building rate of the peasant
 		private var speed:Number;						// The speed that peasant moves at.
 		
+		// The XML modifiers
+		[Embed(source="character/models/modifiers/PeasantBuildModifier.xml", mimeType="application/octet-stream")]
+		public static  var PeasantBuildModifier:Class;
+		
 		public function Peasant()
 		{
 			this.model = new Peasant3D(.15);
@@ -56,7 +73,6 @@ package character.models.NPC
 			// Get the peasant. Needs to be character modifier
 			var xml:XML = cMod.getModifierForClass(this);
 			var xmlList:XMLList = xml..level.(@name = 1);
-			Alert.show(xmlList..@hitpoints.toString());
 				
 			// With the first level information we can now populate the model
 			this.hitpoints = xmlList[0].hitpoints;
@@ -134,6 +150,55 @@ package character.models.NPC
 		
 		override public function getSpeed():Number{
 			return this.speed;
+		}
+		
+		// Override the object list functionality
+		override public function canUsurpObjectList():Boolean {
+			return true;
+		}
+		override public function getObjectListRenderer():ClassFactory{
+			return new ClassFactory(PeasantBuild);
+		}
+		override public function provideOLDataProvider(p:PhotoAssets):ArrayCollection {
+			// Create an arrayCollection
+			var arr:ArrayCollection = new ArrayCollection();
+			
+			// Extractt the xml
+			var b:ByteArray = new Peasant.PeasantBuildModifier();
+			var data:XML = new XML(b.readUTFBytes(b.length));
+			var listOfBuildObjects:XMLList = data.children();
+
+			for each(var building:XML in listOfBuildObjects){
+				var name:String = building.@name;
+				var ic:BitmapAsset = this.getIconsFromName(p, name);
+				var obj:Object = {		// Create the object to be rendered
+					wood: building.wood,
+					stone : building.stone,
+					mana : building.mana,
+					title : name,
+					icon : ic
+				};
+				
+				arr.addItem(obj);
+			}
+		
+			return arr;
+		}
+		
+		// Get icons from a name
+		private function getIconsFromName(p:PhotoAssets, s:String):BitmapAsset{
+			if(s == "Tower"){
+				return new p.TowerLevel0() as BitmapAsset;
+			}else if(s == "Road"){
+				return new p.EastRoad() as BitmapAsset;
+			}else{
+				return new p.ThePortal() as BitmapAsset;
+			}
+		}
+	
+		// Realize a modified focus click depending on the state of the application.
+		override public function realizeModifiedFocusClick(a:Application, g:GameManager):void {
+			
 		}
 	}
 }

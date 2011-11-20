@@ -43,6 +43,7 @@ package managers
 	import mx.controls.Image;
 	import mx.controls.Menu;
 	import mx.core.BitmapAsset;
+	import mx.core.ClassFactory;
 	import mx.events.CloseEvent;
 	import mx.events.CollectionEvent;
 	import mx.events.CollectionEventKind;
@@ -54,8 +55,10 @@ package managers
 	
 	import spark.components.Application;
 	import spark.components.Button;
+	import spark.components.List;
 	import spark.components.RichEditableText;
 	import spark.components.TitleWindow;
+	import spark.components.supportClasses.ItemRenderer;
 	
 	// The Game focus manager, shows a visual manifestation of the focused object(atm it is text)
 	// and allows for specific manipulation of the focused object.
@@ -89,6 +92,8 @@ package managers
 		private var _focusMenu:Menu;										/* Focus menu allows one to select one of multiple objects */
 		private var _focusMenuXML:XML;										/* Focus menu xml - contains the items to be used */
 		private var _popup:TitleWindow;										/* Active popup reference */
+		private var _userObjectList:List;									/* The  user object list */
+		private var _userObjectEventManager:EventManager;					/* The event manager of the user object list */
 		public function GameFocusManager(fI:Image, bT:RichEditableText, tT:RichEditableText, 
 										  p:PhotoAssets, m:Map, a:Application)
 		{
@@ -151,6 +156,12 @@ package managers
 		public function set characterManager(c:CharacterManager):void {
 			this._charManager = c;
 		}
+		public function set userObjectList(l:List):void {
+			this._userObjectList = l;
+		}
+		public function set userObjectEventManager(uOEM:EventManager):void {
+			this._userObjectEventManager = uOEM;
+		}
 		
 		// Called when the user model chnges
 		public function onCollectionChange(e:CollectionEvent) : void {
@@ -186,6 +197,13 @@ package managers
 		
 		// Realize the focus of the selected object
 		private function _realizeFocus(o:Object):void {
+			if(this._focusObject is NPCFunctionality){
+				var npc:NPCFunctionality = this._focusObject as NPCFunctionality;
+				if(npc.canUsurpObjectList()){
+					this._gameManager.resetBuildObjectListEvents();
+				}
+			}
+			
 			if(o is SuperObject){
 				var s:SuperObject = o as SuperObject;
 				// TODO: Possible change of interface.
@@ -208,6 +226,27 @@ package managers
 			}else if(o is NPCFunctionality){
 				var npc:NPCFunctionality = o as NPCFunctionality;
 				this.displayModel(npc);
+				
+				// Are we to modififying the user object list
+				if(npc.canUsurpObjectList()){
+					var dp:ArrayCollection = npc.provideOLDataProvider(this._photo);
+					var it:ClassFactory = npc.getObjectListRenderer();
+				
+					this._userObjectList.dataProvider = dp;
+					this._userObjectList.itemRenderer = it;
+					
+					// Attach the event
+					this._userObjectEventManager.RemoveEvents();
+					this._userObjectEventManager.addEventListener(ItemClickEvent.ITEM_CLICK, onModifiedFocusItemClick);
+				}
+			}
+		}
+		
+		// On a modified focus item click.
+		private function onModifiedFocusItemClick(event:ItemClickEvent):void {
+			if(event.item is NPCFunctionality){
+				var npc:NPCFunctionality = event.item as NPCFunctionality;
+				npc.realizeModifiedFocusClick(this._app, this._gameManager);
 			}
 		}
 		
@@ -289,6 +328,12 @@ package managers
 		
 		// Lose focus from the map event
 		public function loseFocus():void {
+			if(this._focusObject is NPCFunctionality){
+				var npc:NPCFunctionality = this._focusObject as NPCFunctionality;
+				if(npc.canUsurpObjectList()){
+					this._gameManager.resetBuildObjectListEvents();
+				}
+			}
 			this.removeFocus();
 			this._focusObject = null;
 		}

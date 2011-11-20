@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Build>
+	<building name='Tower'>
+		<wood> 1000 </wood>
+		<stone> 1000 </stone>
+		<mana> 1000 </mana>
+	</building>
+	<building name='Portal'>
+		<wood> 500 </wood>
+		<stone> 500 </stone>
+		<mana> 2000 </mana>
+	</building>
+	<building name='Road'>
+		<wood> 250 </wood>
+		<stone> 250 </stone>
+		<mana> 0 </mana>
+	</building>
+</Build>

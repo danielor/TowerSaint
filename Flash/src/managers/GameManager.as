@@ -84,6 +84,7 @@ package managers
 	import mx.containers.TabNavigator;
 	import mx.controls.Alert;
 	import mx.core.BitmapAsset;
+	import mx.core.ClassFactory;
 	import mx.core.IVisualElement;
 	import mx.core.UIComponent;
 	import mx.events.CloseEvent;
@@ -147,6 +148,7 @@ package managers
 		private var modelListEventManager:EventManager;						/* The model list event manager */
 		private var stageEventManager:EventManager;							/* Listen/fans events in the stage */
 		private var characterManager:CharacterManager;						/* Manages the character of a user */
+		private var userObjectEventManager:EventManager;					/* Manages the events of the user object panel */
 		
 		// Constants
 		public static const _emptyState:String = "Empty";							/* The constant string associated with the empty state */
@@ -243,6 +245,11 @@ package managers
 			//this.buildStateInformation = new BuildState(null, false);
 			this.currentTabStateString = GameManager._emptyState;
 
+			// Create the user object list event manager
+			this.userObjectEventManager = new EventManager(this.listOfUserObjects);
+			this.gameFocus.userObjectList = this.listOfUserObjects;
+			this.gameFocus.userObjectEventManager = this.userObjectEventManager;
+			
 		}
 		
 		// Run the game. Intialize active objects, events, and interfaces.
@@ -573,16 +580,26 @@ package managers
 		// === CHAT SETUP ===
 		
 		// ==== UI ====
+		public function resetBuildObjectListEvents():void {
+			// Remove all previous events
+			this.userObjectEventManager.RemoveEvents();
+			
+			// Set up the renderer and data provider
+			this.listOfUserObjects.itemRenderer = new ClassFactory(HUserObjectRenderer);
+			this.listOfUserObjects.dataProvider = this.listOfUserModels;
+			
+			// Add the standard event
+			this.listOfUserObjects.addEventListener(ItemClickEvent.ITEM_CLICK, onListSuperItemClick);
+
+		}
+		
+		
 		public function setupUIEvents() : void {
 			Alert.show("SetupUI");
 
 			// Master events
-			this.buildObjectList.addEventListener(ItemClickEvent.ITEM_CLICK, onBuildItemClick);
-			this.listOfUserObjects.addEventListener(ItemClickEvent.ITEM_CLICK, onListSuperItemClick);
-
-			
-			// Tie array collections
-			this.listOfUserObjects.dataProvider = this.listOfUserModels;
+			this.resetBuildObjectListEvents();
+			this.userObjectEventManager.addEventListener(ItemClickEvent.ITEM_CLICK, onBuildItemClick);
 
 			// User Dependent Events
 			this.setupActionPanelState();

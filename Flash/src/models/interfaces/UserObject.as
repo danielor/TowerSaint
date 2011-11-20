@@ -11,6 +11,7 @@ package models.interfaces
 	
 	import models.User;
 	
+	import mx.collections.ArrayCollection;
 	import mx.core.BitmapAsset;
 
 	public interface UserObject
