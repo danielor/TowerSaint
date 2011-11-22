@@ -7,6 +7,8 @@ package models.away3D
 	import away3d.core.geom.Path;
 	import away3d.core.geom.PathCommand;
 	
+	import character.intefaces.NPCFunctionality;
+	
 	import com.google.maps.LatLng;
 	import com.google.maps.Map;
 	
@@ -17,6 +19,7 @@ package models.away3D
 	
 	import models.constants.GameConstants;
 	import models.interfaces.UserObject;
+	import models.states.events.StateEvent;
 	
 	import mx.controls.Alert;
 	import mx.managers.FocusManager;
@@ -34,6 +37,7 @@ package models.away3D
 		private var _endAtAnimationEnd:Boolean;				// End where the animation ends.
 		private var _endVector:Vector3D;					// Where the animation stops...
 		private var _focusManager:GameFocusManager;			// The game focus manager(Focus will follow)
+		private var _chainedState:StateEvent;				// What are we going to do after moving???
 		
 		// Away 3d path private variables
 		private var _path:Path;
@@ -61,9 +65,46 @@ package models.away3D
 			// Set the state
 			this._isActive = true;
 			this._endAtAnimationEnd = true;
+			this._alterPathDueToChainState(path);
 			
 			// Tie into Path animator functionality
 			this.init3D(path, target, init);
+		}
+		
+		// Alter the path due to the chained state
+		private function _alterPathDueToChainState(pp:Path):void {
+			if(this._userObject is NPCFunctionality){
+				var npc:NPCFunctionality = this._userObject as NPCFunctionality;
+				var s:StateEvent = npc.getChainedState();
+				this.chainedState = s;		// May be null... but we want that.
+				if(s != null){				// We are going to be attacking/building after moving
+					this.chainedState = s;
+					
+					// Modify the path
+					if(pp != null){
+						var v:Vector.<PathCommand> = pp.array;
+						var p:PathCommand = v[v.length -1]; 
+						
+						// Get the new point
+						var eV:Vector3D = p.pEnd;
+						var sV:Vector3D = p.pStart;
+						var endPoint:Point = new Point(p.pEnd.x, p.pEnd.y);
+						var angle:Number = Math.atan2(eV.y - sV.y, eV.x - sV.x);
+						
+						// Get the new point
+						var np:Point = npc.getProximityTriggerToChainedState(endPoint, angle);
+						var nE:Vector3D = new Vector3D(np.x, np.y, 0.);
+						var cE:Vector3D = new Vector3D((sV.x + nE.x) / 2, (sV.y + nE.y)/2, 0.);
+						
+						// Update the path
+						p.pControl = cE;
+						p.pEnd = nE;
+						v[v.length - 1] = p;
+						pp.aSegments = v;
+					}
+	
+				}
+			}
 		}
 		
 		// Get the user Object
@@ -84,6 +125,12 @@ package models.away3D
 		}
 		public function set endAtAnimationEnd(b:Boolean):void {
 			this._endAtAnimationEnd = b;
+		}
+		public function set chainedState(s:StateEvent):void {
+			this._chainedState = s;
+		}
+		public function get chainedState():StateEvent {
+			return this._chainedState;
 		}
 
 		// Restart the animator

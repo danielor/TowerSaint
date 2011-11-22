@@ -246,7 +246,8 @@ package managers
 		private function onModifiedFocusItemClick(event:ItemClickEvent):void {
 			if(event.item is NPCFunctionality){
 				var npc:NPCFunctionality = event.item as NPCFunctionality;
-				npc.realizeModifiedFocusClick(this._app, this._gameManager);
+				
+				//npc.realizeModifiedFocusClick(this._app, this._gameManager);
 			}
 		}
 		

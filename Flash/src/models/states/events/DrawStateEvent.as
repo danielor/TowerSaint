@@ -25,5 +25,9 @@ package models.states.events
 		public function getPreviousState():GameState {
 			return this.previousState;
 		}
+		
+		public function realizeAsEvent():Event{
+			return this;
+		}
 	}
 }

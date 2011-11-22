@@ -26,5 +26,9 @@ package models.states.events
 		{
 			return this.previousState;
 		}
+		
+		public function realizeAsEvent():Event{
+			return this;
+		}
 	}
 }

@@ -12,6 +12,7 @@ package character.models.NPC
 	import com.google.maps.LatLngBounds;
 	import com.google.maps.Map;
 	
+	import flash.events.Event;
 	import flash.geom.Point;
 	
 	import flashx.textLayout.elements.TextFlow;
@@ -22,6 +23,8 @@ package character.models.NPC
 	import models.User;
 	import models.constants.GameConstants;
 	import models.interfaces.ObjectModifier;
+	import models.states.GameState;
+	import models.states.events.StateEvent;
 	
 	import mx.collections.ArrayCollection;
 	import mx.controls.Alert;
@@ -137,8 +140,17 @@ package character.models.NPC
 			return null;
 		}
 		
-		public function realizeModifiedFocusClick(a:Application, g:GameManager):void {
+		public function changeToState(event:Event, s:String, a:Application):void{
 
+		}
+		
+		// Get the chained state
+		public function getChainedState():StateEvent {
+			return null
+		}
+		// Return the proximity to the chained state
+		public function getProximityTriggerToChainedState(p:Point, angle:Number):Point {
+			return null;
 		}
 		
 	}

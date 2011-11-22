@@ -8,12 +8,15 @@ package character.intefaces
 	import com.google.maps.LatLng;
 	import com.google.maps.Map;
 	
+	import flash.events.Event;
 	import flash.geom.Point;
 	
 	import managers.EventManager;
 	import managers.GameManager;
 	
 	import models.interfaces.UserObject;
+	import models.states.GameState;
+	import models.states.events.StateEvent;
 	
 	import mx.collections.ArrayCollection;
 	import mx.core.ClassFactory;
@@ -32,6 +35,8 @@ package character.intefaces
 		function canUsurpObjectList():Boolean;			 				// Can we usurp the object list??
 		function getObjectListRenderer():ClassFactory;					// Return the item rendere for the object list
 		function provideOLDataProvider(p:PhotoAssets):ArrayCollection;	// Provide the data provider for the object list
-		function realizeModifiedFocusClick(a:Application, g:GameManager):void;			// Realize the modified focus of a click
+		function changeToState(event:Event, s:String, a:Application):void;	// Change the state of the object
+		function getChainedState():StateEvent;							// Return the game state chained to the internal state of npc
+		function getProximityTriggerToChainedState(p:Point, angle:Number):Point;// Returns the proximity to the chained state
 	}
 }

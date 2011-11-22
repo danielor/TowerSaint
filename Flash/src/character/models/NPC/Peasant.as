@@ -15,6 +15,8 @@ package character.models.NPC
 	import com.google.maps.LatLngBounds;
 	import com.google.maps.Map;
 	
+	import flash.events.Event;
+	import flash.geom.Point;
 	import flash.utils.ByteArray;
 	
 	import flashx.textLayout.elements.ParagraphElement;
@@ -24,14 +26,25 @@ package character.models.NPC
 	import managers.EventManager;
 	import managers.GameManager;
 	
+	import models.Portal;
+	import models.Road;
+	import models.Tower;
 	import models.User;
+	import models.constants.GameConstants;
 	import models.interfaces.ObjectModifier;
+	import models.interfaces.SuperObject;
+	import models.states.BackgroundState;
+	import models.states.GameState;
+	import models.states.events.BuildStateEvent;
+	import models.states.events.StateEvent;
 	
 	import mx.collections.ArrayCollection;
 	import mx.controls.Alert;
 	import mx.core.BitmapAsset;
 	import mx.core.ClassFactory;
 	import mx.events.CollectionEvent;
+	import mx.events.ItemClickEvent;
+	import mx.events.PropertyChangeEvent;
 	
 	import spark.components.Application;
 	import spark.components.supportClasses.ItemRenderer;
@@ -50,12 +63,20 @@ package character.models.NPC
 		public var user:User;							// The user that owns the peasant
 		
 		// Characteristics of a peasant
-		private var strength:Number;					// The strength of a peasant
-		private var dexterity:Number;					// The dexterity of a peasant
-		private var wisdom:Number;						// The wisdom of a peasant
-		private var intelligence:Number;				// Intelligence of a peasant
-		private var building:Number;					// The building rate of the peasant
-		private var speed:Number;						// The speed that peasant moves at.
+		public var strength:Number;					// The strength of a peasant
+		public var dexterity:Number;					// The dexterity of a peasant
+		public var wisdom:Number;						// The wisdom of a peasant
+		public var intelligence:Number;				// Intelligence of a peasant
+		public var building:Number;					// The building rate of the peasant
+		public var speed:Number;						// The speed that peasant moves at.
+		
+		// State variables 	
+		public static var PEASANT_BUILD:String = "PeasantBuild";
+		public static var PEASANT_ATTACK:String = "PeasantAttack";
+		public static var PEASANT_IDLE:String = "PeasantIdle";
+		
+		// The internal state of the peasant
+		private var _internalState:String;				// The internal state holds information about chained states
 		
 		// The XML modifiers
 		[Embed(source="character/models/modifiers/PeasantBuildModifier.xml", mimeType="application/octet-stream")]
@@ -196,9 +217,54 @@ package character.models.NPC
 			}
 		}
 	
-		// Realize a modified focus click depending on the state of the application.
-		override public function realizeModifiedFocusClick(a:Application, g:GameManager):void {
+		// Change the state
+		override public function changeToState(event:Event, s:String, a:Application):void{
+			if(event is ItemClickEvent){
+				var evt:ItemClickEvent = event as ItemClickEvent;
+				var b:ByteArray = new Peasant.PeasantBuildModifier();
+				var data:XML = new XML(b.readUTFBytes(b.length));
+				var obj:XMLList = data.children()[evt.index];
+				
+				// Create different objects from depending on the name
+				var name:String = obj.@name;
+				var so:SuperObject;
+				if(name == "Tower"){
+					so = new Tower();
+				}else if(name == "Portal"){
+					so = new Portal();
+				}else if(name == "Road"){
+					so = new Road();
+				}else {
+					return;
+				}
+				// Set the internal state
+				this._internalState = Peasant.PEASANT_BUILD;
+				
+				
+				// Create a build event to start the process
+				var p:PropertyChangeEvent = new PropertyChangeEvent(BackgroundState.MOUSE_BUILD);
+				p.newValue = BackgroundState.MOUSE_BUILD;
+				a.dispatchEvent(p);
 			
+			}
 		}
+		
+		override public function getChainedState():StateEvent {
+			if(this._internalState == Peasant.PEASANT_BUILD){
+				var e:BuildStateEvent = new BuildStateEvent(BuildStateEvent.BUILD_INIT);
+				return e;
+			}
+			
+			return null;
+		}
+		
+		override public function getProximityTriggerToChainedState(p:Point, angle:Number):Point {
+			var np:Point = new Point();
+			var dis:Number = GameConstants.proximityDistance();
+			np.x = Math.cos(angle) * dis + p.x;
+			np.y = Math.sin(angle) * dis + p.y;
+			return np;
+		}
+		
 	}
 }

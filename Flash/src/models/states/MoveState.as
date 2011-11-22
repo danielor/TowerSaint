@@ -21,6 +21,7 @@ package models.states
 	import flash.geom.Vector3D;
 	
 	import managers.GameFocusManager;
+	import managers.GameManager;
 	
 	import models.away3D.PathBoneAnimator;
 	import models.constants.GameConstants;
@@ -28,6 +29,7 @@ package models.states
 	import models.interfaces.UserObject;
 	import models.states.events.BackgroundStateEvent;
 	import models.states.events.MoveStateEvent;
+	import models.states.events.StateEvent;
 	
 	import mx.collections.ArrayCollection;
 	import mx.controls.Alert;
@@ -50,8 +52,10 @@ package models.states
 		private var _view:View3D;							/* The view to draw the animations */
 		private var _focusManager:GameFocusManager;			/* Focus follows the moving object */
 		private var _app:Application;						/* The application running the state */
+		private var _gameManager:GameManager;				/* Central manager for the game */
 		
-		public function MoveState(m:Map, v:View3D, s:Scene3D, fM:GameFocusManager, app:Application)
+		public function MoveState(m:Map, v:View3D, s:Scene3D, fM:GameFocusManager, app:Application,
+					gm:GameManager)
 		{
 			this.isInState = false;
 			this._map = m;
@@ -59,6 +63,7 @@ package models.states
 			this._view = v;
 			this._app = app;
 			this._focusManager = fM;
+			this._gameManager = gm;
 			this.moveStateEventType = MoveStateEvent.MOVE_START;
 			this._animationList = new ArrayCollection();
 		}
@@ -252,6 +257,19 @@ package models.states
 			uo.setPosition(tL);
 			m.x = p.x;
 			m.y = p.y;
+			
+			// Start a chained event
+			var s:StateEvent = pan.chainedState;
+			if(s != null){
+				
+				// Dispatch event after animation.
+				var g:GameState = this._gameManager.getActiveState();
+				s.attachPreviousState(g);
+				
+				// Realize the event and dispatch
+				var e:Event = s.realizeAsEvent();
+				this._app.dispatchEvent(e);
+			}
 		}
 		
 		
