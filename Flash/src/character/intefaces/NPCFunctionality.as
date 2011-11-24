@@ -35,7 +35,7 @@ package character.intefaces
 		function canUsurpObjectList():Boolean;			 				// Can we usurp the object list??
 		function getObjectListRenderer():ClassFactory;					// Return the item rendere for the object list
 		function provideOLDataProvider(p:PhotoAssets):ArrayCollection;	// Provide the data provider for the object list
-		function changeToState(event:Event, s:String, a:Application):void;	// Change the state of the object
+		function changeToState(event:Event, s:String, a:Application):Object;	// Change the state of the object
 		function getChainedState():StateEvent;							// Return the game state chained to the internal state of npc
 		function getProximityTriggerToChainedState(p:Point, angle:Number):Point;// Returns the proximity to the chained state
 	}

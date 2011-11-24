@@ -218,13 +218,13 @@ package character.models.NPC
 		}
 	
 		// Change the state
-		override public function changeToState(event:Event, s:String, a:Application):void{
+		override public function changeToState(event:Event, s:String, a:Application):Object{
 			if(event is ItemClickEvent){
 				var evt:ItemClickEvent = event as ItemClickEvent;
 				var b:ByteArray = new Peasant.PeasantBuildModifier();
 				var data:XML = new XML(b.readUTFBytes(b.length));
-				var obj:XMLList = data.children()[evt.index];
-				
+				var objL:XMLList = data.children();
+				var obj:XML = objL[evt.index];
 				// Create different objects from depending on the name
 				var name:String = obj.@name;
 				var so:SuperObject;
@@ -235,18 +235,20 @@ package character.models.NPC
 				}else if(name == "Road"){
 					so = new Road();
 				}else {
-					return;
+					return null;
 				}
 				// Set the internal state
 				this._internalState = Peasant.PEASANT_BUILD;
 				
-				
+			
 				// Create a build event to start the process
 				var p:PropertyChangeEvent = new PropertyChangeEvent(BackgroundState.MOUSE_BUILD);
 				p.newValue = BackgroundState.MOUSE_BUILD;
 				a.dispatchEvent(p);
-			
+				Alert.show("Finished change state");
+				return so;
 			}
+			return null;
 		}
 		
 		override public function getChainedState():StateEvent {

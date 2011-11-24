@@ -37,6 +37,7 @@ package managers
 	import models.interfaces.SuperObject;
 	import models.interfaces.UserObject;
 	import models.map.TowerSaintMarker;
+	import models.states.BuildState;
 	
 	import mx.collections.ArrayCollection;
 	import mx.controls.Alert;
@@ -94,6 +95,7 @@ package managers
 		private var _popup:TitleWindow;										/* Active popup reference */
 		private var _userObjectList:List;									/* The  user object list */
 		private var _userObjectEventManager:EventManager;					/* The event manager of the user object list */
+		private var _buildState:BuildState;									/* The build state */
 		public function GameFocusManager(fI:Image, bT:RichEditableText, tT:RichEditableText, 
 										  p:PhotoAssets, m:Map, a:Application)
 		{
@@ -162,6 +164,9 @@ package managers
 		public function set userObjectEventManager(uOEM:EventManager):void {
 			this._userObjectEventManager = uOEM;
 		}
+		public function set buildState(b:BuildState):void {
+			this._buildState = b;
+		}
 		
 		// Called when the user model chnges
 		public function onCollectionChange(e:CollectionEvent) : void {
@@ -198,8 +203,8 @@ package managers
 		// Realize the focus of the selected object
 		private function _realizeFocus(o:Object):void {
 			if(this._focusObject is NPCFunctionality){
-				var npc:NPCFunctionality = this._focusObject as NPCFunctionality;
-				if(npc.canUsurpObjectList()){
+				var np:NPCFunctionality = this._focusObject as NPCFunctionality;
+				if(np.canUsurpObjectList()){
 					this._gameManager.resetBuildObjectListEvents();
 				}
 			}
@@ -238,15 +243,21 @@ package managers
 					// Attach the event
 					this._userObjectEventManager.RemoveEvents();
 					this._userObjectEventManager.addEventListener(ItemClickEvent.ITEM_CLICK, onModifiedFocusItemClick);
+
 				}
 			}
 		}
 		
 		// On a modified focus item click.
-		private function onModifiedFocusItemClick(event:ItemClickEvent):void {
-			if(event.item is NPCFunctionality){
-				var npc:NPCFunctionality = event.item as NPCFunctionality;
-				
+		public function onModifiedFocusItemClick(event:ItemClickEvent):void {
+			if(this._focusObject is NPCFunctionality){
+				var npc:NPCFunctionality = this._focusObject as NPCFunctionality;
+				var obj:Object = npc.changeToState(event, "Build", this._app);
+				if(obj is SuperObject){
+					var s:SuperObject = obj as SuperObject;
+					this._buildState.newBuildObject = s;
+				}
+				Alert.show("Finished Focus");
 				//npc.realizeModifiedFocusClick(this._app, this._gameManager);
 			}
 		}

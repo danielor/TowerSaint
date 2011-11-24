@@ -245,10 +245,7 @@ package managers
 			//this.buildStateInformation = new BuildState(null, false);
 			this.currentTabStateString = GameManager._emptyState;
 
-			// Create the user object list event manager
-			this.userObjectEventManager = new EventManager(this.listOfUserObjects);
-			this.gameFocus.userObjectList = this.listOfUserObjects;
-			this.gameFocus.userObjectEventManager = this.userObjectEventManager;
+		
 			
 		}
 		
@@ -309,9 +306,12 @@ package managers
 			this.drawState = new DrawState(this.listOfUserModels, this.map, this.view, this.scene, this.gameFocus, 
 					this.photo, this.user, this.userObjectManager, this.queueManager, this, this.app, this.userBoundary,
 					this.buildState);
-			this.moveState = new MoveState(this.map, this.view, this.scene, this.gameFocus, this.app);
+			this.moveState = new MoveState(this.map, this.view, this.scene, this.gameFocus, this.app, this);
 			this.backgroundState = new BackgroundState(this.map, this.app, this.gameFocus, this.buildState, this, this.moveState);
 			this.gameStartState = new GameStartState(this, this.app);
+			
+			// Attach states to focus 
+			this.gameFocus.buildState = buildState;
 			
 			// Setup up some interestate property events
 			this.app.addEventListener(BackgroundState.MAP_READY, this.drawState.onMapReady);
@@ -589,24 +589,29 @@ package managers
 			this.listOfUserObjects.dataProvider = this.listOfUserModels;
 			
 			// Add the standard event
-			this.listOfUserObjects.addEventListener(ItemClickEvent.ITEM_CLICK, onListSuperItemClick);
+			this.userObjectEventManager.addEventListener(ItemClickEvent.ITEM_CLICK, onListSuperItemClick);
 
 		}
 		
 		
 		public function setupUIEvents() : void {
-			Alert.show("SetupUI");
+			
+			// Create the user object list event manager
+			this.userObjectEventManager = new EventManager(this.listOfUserObjects);
+			this.gameFocus.userObjectList = this.listOfUserObjects;
+			this.gameFocus.userObjectEventManager = this.userObjectEventManager;
+			
 
 			// Master events
 			this.resetBuildObjectListEvents();
-			this.userObjectEventManager.addEventListener(ItemClickEvent.ITEM_CLICK, onBuildItemClick);
+			this.buildObjectList.addEventListener(ItemClickEvent.ITEM_CLICK, onBuildItemClick);
 
 			// User Dependent Events
 			this.setupActionPanelState();
 
 		}
 		
-		private function onListSuperItemClick(event:ItemClickEvent) : void {
+		public function onListSuperItemClick(event:ItemClickEvent) : void {
 			var s:SuperObject = this.listOfUserModels[event.index] as SuperObject;
 			var b:LatLngBounds = this.map.getLatLngBounds();
 			var l:LatLng = s.getPosition(b);

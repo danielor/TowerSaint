@@ -6,12 +6,12 @@
 				click="onItemClick(event)">
 	<fx:Script>
 		<![CDATA[
+			import mx.controls.Alert;
 			import mx.events.ItemClickEvent;
 			protected function onItemClick(evt:MouseEvent) : void {
 				var e:ItemClickEvent = new ItemClickEvent(ItemClickEvent.ITEM_CLICK, true);
 				e.item = this.data;
 				e.index = this.itemIndex;
-				
 				dispatchEvent(e);
 			}
 		]]>

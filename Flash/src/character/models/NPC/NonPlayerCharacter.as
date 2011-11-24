@@ -140,8 +140,8 @@ package character.models.NPC
 			return null;
 		}
 		
-		public function changeToState(event:Event, s:String, a:Application):void{
-
+		public function changeToState(event:Event, s:String, a:Application):Object{
+			return null;
 		}
 		
 		// Get the chained state
