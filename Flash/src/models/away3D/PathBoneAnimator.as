@@ -101,6 +101,10 @@ package models.away3D
 						p.pEnd = nE;
 						v[v.length - 1] = p;
 						pp.aSegments = v;
+						
+						// Reset the target location to the new point
+						var l:LatLng = GameConstants.fromAway3DtoMap(np, this._map);
+						this.targetLocation = l;
 					}
 	
 				}

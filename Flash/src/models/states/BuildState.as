@@ -7,6 +7,8 @@ package models.states
 	import away3d.containers.Scene3D;
 	import away3d.containers.View3D;
 	
+	import character.models.NPC.Peasant;
+	
 	import com.google.maps.LatLng;
 	import com.google.maps.LatLngBounds;
 	import com.google.maps.Map;
@@ -38,6 +40,7 @@ package models.states
 	import models.constants.DateConstants;
 	import models.constants.PurchaseConstants;
 	import models.interfaces.SuperObject;
+	import models.interfaces.UserObject;
 	import models.states.events.BackgroundStateEvent;
 	import models.states.events.BuildStateEvent;
 	
@@ -291,34 +294,49 @@ package models.states
 				}
 				
 			}else{
-				// Get the current production
-				var totalWood:Number = this.resourceText.getWoodProduction(d);
-				var totalStone:Number = this.resourceText.getManaProduction(d);
-				var totalMana:Number = this.resourceText.getManaProduction(d);
-				
-				// Find out why the purchase failed, and tell the user
-				var failureString:String = PurchaseConstants.missingResourcesString(this._newBuildObject, 0, totalWood, totalStone, totalMana);
-				
-				// Setup and create a popup to inform the user.
-				var s:SimplePopup = new SimplePopup();
-				popup = s;
+				this._insufficientResourcesFailure(d);
 
-				PopUpManager.addPopUp(s, this.app, true);
-				PopUpManager.centerPopUp(s);
-				
-				// Setup up the events
-				s.addEventListener(CloseEvent.CLOSE, onCloseBuildPopup);
-				s.okButton.addEventListener(MouseEvent.CLICK, onCloseBuildPopup);
-				s.theText.text = failureString;
-				s.title = "You do not have enough resources!";
-				
-				// Remove the current build object from the map
-				this._newBuildObject.eraseFromMap(this.map, this.scene);
-				this.userBoundary.removeAndDraw(this._newBuildObject);
 				
 				// Change the state 
-				this.gameManager.changeState(GameManager._emptyState);
+				//this.gameManager.changeState(GameManager._emptyState);
 			}			
+		}
+		
+		private function _insufficientResourcesFailure(d:Date):void {
+			// Get the current production
+			var totalWood:Number = this.resourceText.getWoodProduction(d);
+			var totalStone:Number = this.resourceText.getManaProduction(d);
+			var totalMana:Number = this.resourceText.getManaProduction(d);
+			
+			// Find out why the purchase failed, and tell the user
+			var failureString:String = PurchaseConstants.missingResourcesString(this._newBuildObject, 0, totalWood, totalStone, totalMana);
+			
+			// Setup and create a popup to inform the user.
+			var s:SimplePopup = new SimplePopup();
+			popup = s;
+			
+			PopUpManager.addPopUp(s, this.app, true);
+			PopUpManager.centerPopUp(s);
+			
+			// Setup up the events
+			s.addEventListener(CloseEvent.CLOSE, onCloseBuildPopup);
+			s.okButton.addEventListener(MouseEvent.CLICK, onCloseBuildPopup);
+			s.theText.text = failureString;
+			s.title = "You do not have enough resources!";
+			
+			// Remove the current build object from the map
+			this._newBuildObject.eraseFromMap(this.map, this.scene);
+			this.userBoundary.removeAndDraw(this._newBuildObject);
+		}
+		
+		public function isFailedPurchase():Boolean {
+			var d:Date = new Date();
+			if(!canPurchase(d)){
+				this._insufficientResourcesFailure(d);
+				return true;
+			}
+			
+			return false;
 		}
 		
 		private function onCloseBuildPopup(event:Event) : void {
@@ -379,7 +397,7 @@ package models.states
 					}
 				}
 				// Highlight the objects with focus, when a dynamic object 
-				this.gameFocusManager.setFocusFromMapEvent(event);
+				//this.gameFocusManager.setFocusFromMapEvent(event);
 				
 			}
 		}
@@ -451,6 +469,7 @@ package models.states
 		// Change the mouse state
 		private function _finishBuildFromClick():void {
 			// Setup the action state
+			/*
 			var b:BuildActionGroup = this.gameManager.getActionGroup(GameManager._buildState) as BuildActionGroup;
 			var c:Class = this.pictureForObject();
 			b.buildImage.source = new c as BitmapAsset;
@@ -463,9 +482,16 @@ package models.states
 			pGraph.addChild(iSpan);
 			textFlow.addChild(pGraph);
 			b.buildText.textFlow = textFlow;
+			*/
 			
-			// Change the state
-			this.gameManager.changeState(GameManager._buildState);;
+			var uo:UserObject = this.gameFocusManager.focusObject;
+			if(uo is Peasant){
+				var pea:Peasant = uo as Peasant;
+				
+			}
+			
+			// Change the view state
+			//this.gameManager.changeState(GameManager._buildState);;
 			
 			// Add the object to the empire boundary
 			this.userBoundary.addAndDraw(_newBuildObject);

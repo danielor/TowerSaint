@@ -245,7 +245,6 @@ package character.models.NPC
 				var p:PropertyChangeEvent = new PropertyChangeEvent(BackgroundState.MOUSE_BUILD);
 				p.newValue = BackgroundState.MOUSE_BUILD;
 				a.dispatchEvent(p);
-				Alert.show("Finished change state");
 				return so;
 			}
 			return null;
@@ -263,8 +262,8 @@ package character.models.NPC
 		override public function getProximityTriggerToChainedState(p:Point, angle:Number):Point {
 			var np:Point = new Point();
 			var dis:Number = GameConstants.proximityDistance();
-			np.x = Math.cos(angle) * dis + p.x;
-			np.y = Math.sin(angle) * dis + p.y;
+			np.x = p.x - Math.cos(angle) * dis ;
+			np.y = p.y - Math.sin(angle) * dis;
 			return np;
 		}
 		

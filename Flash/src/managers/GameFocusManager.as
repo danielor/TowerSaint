@@ -257,8 +257,6 @@ package managers
 					var s:SuperObject = obj as SuperObject;
 					this._buildState.newBuildObject = s;
 				}
-				Alert.show("Finished Focus");
-				//npc.realizeModifiedFocusClick(this._app, this._gameManager);
 			}
 		}
 		

@@ -165,29 +165,37 @@ package models.states
 					// Lose focus 
 					this.gameFocus.loseFocus();
 				}else{
-					this.gameFocus.setFocusFromMapEvent(event);
-	
-					// Get the focus object
-					var focusObject:UserObject = this.gameFocus.focusObject;
-					if(focusObject != null){
-						if(focusObject is NPCFunctionality){
-							// Set the internal state
-							this._mouseState = BackgroundState.MOUSE_MOVE;
-							
-							// Send out a move event
-							var e:MoveStateEvent = new MoveStateEvent(MoveStateEvent.MOVE_START);
-							e.attachPreviousState(this);
-							e.moveObject = focusObject;				// Set object to move
-							e.targetLocation = event.latLng;		// Set the end pos
-							this.app.dispatchEvent(e);
-						}
-					}
+					_updateFocusObjectFromMapEvent(event);
 				}
 				
 			}else if(this._mouseState == BackgroundState.MOUSE_BUILD){
 				// Call the build state hook and return to the previous state
 				this.buildState.onMapMouseClick(event);
+				
+				if(!this.buildState.isFailedPurchase()){
+					_updateFocusObjectFromMapEvent(event);
+				}
 				//this._mouseState = BackgroundState.MOUSE_FOCUS;
+			}
+		}
+		
+		private function _updateFocusObjectFromMapEvent(event:MapMouseEvent):void {
+			this.gameFocus.setFocusFromMapEvent(event);
+			
+			// Get the focus object
+			var focusObject:UserObject = this.gameFocus.focusObject;
+			if(focusObject != null){
+				if(focusObject is NPCFunctionality){
+					// Set the internal state
+					this._mouseState = BackgroundState.MOUSE_MOVE;
+					
+					// Send out a move event
+					var e:MoveStateEvent = new MoveStateEvent(MoveStateEvent.MOVE_START);
+					e.attachPreviousState(this);
+					e.moveObject = focusObject;				// Set object to move
+					e.targetLocation = event.latLng;		// Set the end pos
+					this.app.dispatchEvent(e);
+				}
 			}
 		}
 		
