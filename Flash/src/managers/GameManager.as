@@ -307,7 +307,8 @@ package managers
 					this.photo, this.user, this.userObjectManager, this.queueManager, this, this.app, this.userBoundary,
 					this.buildState);
 			this.moveState = new MoveState(this.map, this.view, this.scene, this.gameFocus, this.app, this);
-			this.backgroundState = new BackgroundState(this.map, this.app, this.gameFocus, this.buildState, this, this.moveState);
+			this.backgroundState = new BackgroundState(this.map, this.app, this.gameFocus, this.buildState, this, this.moveState,
+					this.queueManager);
 			this.gameStartState = new GameStartState(this, this.app);
 			
 			// Attach states to focus 
@@ -358,6 +359,7 @@ package managers
 			// Attach the state
 			this.buildState.listOfQueueObjects = event.listOfQueueObjecs;
 			this.buildState.buildStateEventType = event.type;
+			this.buildState.buildStateEvent = event;
 			
 			// Change the game state
 			this.changeGameState(this.buildState, lastState);

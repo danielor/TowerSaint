@@ -13,6 +13,7 @@ package models.states.events
 		private var previousState:GameState;							/* The previous state */
 		private var _moveObject:UserObject;								/* The object being moved */
 		private var _targetLocation:LatLng;								/* The location to end up in */
+		private var chainedEvent:StateEvent;						    /* An non standard next state */
 		public static const MOVE_START:String = "MoveStateStart";		/* The move state starts */
 		public static const MOVE_STEP:String = "MoveStateStep";			/* Itermediate drag movements in the state */
 		public static const MOVE_END:String = "MoveStateEnd"; 			/* The end of the movement */
@@ -53,6 +54,13 @@ package models.states.events
 		
 		public function realizeAsEvent():Event{
 			return this;
+		}
+		
+		public function  getChainedEvent():StateEvent {
+			return this.chainedEvent;
+		}
+		public function setChainedEvent(s:StateEvent):void{
+			this.chainedEvent = s;
 		}
 	}
 }

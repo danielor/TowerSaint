@@ -12,6 +12,8 @@ package models.states.events
 		private var previousState:GameState;					/* The previous state associated with the event */
 		private var _listOfQueueObjects:ArrayCollection;		/* A list of objects we would like to send to the build state */
 		private var _type:String;								/* The type associated with the event */
+		private var chainedEvent:StateEvent;						/* An non standard next state */
+
 		
 		// The constants associated with the event
 		public static var BUILD_COMPLETE:String = "BuildComplete";
@@ -53,6 +55,13 @@ package models.states.events
 		
 		public function realizeAsEvent():Event{
 			return this;
+		}
+		
+		public function  getChainedEvent():StateEvent {
+			return this.chainedEvent;
+		}
+		public function setChainedEvent(s:StateEvent):void{
+			this.chainedEvent = s;
 		}
 	}
 }

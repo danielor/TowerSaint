@@ -162,6 +162,27 @@ package managers
 			return false;
 		}
 		
+		// Get queue object of super object and remove it
+		public function getAndHaltQueueObject(s:SuperObject):QueueObject {
+			var tq:QueueObject;
+			var hIndex:int = -1;
+			for(var i:int = 0; i < this.listOfQueueObjects.length; i++){
+				var q:QueueObject = this.listOfQueueObjects[i] as QueueObject;
+				if(s.statelessEqual(q.buildObject)){
+					tq = q;
+					hIndex = i;
+					break;
+				}
+			}
+			
+			Alert.show(hIndex.toString());
+			if(hIndex != -1){
+				this.listOfQueueObjects.removeItemAt(hIndex);
+			}
+			
+			return tq;
+		}
+		
 		// Returns true if a superobject is in the queue
 		public function isInQueue(s:SuperObject) : Boolean {
 			for(var i:int = 0; i < this.listOfQueueObjects.length; i++){

@@ -43,6 +43,7 @@ package models.states
 	import models.interfaces.UserObject;
 	import models.states.events.BackgroundStateEvent;
 	import models.states.events.BuildStateEvent;
+	import models.states.events.StateEvent;
 	
 	import mx.collections.ArrayCollection;
 	import mx.controls.Alert;
@@ -82,6 +83,7 @@ package models.states
 		private var buildStage:Number;									/* For multi stage builds this count holds the stage */
 		private var buildStageTimer:Timer;								/* The build stage timer */
 		private var buildStatePosition:LatLng;							/* The build stage position */
+		private var _buildStateEvent:BuildStateEvent;					/* Information about the build state event */
 		// Constants determine whether the state has the active mouse
 		public function BuildState(a:Application, m:Map, u:User, uOM:UserObjectManager, qM:QueueManager, uB:PolygonBoundaryManager,
 					gm:GameManager, rT:ResourceProductionText, p:PhotoAssets, lOFM:ArrayCollection, s:Scene3D, v:View3D,
@@ -112,6 +114,10 @@ package models.states
 		public function set buildStateEventType(type:String) : void {
 			this._buildStateEventType = type;
 		}
+		public function set buildStateEvent(e:BuildStateEvent):void {
+			this._buildStateEvent = e;
+		}
+		
 		public function set newBuildObject(s:SuperObject):void {
 			// Check if an object needs to be removes from the map
 			if(this._newBuildObject != null){
@@ -179,7 +185,18 @@ package models.states
 			// Return to the background state
 			var e:BackgroundStateEvent = new BackgroundStateEvent(BackgroundStateEvent.BACKGROUND_STATE);
 			e.attachPreviousState(this);
-			this.app.dispatchEvent(e);
+			if(this._buildStateEvent == null){
+				this.app.dispatchEvent(e);
+			}else{
+				var es:StateEvent = this._buildStateEvent.getChainedEvent();
+				if(es == null){
+					this.app.dispatchEvent(e);
+				}else{
+					es.attachPreviousState(this);
+					var ese:Event = es.realizeAsEvent();
+					this.app.dispatchEvent(ese);
+				}
+			}
 		}
 		
 		// Null function call

@@ -24,6 +24,7 @@ package character.models.NPC
 	import models.constants.GameConstants;
 	import models.interfaces.ObjectModifier;
 	import models.states.GameState;
+	import models.states.events.GameStartEvent;
 	import models.states.events.StateEvent;
 	
 	import mx.collections.ArrayCollection;
@@ -153,5 +154,25 @@ package character.models.NPC
 			return null;
 		}
 		
+		// Block interface allows for certain operations to require specific user interruption
+		// to cease
+		public function changeInternalState(s:String):void {
+			
+		}
+		public function isBlocking(g:GameState):Boolean {
+			return false;
+		}
+		public function getInternalState():String {
+			return "";
+		}
+		public function getInterruptStateString(s:String):String {
+			return "";
+		}
+		public function  alterInternalStateOnGameState(r:StateEvent):void{
+
+		}
+		public function setInternalIdleState():void {
+			
+		}
 	}
 }

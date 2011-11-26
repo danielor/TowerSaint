@@ -10,6 +10,8 @@ package models.states.events
 	{
 		function attachPreviousState(g:GameState):void;
 		function getPreviousState():GameState;
+		function getChainedEvent():StateEvent;			// Get the next event, if not default
+		function setChainedEvent(s:StateEvent):void;	// Set a nonstandard event.
 		function realizeAsEvent():Event;				// Return self as event
 	}
 }

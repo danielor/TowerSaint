@@ -8,6 +8,8 @@ package models.states.events
 	{
 		public static var BACKGROUND_STATE:String = "BackgroundState";			/* Event string */
 		private var previousState:GameState;									/* The previous state */
+		private var chainedEvent:StateEvent;						/* An non standard next state */
+
 		public function BackgroundStateEvent(type:String, bubbles:Boolean=false, cancelable:Boolean=false)
 		{
 			super(type, bubbles, cancelable);
@@ -27,6 +29,13 @@ package models.states.events
 		
 		public function realizeAsEvent():Event{
 			return this;
+		}
+		
+		public function  getChainedEvent():StateEvent {
+			return this.chainedEvent;
+		}
+		public function setChainedEvent(s:StateEvent):void{
+			this.chainedEvent = s;
 		}
 	}
 }

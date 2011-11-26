@@ -1,6 +1,9 @@
 package models.states
 {
+	import action.SimpleQuestion;
+	
 	import character.intefaces.NPCFunctionality;
+	import character.models.NPC.Peasant;
 	
 	import com.google.maps.LatLng;
 	import com.google.maps.LatLngBounds;
@@ -9,22 +12,31 @@ package models.states
 	import com.google.maps.MapMouseEvent;
 	import com.google.maps.MapMoveEvent;
 	
+	import flash.events.MouseEvent;
+	
 	import managers.EventManager;
 	import managers.GameFocusManager;
 	import managers.GameManager;
+	import managers.QueueManager;
 	import managers.UserObjectManager;
 	
+	import models.QueueObject;
 	import models.interfaces.SuperObject;
 	import models.interfaces.UserObject;
+	import models.states.events.BuildStateEvent;
 	import models.states.events.GameStartEvent;
 	import models.states.events.MoveStateEvent;
 	import models.states.events.UpdateStateEvent;
 	
+	import mx.collections.ArrayCollection;
 	import mx.controls.Alert;
+	import mx.events.CloseEvent;
 	import mx.events.PropertyChangeEvent;
 	import mx.events.PropertyChangeEventKind;
+	import mx.managers.PopUpManager;
 	
 	import spark.components.Application;
+	import spark.components.TitleWindow;
 
 	// The background state runs when no other states are running
 	public class BackgroundState implements GameState
@@ -39,6 +51,8 @@ package models.states
 		private var isClicked:Boolean;									/* True if the operation is clicked */
 		private var gameManager:GameManager;							/* The game manager running the state */
 		private var moveState:MoveState;								/* The state associated with moving */
+		private var _popup:TitleWindow;									/* Popup for state information */
+		private var _queueManager:QueueManager;							/* Manage the build states.. */
 		private const viewString:String = "inApp";						/* The view state */
 		
 		// Constants associate a certain type of mouse activity with a certain state.
@@ -53,7 +67,7 @@ package models.states
 		public static const MAP_READY:String = "MapMoveOver";
 		
 		public function BackgroundState(m:Map, a:Application, gF:GameFocusManager, bS:BuildState,
-								gm:GameManager, mv:MoveState)
+								gm:GameManager, mv:MoveState, q:QueueManager)
 		{
 			// Initialize
 			this.map = m;
@@ -61,11 +75,13 @@ package models.states
 			this.gameFocus= gF;
 			this.buildState = bS;
 			this.gameManager = gm;
+			this._queueManager = q;
 			
 			// Set the state
 			this.isInState = false;
 			this._mouseState = BackgroundState.MOUSE_FOCUS;
 			this.isClicked = false;
+			this._popup = null;
 			
 			// Setup the events associated with the mouse deferred events
 			this.app.addEventListener(BackgroundState.MOUSE_BUILD, onMouseState);
@@ -182,21 +198,98 @@ package models.states
 		private function _updateFocusObjectFromMapEvent(event:MapMouseEvent):void {
 			this.gameFocus.setFocusFromMapEvent(event);
 			
+			// Update the position clicked in a modal popup
+			if(this._popup != null){
+				var sqp:SimpleQuestion = this._popup as SimpleQuestion;
+				sqp.eventPosition = event.latLng;
+			}
+			
 			// Get the focus object
 			var focusObject:UserObject = this.gameFocus.focusObject;
 			if(focusObject != null){
 				if(focusObject is NPCFunctionality){
-					// Set the internal state
-					this._mouseState = BackgroundState.MOUSE_MOVE;
+					var npc:NPCFunctionality = focusObject as NPCFunctionality;
 					
-					// Send out a move event
-					var e:MoveStateEvent = new MoveStateEvent(MoveStateEvent.MOVE_START);
-					e.attachPreviousState(this);
-					e.moveObject = focusObject;				// Set object to move
-					e.targetLocation = event.latLng;		// Set the end pos
-					this.app.dispatchEvent(e);
+					if(npc.isBlocking(this.moveState)){
+						var s:String = npc.getInterruptStateString(Peasant.PEASANT_BUILD_START);
+					
+						// Create a popup associated with the state
+						var sq:SimpleQuestion = new SimpleQuestion();
+						this._popup = sq;
+						
+						// Add and center the popup
+						PopUpManager.addPopUp(sq, this.app, true);
+						PopUpManager.centerPopUp(sq);
+						
+						// Setup the event listeners/information
+						sq.userObject = focusObject;
+						sq.addEventListener(CloseEvent.CLOSE, onCloseBlockingPopup);
+						sq.okButton.addEventListener(MouseEvent.CLICK, onOkBlockingPopup);
+						sq.cancelButton.addEventListener(MouseEvent.CLICK, onCancelBlockingPopup);
+						sq.theText.text = s;
+						sq.eventPosition = event.latLng;
+							
+					}else{
+						this._setFocusObjectToMove(focusObject, event.latLng);
+					}
 				}
 			}
+		}
+		
+		private function _setFocusObjectToMove(focusObject:UserObject, l:LatLng):void {
+			// Set the internal state
+			this._mouseState = BackgroundState.MOUSE_MOVE;
+			
+			// Send out a move event
+			var e:MoveStateEvent = new MoveStateEvent(MoveStateEvent.MOVE_START);
+			e.attachPreviousState(this);
+			e.moveObject = focusObject;				// Set object to move
+			e.targetLocation = l		// Set the end pos
+			this.app.dispatchEvent(e);
+		}
+		
+		private function onCloseBlockingPopup(event:CloseEvent):void {			
+			PopUpManager.removePopUp(this._popup);
+			this._popup = null;
+		}
+		private function onOkBlockingPopup(event:MouseEvent):void {
+			// Cancel the move 
+			var sq:SimpleQuestion = this._popup as SimpleQuestion;
+
+			// Create the chained event
+			var e:MoveStateEvent = new MoveStateEvent(MoveStateEvent.MOVE_START);
+			e.attachPreviousState(this);
+			e.moveObject = sq.userObject;				// Set object to move
+			e.targetLocation = sq.eventPosition;		// Set the end pos
+			
+			// Get the queue object associated with the user object
+			var s:SuperObject = null;
+			if(sq.userObject is Peasant){
+				var p:Peasant = sq.userObject as Peasant;
+				p.setInternalIdleState();
+				s = p.getBuildObject();
+			}
+
+			
+			// Get superobject from queue manager
+			var q:QueueObject = this._queueManager.getAndHaltQueueObject(s);
+			
+			// Create the build event
+			var b:BuildStateEvent = new BuildStateEvent(BuildStateEvent.BUILD_CANCEL);
+			b.listOfQueueObjects = new ArrayCollection([q]);
+			b.attachPreviousState(this);
+			b.setChainedEvent(e);
+			this.app.dispatchEvent(b);
+			
+			// Change the state to nonblocking
+			
+			
+			PopUpManager.removePopUp(this._popup);
+			this._popup = null;
+		}
+		private function onCancelBlockingPopup(event:MouseEvent):void {
+			PopUpManager.removePopUp(this._popup);
+			this._popup = null;
 		}
 		
 		private function onMapMouseMove(event:MapMouseEvent):void {

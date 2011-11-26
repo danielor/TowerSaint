@@ -261,6 +261,11 @@ package models.states
 			// Start a chained event
 			var s:StateEvent = pan.chainedState;
 			if(s != null){
+				// Alter the internal state of the object causing the chained state
+				if(uo is NPCFunctionality){
+					var npc:NPCFunctionality = uo as NPCFunctionality;
+					npc.alterInternalStateOnGameState(s);
+				}
 				
 				// Dispatch event after animation.
 				var g:GameState = this._gameManager.getActiveState();

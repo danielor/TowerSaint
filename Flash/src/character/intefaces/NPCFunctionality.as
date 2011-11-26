@@ -16,6 +16,7 @@ package character.intefaces
 	
 	import models.interfaces.UserObject;
 	import models.states.GameState;
+	import models.states.events.GameStartEvent;
 	import models.states.events.StateEvent;
 	
 	import mx.collections.ArrayCollection;
@@ -38,5 +39,11 @@ package character.intefaces
 		function changeToState(event:Event, s:String, a:Application):Object;	// Change the state of the object
 		function getChainedState():StateEvent;							// Return the game state chained to the internal state of npc
 		function getProximityTriggerToChainedState(p:Point, angle:Number):Point;// Returns the proximity to the chained state
+		function changeInternalState(s:String):void;					// Change the internal state of the NPC
+		function isBlocking(g:GameState):Boolean;						// Object performs an operation that cannot be interrupted
+		function getInternalState():String;								// Return the internal state of the object
+		function getInterruptStateString(s:String):String;				// Allow the user to interrupt
+		function alterInternalStateOnGameState(s:StateEvent):void; 	    // Alter the internal state depending on game state
+		function setInternalIdleState():void;							// Set the internal idle state
 	}
 }

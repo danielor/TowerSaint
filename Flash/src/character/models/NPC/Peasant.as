@@ -36,6 +36,7 @@ package character.models.NPC
 	import models.states.BackgroundState;
 	import models.states.GameState;
 	import models.states.events.BuildStateEvent;
+	import models.states.events.GameStartEvent;
 	import models.states.events.StateEvent;
 	
 	import mx.collections.ArrayCollection;
@@ -71,12 +72,14 @@ package character.models.NPC
 		public var speed:Number;						// The speed that peasant moves at.
 		
 		// State variables 	
-		public static var PEASANT_BUILD:String = "PeasantBuild";
+		public static var PEASANT_BUILD_FOCUS:String = "PeasantBuildFocus";
+		public static var PEASANT_BUILD_START:String = "PeasantBuildStart";
 		public static var PEASANT_ATTACK:String = "PeasantAttack";
 		public static var PEASANT_IDLE:String = "PeasantIdle";
 		
 		// The internal state of the peasant
 		private var _internalState:String;				// The internal state holds information about chained states
+		private var _buildObject:SuperObject;			// The build object
 		
 		// The XML modifiers
 		[Embed(source="character/models/modifiers/PeasantBuildModifier.xml", mimeType="application/octet-stream")]
@@ -238,8 +241,8 @@ package character.models.NPC
 					return null;
 				}
 				// Set the internal state
-				this._internalState = Peasant.PEASANT_BUILD;
-				
+				this._internalState = Peasant.PEASANT_BUILD_FOCUS;
+				this._buildObject = so;
 			
 				// Create a build event to start the process
 				var p:PropertyChangeEvent = new PropertyChangeEvent(BackgroundState.MOUSE_BUILD);
@@ -250,8 +253,12 @@ package character.models.NPC
 			return null;
 		}
 		
+		public function getBuildObject():SuperObject {
+			return this._buildObject;
+		}
+		
 		override public function getChainedState():StateEvent {
-			if(this._internalState == Peasant.PEASANT_BUILD){
+			if(this._internalState == Peasant.PEASANT_BUILD_FOCUS){
 				var e:BuildStateEvent = new BuildStateEvent(BuildStateEvent.BUILD_INIT);
 				return e;
 			}
@@ -267,5 +274,34 @@ package character.models.NPC
 			return np;
 		}
 		
+		override public function changeInternalState(s:String):void {
+			this._internalState = s;
+		}
+		
+		override public function isBlocking(g:GameState):Boolean {
+			return this._internalState == Peasant.PEASANT_BUILD_START;
+		}
+		
+		override public function getInternalState():String {
+			return this._internalState;
+		}
+		
+		override public function getInterruptStateString(s:String):String {
+			var s:String = "";
+			if(this._internalState == Peasant.PEASANT_BUILD_START){
+				s += "Would you like to stop the build?";
+			}
+			return s;
+		}
+		
+		override public function  alterInternalStateOnGameState(r:StateEvent):void{
+			if(r is BuildStateEvent){
+				this._internalState = Peasant.PEASANT_BUILD_START;
+			}
+		}
+		
+		override public function setInternalIdleState():void{
+			this._internalState = Peasant.PEASANT_IDLE;
+		}
 	}
 }

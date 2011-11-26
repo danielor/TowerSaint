@@ -9,6 +9,7 @@ package models.states.events
 	{
 		public static const UPDATE_STATE:String = "UpdateBuild";
 		private var previousState:GameState;						/* The previous game state */
+		private var chainedEvent:StateEvent;						/* An non standard next state */
 		public function UpdateStateEvent()
 		{
 			super(UPDATE_STATE);
@@ -28,6 +29,13 @@ package models.states.events
 		
 		public function realizeAsEvent():Event{
 			return this;
+		}
+		
+		public function  getChainedEvent():StateEvent {
+			return this.chainedEvent;
+		}
+		public function setChainedEvent(s:StateEvent):void{
+			this.chainedEvent = s;
 		}
 	}
 }
