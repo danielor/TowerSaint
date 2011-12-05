@@ -28,7 +28,7 @@ package models.states
 	import managers.PolygonBoundaryManager;
 	import managers.UserObjectManager;
 	
-	import models.Tower;
+	import models.building.Tower;
 	import models.User;
 	import models.map.TowerSaintMarker;
 	import models.states.events.BackgroundStateEvent;

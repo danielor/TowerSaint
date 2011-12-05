@@ -43,11 +43,11 @@
 			
 			import models.Bounds;
 			import models.Location;
-			import models.Portal;
-			import models.Road;
-			import models.Tower;
+			import models.building.Portal;
+			import models.building.Road;
+			import models.building.Tower;
 			import models.User;
-			import models.interfaces.SuperObject;
+			import models.interfaces.BuildingObject;
 			import models.states.ImageState;
 			
 			import mx.collections.ArrayCollection;

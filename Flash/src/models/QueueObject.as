@@ -1,6 +1,6 @@
 package models
 {
-	import models.interfaces.SuperObject;
+	import models.interfaces.BuildingObject;
 	
 	import mx.controls.ProgressBar;
 
@@ -13,13 +13,13 @@ package models
 		public var periodicFunction:Function;				/* What should I call while calling? */
 		public var startDate:Date;							/* When did I start? */
 		public var percentComplete:Number;					/* The percentage of the operation that is complete */
-		public var buildObject:SuperObject;					/* The object that needs to be built */
+		public var buildObject:BuildingObject;					/* The object that needs to be built */
 		public var isActive:Boolean;						/* The queue object can be in active or passive mode */
 		
 		// Variables associated with keeping the state
 		private var progressBar:ProgressBar;					/* Tie a progress bar to the queue object for updating */
 		
-		public function QueueObject(dS:String, d:Date, pF:Function, bO:SuperObject)
+		public function QueueObject(dS:String, d:Date, pF:Function, bO:BuildingObject)
 		{
 			this.description = dS;
 			this.date = d;

@@ -24,7 +24,7 @@ package models.map
 		public function draw() : void {
 			// Draw the current empire boundary
 			for(var i:int = 0;  i < this.listOfGameObjects.length; i++){
-				var s:SuperObject = this.listOfGameObjects[i] as SuperObject;
+				var s:SuperObject = this.listOfGameObjects[i] as BuildingObject;
 				
 			}
 		}

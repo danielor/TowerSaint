@@ -26,13 +26,20 @@ package character.models.NPC
 	import managers.EventManager;
 	import managers.GameManager;
 	
-	import models.Portal;
-	import models.Road;
-	import models.Tower;
 	import models.User;
+	import models.away3D.buildings.ManaProduction3D;
+	import models.building.Barracks;
+	import models.building.Home;
+	import models.building.ManaProduction;
+	import models.building.Portal;
+	import models.building.Road;
+	import models.building.StoneProduction;
+	import models.building.Tower;
+	import models.building.TownHall;
+	import models.building.WoodProduction;
 	import models.constants.GameConstants;
+	import models.interfaces.BuildingObject;
 	import models.interfaces.ObjectModifier;
-	import models.interfaces.SuperObject;
 	import models.states.BackgroundState;
 	import models.states.GameState;
 	import models.states.events.BuildStateEvent;
@@ -79,7 +86,7 @@ package character.models.NPC
 		
 		// The internal state of the peasant
 		private var _internalState:String;				// The internal state holds information about chained states
-		private var _buildObject:SuperObject;			// The build object
+		private var _buildObject:BuildingObject;			// The build object
 		
 		// The XML modifiers
 		[Embed(source="character/models/modifiers/PeasantBuildModifier.xml", mimeType="application/octet-stream")]
@@ -230,14 +237,26 @@ package character.models.NPC
 				var obj:XML = objL[evt.index];
 				// Create different objects from depending on the name
 				var name:String = obj.@name;
-				var so:SuperObject;
+				var so:BuildingObject;
 				if(name == "Tower"){
 					so = new Tower();
 				}else if(name == "Portal"){
 					so = new Portal();
 				}else if(name == "Road"){
 					so = new Road();
-				}else {
+				}else if(name == "Barracks"){
+					so = new Barracks();
+				}else if(name == "TownHall"){
+					so = new TownHall();
+				}else if(name == "WoodProduction"){
+					so = new WoodProduction();
+				}else if(name == "StoneProduction"){
+					so = new StoneProduction();
+				}else if(name == 'ManaProduction'){
+					so = new ManaProduction();
+				}else if(name == 'Home'){
+					so = new Home();
+				}else{
 					return null;
 				}
 				// Set the internal state
@@ -253,7 +272,7 @@ package character.models.NPC
 			return null;
 		}
 		
-		public function getBuildObject():SuperObject {
+		public function getBuildObject():BuildingObject {
 			return this._buildObject;
 		}
 		

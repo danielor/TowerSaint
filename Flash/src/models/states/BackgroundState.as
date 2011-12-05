@@ -21,7 +21,7 @@ package models.states
 	import managers.UserObjectManager;
 	
 	import models.QueueObject;
-	import models.interfaces.SuperObject;
+	import models.interfaces.BuildingObject;
 	import models.interfaces.UserObject;
 	import models.states.events.BuildStateEvent;
 	import models.states.events.GameStartEvent;
@@ -263,7 +263,7 @@ package models.states
 			e.targetLocation = sq.eventPosition;		// Set the end pos
 			
 			// Get the queue object associated with the user object
-			var s:SuperObject = null;
+			var s:BuildingObject = null;
 			if(sq.userObject is Peasant){
 				var p:Peasant = sq.userObject as Peasant;
 				p.setInternalIdleState();

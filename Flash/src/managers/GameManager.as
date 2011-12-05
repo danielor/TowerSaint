@@ -53,18 +53,18 @@ package managers
 	import messaging.events.ChannelUserLogoutEvent;
 	
 	import models.GameChannel;
-	import models.Portal;
+	import models.building.Portal;
 	import models.Production;
 	import models.QueueObject;
-	import models.Road;
-	import models.Tower;
+	import models.building.Road;
+	import models.building.Tower;
 	import models.User;
 	import models.away3D.PathBoneAnimator;
 	import models.away3D.ResourceProductionText;
 	import models.constants.DateConstants;
 	import models.constants.PurchaseConstants;
 	import models.interfaces.BoundarySuperObject;
-	import models.interfaces.SuperObject;
+	import models.interfaces.BuildingObject;
 	import models.states.BackgroundState;
 	import models.states.BuildState;
 	import models.states.DrawState;
@@ -138,7 +138,7 @@ package managers
 		private var buildObjectList:List;									/* The objects that can be built in the game */
 		private var aPStateMatchine:Dictionary;								/* The state machine associated with the action panel */
 		private var tabNavigator:TabNavigator;								/* Tab navigator (info, build, action) */
-		private var newBuildObject:SuperObject;								/* The new build object(tower, portal, or road */
+		private var newBuildObject:BuildingObject;								/* The new build object(tower, portal, or road */
 		private var mapGroup:VGroup;										/* The group that contains the map */
 		private var queueManager:QueueManager;								/* The manager handles the queue manager */
 		private var userBoundary:PolygonBoundaryManager;					/* The boundary of towers associated with this user */
@@ -453,7 +453,7 @@ package managers
 			var buildObject:Object = event.buildObject;	
 			
 			// Extract the built object
-			var s:SuperObject;
+			var s:BuildingObject;
 			
 			if(buildUser == this.user.alias){
 				if(buildObject.Class == "Tower"){
@@ -614,7 +614,7 @@ package managers
 		}
 		
 		public function onListSuperItemClick(event:ItemClickEvent) : void {
-			var s:SuperObject = this.listOfUserModels[event.index] as SuperObject;
+			var s:BuildingObject = this.listOfUserModels[event.index] as BuildingObject;
 			var b:LatLngBounds = this.map.getLatLngBounds();
 			var l:LatLng = s.getPosition(b);
 			this.map.panTo(l);
@@ -662,8 +662,8 @@ package managers
 			//this.buildStateInformation.enterState(this.newBuildObject);
 		}
 		
-		private function getItemFromClass(photo:Class, pos:LatLng):SuperObject{
-			var obj:SuperObject;
+		private function getItemFromClass(photo:Class, pos:LatLng):BuildingObject{
+			var obj:BuildingObject;
 			if(photo == this.photo.TowerLevel0){
 				var t:Tower = new Tower();
 				t.updatePosition(pos);
@@ -685,7 +685,7 @@ package managers
 			
 			// Create a temporary object without fixed position
 			var pos:LatLng =  this.map.getCenter();
-			var tempObject:SuperObject = this.getItemFromClass(this.buildObjectPicture, pos);
+			var tempObject:BuildingObject = this.getItemFromClass(this.buildObjectPicture, pos);
 			
 			// Find the cost for that temporary object
 			var woodCost:Number = PurchaseConstants.woodCost(tempObject, 0);
@@ -734,7 +734,7 @@ package managers
 		}
 		
 		// Function is called when building is cancelled.
-		private function onBuildCancel(s:SuperObject, pC:Number) : void {
+		private function onBuildCancel(s:BuildingObject, pC:Number) : void {
 			// Return the material left over from the purchase
 			var woodCost:Number = -int(PurchaseConstants.woodCost(s, 0) * (1. - pC));
 			var stoneCost:Number = -int(PurchaseConstants.stoneCost(s, 0) * (1. - pC));
@@ -761,7 +761,7 @@ package managers
 		}
 		
 		// Function is called when building is complete
-		private function onBuildEnd(s:SuperObject) : void {
+		private function onBuildEnd(s:BuildingObject) : void {
 			
 			// Get the production associated with the superobject
 			var production:Production = s.getProduction();
@@ -801,7 +801,7 @@ package managers
 		
 		public function onCancelBuildButton(event:MouseEvent) : void {
 			// Remove the newest tower
-			var s:SuperObject = this.buildState.newBuildObject;
+			var s:BuildingObject = this.buildState.newBuildObject;
 			s.eraseFromMap(this.map, this.scene);
 			
 			// Remove from the boundary

@@ -3,7 +3,7 @@ package models.interfaces
 	import com.google.maps.LatLng;
 	import com.google.maps.Map;
 
-	public interface BoundarySuperObject extends SuperObject
+	public interface BoundarySuperObject extends BuildingObject
 	{
 		// Interface functions for objects which have a boundary of influence
 		// in the towersaint game.

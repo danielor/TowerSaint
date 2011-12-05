@@ -11,10 +11,10 @@ package managers
 	import flash.geom.Point;
 	import flash.utils.Dictionary;
 	
-	import models.BaseObject;
-	import models.Tower;
+	import models.building.BaseBuilding;
+	import models.building.Tower;
 	import models.User;
-	import models.interfaces.SuperObject;
+	import models.interfaces.BuildingObject;
 	import models.map.TowerSaintPolygon;
 	
 	import mx.collections.ArrayCollection;
@@ -72,13 +72,13 @@ package managers
 		When the valid location changes(when an object is moving), the boundary changes
 		*/
 		private function onTowerValidLocationChange(e:PropertyChangeEvent):void {
-			this.removeAndDraw({} as SuperObject);
+			this.removeAndDraw({} as BuildingObject);
 		}
 		private function onTowerDragStart(e:PropertyChangeEvent):void {
-			this.removeAndDraw(e.source as SuperObject);
+			this.removeAndDraw(e.source as BuildingObject);
 		}
 		private function onTowerDragEnd(e:PropertyChangeEvent):void {
-			this.addAndDraw(e.source as SuperObject);
+			this.addAndDraw(e.source as BuildingObject);
 		}
 		/* 
 		Draw the Polygon
@@ -123,7 +123,7 @@ package managers
 			
 			// Grab the game objects and draw them
 			for(var i:int = 0;  i < arr.length; i++){
-				var s:SuperObject = arr[i] as SuperObject;
+				var s:BuildingObject = arr[i] as BuildingObject;
 				if(s.isReady()){
 					var p:Polygon = s.getBoundaryPolygon();
 					if(p != null){
@@ -153,7 +153,7 @@ package managers
 		Add and draw, and adds a new superobject to the boundary,
 		and draws it
 		*/
-		public function addAndDraw(s:SuperObject) : void {
+		public function addAndDraw(s:BuildingObject) : void {
 			var arr:ArrayCollection = this.fromLatLngToPoint(new ArrayCollection([s]));
 						
 			// Add to the array
@@ -173,7 +173,7 @@ package managers
 		TODO: Add move, and change plugins
 		*/
 		public function onCollectionChange(e:CollectionEvent):void {
-			var obj:SuperObject = e.items[e.location] as SuperObject;
+			var obj:BuildingObject = e.items[e.location] as BuildingObject;
 			if(e.kind == CollectionEventKind.ADD || e.kind == CollectionEventKind.REPLACE){
 				this.addAndDraw(obj);
 			}else if(e.kind == CollectionEventKind.REMOVE){
@@ -184,9 +184,9 @@ package managers
 				// Tie in some events
 				if(obj is Tower){
 					var t:Tower = obj as Tower;
-					t.addEventListener(BaseObject.AT_VALID_LOCATION_CHANGE, onTowerValidLocationChange);
-					t.addEventListener(BaseObject.ON_DRAG_START, onTowerDragStart);
-					t.addEventListener(BaseObject.ON_DRAG_END, onTowerDragEnd);
+					t.addEventListener(BaseBuilding.AT_VALID_LOCATION_CHANGE, onTowerValidLocationChange);
+					t.addEventListener(BaseBuilding.ON_DRAG_START, onTowerDragStart);
+					t.addEventListener(BaseBuilding.ON_DRAG_END, onTowerDragEnd);
 				}
 			}
 		}
@@ -197,7 +197,7 @@ package managers
 		*/
 		public function isInsidePolygon(pos:LatLng) : Boolean {
 			for(var i:int = 0; i < this.listOfGameObjects.length; i++){
-				var s:SuperObject = this.listOfGameObjects[i] as SuperObject;
+				var s:BuildingObject = this.listOfGameObjects[i] as BuildingObject;
 				var p:Polygon = s.getBoundaryPolygon();
 				
 				var bounds:LatLngBounds = p.getLatLngBounds();
@@ -223,7 +223,7 @@ package managers
 		/*
 		Referesh and draw the empire boundary
 		*/
-		public function refreshAndDraw(s:SuperObject):void {
+		public function refreshAndDraw(s:BuildingObject):void {
 			// Remove temporray polygons
 			this.removeAndDraw(s);
 			this.addAndDraw(s);
@@ -233,7 +233,7 @@ package managers
 		Remove and draw, removes a superobject from the boundary,
 		an updates the boundary
 		*/
-		public function removeAndDraw(s:SuperObject) : void {
+		public function removeAndDraw(s:BuildingObject) : void {
 			
 			// Clear the current dictionary
 			for(var obj:Object in this.disjointPolygons){

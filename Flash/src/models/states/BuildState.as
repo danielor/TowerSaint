@@ -30,16 +30,16 @@ package models.states
 	import managers.QueueManager;
 	import managers.UserObjectManager;
 	
-	import models.Portal;
+	import models.building.Portal;
 	import models.Production;
 	import models.QueueObject;
-	import models.Road;
-	import models.Tower;
+	import models.building.Road;
+	import models.building.Tower;
 	import models.User;
 	import models.away3D.ResourceProductionText;
 	import models.constants.DateConstants;
 	import models.constants.PurchaseConstants;
-	import models.interfaces.SuperObject;
+	import models.interfaces.BuildingObject;
 	import models.interfaces.UserObject;
 	import models.states.events.BackgroundStateEvent;
 	import models.states.events.BuildStateEvent;
@@ -71,7 +71,7 @@ package models.states
 		private var queueManager:QueueManager;							/* Manages objects that take time */
 		private var userBoundary:PolygonBoundaryManager; 				/* Manage the boundary of the empire */
 		private var gameManager:GameManager;							/* The game manager */
-		private var _newBuildObject:SuperObject;						/* The object that is begin built */
+		private var _newBuildObject:BuildingObject;						/* The object that is begin built */
 		private var resourceText:ResourceProductionText;				/* Away3D resource field */
 		private var popup:TitleWindow;									/* A reference to any popup placed on top of the game manager */
 		private var photo:PhotoAssets;									/* The photos used in the game */
@@ -118,7 +118,7 @@ package models.states
 			this._buildStateEvent = e;
 		}
 		
-		public function set newBuildObject(s:SuperObject):void {
+		public function set newBuildObject(s:BuildingObject):void {
 			// Check if an object needs to be removes from the map
 			if(this._newBuildObject != null){
 				if(!this.queueManager.hasSuperObject(this._newBuildObject)){
@@ -141,7 +141,7 @@ package models.states
 			}
 		}
 		
-		public function get newBuildObject():SuperObject {
+		public function get newBuildObject():BuildingObject {
 			return this._newBuildObject;
 		}
 		
@@ -209,7 +209,7 @@ package models.states
 		private function _buildCancel():void {
 			for(var i:int = 0; i < this._listOfQueueObjects.length; i++){
 				var q:QueueObject = this._listOfQueueObjects[i] as QueueObject;
-				var s:SuperObject = q.buildObject;
+				var s:BuildingObject = q.buildObject;
 				var pC:Number = q.percentComplete;
 				
 				// Return the material left over from the purchase
@@ -240,7 +240,7 @@ package models.states
 			var arr:ArrayCollection = this.queueManager.getListOfSuperObjects();
 		
 			for(var j:int = 0; j < arr.length; j++){
-				var js:SuperObject = arr[j] as SuperObject;
+				var js:BuildingObject = arr[j] as BuildingObject;
 				this.userBoundary.addAndDraw(js);
 			}
 		}
@@ -261,7 +261,7 @@ package models.states
 			for(var i:int = 0; this._listOfQueueObjects.length; i++){
 				var b:LatLngBounds = this.map.getLatLngBounds();
 				var q:QueueObject = this._listOfQueueObjects[i] as QueueObject;
-				var s:SuperObject = q.buildObject;
+				var s:BuildingObject = q.buildObject;
 				var production:Production = s.getProduction();
 				
 				// Purchase the objects, update resource total
@@ -374,7 +374,7 @@ package models.states
 			var d:Date = new Date();
 			var b:LatLngBounds = new LatLngBounds();
 			for(var j:int = 0; j < this._listOfQueueObjects.length; j++){
-				var nobj:SuperObject = this._listOfQueueObjects[j] as SuperObject;
+				var nobj:BuildingObject = this._listOfQueueObjects[j] as BuildingObject;
 				
 				// Add time to the production date
 				var maxDate:Date = PurchaseConstants.buildTime(nobj, 0);
@@ -436,7 +436,7 @@ package models.states
 					if(this.gameFocusManager.focusActive){
 						// Attach position to focus object
 						var b:LatLngBounds = this.map.getLatLngBounds();
-						var s:SuperObject = this.gameFocusManager.focusObject as SuperObject;
+						var s:BuildingObject = this.gameFocusManager.focusObject as BuildingObject;
 						pos = s.getClosestPointOnObject(pos);
 						
 						
@@ -570,7 +570,7 @@ package models.states
 		
 		private function intersectsCurrentObject(pos:LatLng):Boolean {
 			for(var i:int = 0; i < this.listOfUserModels.length; i++){
-				var s:SuperObject = this.listOfUserModels[i] as SuperObject;
+				var s:BuildingObject = this.listOfUserModels[i] as BuildingObject;
 				if(! s.isOverLappingBoundsOfObject(pos, this.map, this.photo)){
 					return false;
 				}

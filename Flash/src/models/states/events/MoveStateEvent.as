@@ -4,7 +4,7 @@ package models.states.events
 	
 	import flash.events.Event;
 	
-	import models.interfaces.SuperObject;
+	import models.interfaces.BuildingObject;
 	import models.interfaces.UserObject;
 	import models.states.GameState;
 	

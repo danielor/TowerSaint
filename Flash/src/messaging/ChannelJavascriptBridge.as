@@ -35,10 +35,12 @@ package messaging
 			this.app = a;
 		}
 		
+		
 		public function initGameChannel(gc:GameChannel) : void {
 			var token:String = gc.token;
 			ExternalInterface.call("CTA.openChannel", token);
 		}
+		
 		
 		public function onChannelOpen() : void {
 			

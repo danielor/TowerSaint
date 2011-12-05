@@ -13,7 +13,7 @@ package managers
 	
 	import models.Bounds;
 	import models.Location;
-	import models.interfaces.SuperObject;
+	import models.interfaces.BuildingObject;
 	import models.User;
 	
 	import mx.collections.ArrayCollection;
@@ -254,7 +254,7 @@ package managers
 		private function onGetAllObjects(event:ResultEvent) : void {
 			var tArray:ArrayCollection = event.result as ArrayCollection;
 			for(var i:Number = 0; i < tArray.length; i++){
-				var s:SuperObject = tArray.getItemAt(i) as SuperObject;
+				var s:BuildingObject = tArray.getItemAt(i) as BuildingObject;
 			}
 			
 			// Save the list of objects
@@ -300,7 +300,7 @@ package managers
 			var objectsOnMap:ArrayCollection =  new ArrayCollection();
 			
 			for(var i:int = 0; i < this.listOfObjects.length; i++){
-				var s:SuperObject = this.listOfObjects[i] as SuperObject;
+				var s:BuildingObject = this.listOfObjects[i] as BuildingObject;
 				if(s.isVisible(this.map)){
 					
 				}
@@ -433,7 +433,7 @@ package managers
 		public function getAllModifiedObjects():Array {
 			var a:Array = new Array();
 			for(var i:int = 0; i < this.listOfObjects.length; i++){
-				var s:SuperObject = this.listOfObjects.getItemAt(i) as SuperObject;
+				var s:BuildingObject = this.listOfObjects.getItemAt(i) as BuildingObject;
 				if(s.getIsModified()){
 					a.push(s);
 				}

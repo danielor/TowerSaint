@@ -1,9 +1,9 @@
 package models.constants
 {
-	import models.Portal;
-	import models.Road;
-	import models.interfaces.SuperObject;
-	import models.Tower;
+	import models.building.Portal;
+	import models.building.Road;
+	import models.interfaces.BuildingObject;
+	import models.building.Tower;
 	
 	import mx.controls.Alert;
 	import mx.utils.ObjectUtil;
@@ -21,7 +21,7 @@ package models.constants
 		}
 		
 		// Function returns whether a superobject can be purchased.
-		public static function canPurchase(s:SuperObject, level:Number, totalWood:Number, totalStone:Number, 
+		public static function canPurchase(s:BuildingObject, level:Number, totalWood:Number, totalStone:Number, 
 				totalMana:Number) : Boolean {
 			return totalWood > PurchaseConstants.woodCost(s, level) && totalStone > PurchaseConstants.stoneCost(s, level) &&
 				totalMana > PurchaseConstants.manaCost(s, level);
@@ -29,7 +29,7 @@ package models.constants
 		
 		// Function returns a string that corresponds to what resources are missing from
 		// a purchase?
-		public static function missingResourcesString(s:SuperObject, level:Number, totalWood:Number, totalStone:Number, 
+		public static function missingResourcesString(s:BuildingObject, level:Number, totalWood:Number, totalStone:Number, 
 													  totalMana:Number) : String {
 			var resourceString:String = "";
 			var templateString:String = "You need {0} more {1} to build a {2}"
@@ -66,7 +66,7 @@ package models.constants
 		}
 		
 		// Get the time associated with building an object
-		public static function buildTime(s:SuperObject, level:Number) : Date {
+		public static function buildTime(s:BuildingObject, level:Number) : Date {
 			if(s is Tower){
 				return PurchaseConstants.getTowerBuildTime(level);
 			}else if(s is Portal){
@@ -126,7 +126,7 @@ package models.constants
 		}
 		
 		// Wood cost for all objects
-		public static function woodCost(s:SuperObject, level:Number):Number {
+		public static function woodCost(s:BuildingObject, level:Number):Number {
 			if(s is Tower){
 				return PurchaseConstants.getTowerWoodCost(level);
 			}else if(s is Portal){
@@ -150,7 +150,7 @@ package models.constants
 		}
 		
 		// Stone cost for all objects
-		public static function stoneCost(s:SuperObject, level:Number):Number {
+		public static function stoneCost(s:BuildingObject, level:Number):Number {
 			if(s is Tower){
 				return PurchaseConstants.getTowerStoneCost(level);
 			}else if(s is Portal){
@@ -174,7 +174,7 @@ package models.constants
 		}
 		
 		// Mana cost for all objects
-		public static function manaCost(s:SuperObject, level:Number):Number {
+		public static function manaCost(s:BuildingObject, level:Number):Number {
 			if(s is Tower){
 				return PurchaseConstants.getTowerManaCost(level);
 			}else if(s is Portal){

@@ -24,7 +24,7 @@ package models.states
 	import models.User;
 	import models.constants.DateConstants;
 	import models.constants.PurchaseConstants;
-	import models.interfaces.SuperObject;
+	import models.interfaces.BuildingObject;
 	import models.states.events.BackgroundStateEvent;
 	import models.states.events.BuildStateEvent;
 	
@@ -147,7 +147,7 @@ package models.states
 			// Create a list of draw objects to later draw their boundaries
 			var listOfDrawnObjects:ArrayCollection = new ArrayCollection();
 			for(var i:int = 0; i < this.listOfUserModels.length; i++){
-				var obj:SuperObject = this.listOfUserModels[i] as SuperObject;
+				var obj:BuildingObject = this.listOfUserModels[i] as BuildingObject;
 				var pos:LatLng = obj.getPosition(bounds);
 				
 				// Check if the object is visbile
@@ -194,7 +194,7 @@ package models.states
 			// If there are active queue objects redraw them if necessary
 			var arr:ArrayCollection = this.queueManager.getListOfSuperObjects();
 			for(var j:int = 0; j < arr.length; j++){
-				var s:SuperObject = arr[j] as SuperObject;
+				var s:BuildingObject = arr[j] as BuildingObject;
 				var spos:LatLng = s.getPosition(bounds);
 				if(bounds.containsLatLng(spos)){
 					// Redraw and draw
@@ -219,7 +219,7 @@ package models.states
 			
 			// Cancel the build object if we leave the current map pane.
 			if(this.buildState.hasUnitializedBuildObject()){
-				var ts:SuperObject = this.buildState.newBuildObject;
+				var ts:BuildingObject = this.buildState.newBuildObject;
 				var tq:QueueObject = new QueueObject(null, null, null, ts);
 				var bS:BuildStateEvent = new BuildStateEvent(BuildStateEvent.BUILD_CANCEL);
 				bS.listOfQueueObjects = new ArrayCollection([tq]);
@@ -238,7 +238,7 @@ package models.states
 		
 		// Update build information after the build state is finished
 		// TODO: A user state manager needs to be written that one can send property events
-		public function updateUserState(s:SuperObject):void {
+		public function updateUserState(s:BuildingObject):void {
 			// Get the production associated with the superobject
 			var production:Production = s.getProduction();
 			

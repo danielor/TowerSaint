@@ -12,7 +12,7 @@ package models.states
 	
 	import models.Bounds;
 	import models.User;
-	import models.interfaces.SuperObject;
+	import models.interfaces.BuildingObject;
 	import models.states.events.BackgroundStateEvent;
 	import models.states.events.DrawStateEvent;
 	
@@ -110,7 +110,7 @@ package models.states
 			var arr:ArrayCollection = event.result as ArrayCollection;
 			// Get the first object, and draw it on the map. It should be the capital
 			if(arr.length != 0){
-				var obj:SuperObject = arr.getItemAt(0) as SuperObject;
+				var obj:BuildingObject = arr.getItemAt(0) as BuildingObject;
 				var bounds:LatLngBounds = this.map.getLatLngBounds();
 				var pos:LatLng = obj.getPosition(this.map.getLatLngBounds());
 				if(this.listOfUserModels.length == 0){
@@ -123,7 +123,7 @@ package models.states
 				this.user = this.user.cloneUser();
 				var found:Boolean;
 				for(var i:int = 0; i < arr.length; i++){
-					var sobj:SuperObject = arr.getItemAt(i) as SuperObject;
+					var sobj:BuildingObject = arr.getItemAt(i) as BuildingObject;
 					sobj.setUser(null);
 					
 					// Check if the object has *not* completed building. If it has not,
@@ -136,7 +136,7 @@ package models.states
 						// stored on the server.
 						found = false;
 						for(var j:int = 0; j < this.listOfUserModels.length; j++){
-							var s:SuperObject = this.listOfUserModels[j] as SuperObject;
+							var s:BuildingObject = this.listOfUserModels[j] as BuildingObject;
 							//Alert.show(s.display().getText() + ":\n" + sobj.display().getText());
 							if(s.statelessEqual(sobj)){
 								found = true;

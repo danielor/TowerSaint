@@ -7,7 +7,7 @@ package models.map
 	import com.google.maps.overlays.Marker;
 	import com.google.maps.overlays.MarkerOptions;
 	
-	import models.interfaces.SuperObject;
+	import models.interfaces.BuildingObject;
 	
 	import spark.effects.Scale3D;
 	
@@ -15,10 +15,10 @@ package models.map
 	public class TowerSaintMarker extends Marker
 	{
 		// The model of the object associated with marker
-		private var model:SuperObject;
+		private var model:BuildingObject;
 		private var map:Map;
 		private var view:View3D;
-		public function TowerSaintMarker(m:SuperObject, pos:LatLng, mOpt:MarkerOptions, map:Map, view:View3D)
+		public function TowerSaintMarker(m:BuildingObject, pos:LatLng, mOpt:MarkerOptions, map:Map, view:View3D)
 		{
 			// The model
 			this.model = m;
@@ -33,7 +33,7 @@ package models.map
 			return map;
 		}
 		
-		public function getModel():SuperObject{
+		public function getModel():BuildingObject{
 			return model;
 		}
 		

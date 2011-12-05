@@ -18,7 +18,7 @@ package managers
 	import flashx.textLayout.elements.TextFlow;
 	
 	import models.QueueObject;
-	import models.interfaces.SuperObject;
+	import models.interfaces.BuildingObject;
 	import models.states.events.BuildStateEvent;
 	
 	import mx.collections.ArrayCollection;
@@ -141,7 +141,7 @@ package managers
 		}
 		
 		// Check if it has a superobject in queue
-		public function hasSuperObject(s:SuperObject):Boolean {
+		public function hasSuperObject(s:BuildingObject):Boolean {
 			for(var j:int = 0; j < this.listOfQueueObjects.length; j++){
 				var q:QueueObject = this.listOfQueueObjects[j] as QueueObject;
 				if(ObjectUtil.compare(q.buildObject, s) == 0){
@@ -163,7 +163,7 @@ package managers
 		}
 		
 		// Get queue object of super object and remove it
-		public function getAndHaltQueueObject(s:SuperObject):QueueObject {
+		public function getAndHaltQueueObject(s:BuildingObject):QueueObject {
 			var tq:QueueObject;
 			var hIndex:int = -1;
 			for(var i:int = 0; i < this.listOfQueueObjects.length; i++){
@@ -184,10 +184,10 @@ package managers
 		}
 		
 		// Returns true if a superobject is in the queue
-		public function isInQueue(s:SuperObject) : Boolean {
+		public function isInQueue(s:BuildingObject) : Boolean {
 			for(var i:int = 0; i < this.listOfQueueObjects.length; i++){
 				var obj:QueueObject = this.listOfQueueObjects[i] as QueueObject;
-				var sObj:SuperObject = obj.buildObject;
+				var sObj:BuildingObject = obj.buildObject;
 				if(sObj.statelessEqual(s)){
 					return true;
 				}
@@ -208,7 +208,7 @@ package managers
 			// Search for the positions of the super object
 			for(var i:int = 0; i < this.listOfQueueObjects.length; i++){
 				var tempQ:QueueObject = this.listOfQueueObjects[i] as QueueObject;
-				var buildObject:SuperObject = tempQ.buildObject;
+				var buildObject:BuildingObject = tempQ.buildObject;
 		
 				var cPos:LatLng = buildObject.getPosition(bounds);
 				if(cPos.equals(pos)){
@@ -281,7 +281,7 @@ package managers
 			var i:int = event.index;
 			this.selectedIndex = i;
 			var q:QueueObject = this.listOfQueueObjects[i] as QueueObject;
-			var s:SuperObject = q.buildObject;
+			var s:BuildingObject = q.buildObject;
 			
 			// Get the data associated with the superobject
 			var t:TextFlow = s.display();

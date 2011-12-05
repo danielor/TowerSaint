@@ -30,11 +30,11 @@ package managers
 	import flashx.textLayout.elements.TextFlow;
 	
 	import models.QueueObject;
-	import models.Road;
-	import models.Tower;
+	import models.building.Road;
+	import models.building.Tower;
 	import models.constants.GameConstants;
 	import models.interfaces.FilteredObject;
-	import models.interfaces.SuperObject;
+	import models.interfaces.BuildingObject;
 	import models.interfaces.UserObject;
 	import models.map.TowerSaintMarker;
 	import models.states.BuildState;
@@ -209,8 +209,8 @@ package managers
 				}
 			}
 			
-			if(o is SuperObject){
-				var s:SuperObject = o as SuperObject;
+			if(o is BuildingObject){
+				var s:BuildingObject = o as BuildingObject;
 				// TODO: Possible change of interface.
 				if(s is Road){
 					var r:Road = s as Road;
@@ -253,8 +253,8 @@ package managers
 			if(this._focusObject is NPCFunctionality){
 				var npc:NPCFunctionality = this._focusObject as NPCFunctionality;
 				var obj:Object = npc.changeToState(event, "Build", this._app);
-				if(obj is SuperObject){
-					var s:SuperObject = obj as SuperObject;
+				if(obj is BuildingObject){
+					var s:BuildingObject = obj as BuildingObject;
 					this._buildState.newBuildObject = s;
 				}
 			}
@@ -354,7 +354,7 @@ package managers
 			this._focusLatLng = e.latLng;
 			var p:Point = GameConstants.fromMapToAway3D(this._focusLatLng, this._map);
 			for(var i:int = 0; i < this._listOfModels.length; i++){
-				var s:SuperObject = this._listOfModels[i] as SuperObject;
+				var s:BuildingObject = this._listOfModels[i] as BuildingObject;
 				if(s.isCloseToPoint(p)){
 					this._foundObjects.addItem(s);
 				}
@@ -362,7 +362,7 @@ package managers
 			var arr:ArrayCollection = this._queueManager.listOfQueueObjects
 			for(var j:int = 0; j < arr.length; j++){
 				var q:QueueObject = arr[j] as QueueObject
-				var sl:SuperObject = q.buildObject;
+				var sl:BuildingObject = q.buildObject;
 				if(s.isCloseToPoint(p)){
 					this._foundObjects.addItem(q);
 				}
@@ -408,7 +408,7 @@ package managers
 		
 		// Attach focus. Highlights the focused object. 
 		public function attachFocus(obj:ObjectContainer3D) : void {
-			displayModel(obj as SuperObject);
+			displayModel(obj as BuildingObject);
 			this.hasFocus = true;
 		}
 		public function removeFocus() : void {

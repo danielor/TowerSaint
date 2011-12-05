@@ -15,4 +15,34 @@
 		<stone> 250 </stone>
 		<mana> 0 </mana>
 	</building>
+	<building name='TownHall'>
+		<wood> 5000 </wood>
+		<stone 5000 </stone>
+		<mana> 5000 </mana>
+	</building>
+	<building name='WoodProduction'>
+		<wood> 2000 </wood>
+		<stone> 500 </stone>
+		<mana> 0</mana>
+	</building>
+	<building name='StoneProduction'>
+		<wood> 500 </wood>
+		<stone> 2000 </stone>
+		<mana> 0</mana>
+	</building>
+	<building name='ManaProduction'>
+		<wood> 250 </wood>
+		<stone> 250 </stone>
+		<mana> 2000 </mana>
+	</building>
+	<building name='Barracks'>
+		<wood> 2000 </wood>
+		<stone> 2000 </stone>
+		<mana> 2000 </mana>
+	</building>
+	<building name='Home'>
+		<wood> 250 </wood>
+		<stone> 250 </stone>
+		<mana> 250 </mana>
+	</building>
 </Build>

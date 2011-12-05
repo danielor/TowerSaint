@@ -25,7 +25,7 @@ package models.states
 	
 	import models.away3D.PathBoneAnimator;
 	import models.constants.GameConstants;
-	import models.interfaces.SuperObject;
+	import models.interfaces.BuildingObject;
 	import models.interfaces.UserObject;
 	import models.states.events.BackgroundStateEvent;
 	import models.states.events.MoveStateEvent;
